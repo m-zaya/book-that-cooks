@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Digital Cookbook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #6b3e2e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            perspective: 1200px;
+        }
+
+        .book-container {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            height: 80vh;
+            min-height: 650px;
+        }
+
+        /* Left page stack */
+        .page-stack-left {
+            position: absolute;
+            left: 0;
+            top: 20px;
+            width: 48%;
+            height: calc(100% - 40px);
+            transform-origin: right center;
+            transform: perspective(1000px) rotateY(-15deg);
+        }
+
+        .page-stack-left::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: 10px;
+            bottom: -5px;
+            background: linear-gradient(to right, #f8f8f8, #e8e8e8, #d8d8d8);
+            border-radius: 5px 0 0 5px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+            z-index: -3;
+        }
+
+        .page-stack-left::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: 8px;
+            bottom: -3px;
+            background: linear-gradient(to right, #f0f0f0, #e0e0e0, #d0d0d0);
+            border-radius: 5px 0 0 5px;
+            box-shadow: -3px 0 10px rgba(0,0,0,0.15);
+            z-index: -2;
+        }
+
+        /* Right page stack */
+        .page-stack-right {
+            position: absolute;
+            right: 0;
+            top: 20px;
+            width: 48%;
+            height: calc(100% - 40px);
+            transform-origin: left center;
+            transform: perspective(1000px) rotateY(15deg);
+        }
+
+        .page-stack-right::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 10px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(to left, #f8f8f8, #e8e8e8, #d8d8d8);
+            border-radius: 0 5px 5px 0;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+            z-index: -3;
+        }
+
+        .page-stack-right::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: 8px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(to left, #f0f0f0, #e0e0e0, #d0d0d0);
+            border-radius: 0 5px 5px 0;
+            box-shadow: 3px 0 10px rgba(0,0,0,0.15);
+            z-index: -2;
+        }
+
+        /* Main book pages */
+        .book-pages {
+            position: absolute;
+            left: 2%;
+            top: 10px;
+            width: 96%;
+            height: calc(100% - 20px);
+            display: flex;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        /* Book spine shadow */
+        .book-spine {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.1) 0%, 
+                rgba(0,0,0,0.3) 20%, 
+                rgba(0,0,0,0.3) 80%, 
+                rgba(0,0,0,0.1) 100%
+            );
+            transform: translateX(-50%);
+            z-index: 15;
+        }
+
+        .page {
+            width: 50%;
+            height: 100%;
+            padding: 40px 30px;
+            position: relative;
+            overflow-y: auto;
+            background: linear-gradient(to bottom, #ffffff 0%, #fefefe 100%);
+        }
+
+        .page-left {
+            background: linear-gradient(to right, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+            border-right: 1px solid #eee;
+        }
+
+        .page-right {
+            background: linear-gradient(to left, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+        }
+
+        /* Page numbers */
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            font-size: 12px;
+            color: #888;
+            font-style: italic;
+        }
+
+        .page-left .page-number {
+            left: 30px;
+        }
+
+        .page-right .page-number {
+            right: 30px;
+        }
+
+        /* Recipe content styles */
+        .recipe-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #8B4513;
+        }
+
+        .recipe-title {
+            font-size: 2.4em;
+            color: #8B4513;
+            margin-bottom: 8px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .recipe-time {
+            color: #666;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.1em;
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            border: 3px solid #f0f0f0;
+        }
+
+        .recipe-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .difficulty-rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .difficulty-stars {
+            color: #FFD700;
+            font-size: 1.2em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .timeline {
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #8B4513;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        .timeline-title {
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .timeline-steps {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            position: relative;
+            height: 80px;
+        }
+
+        .timeline-start-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        .timeline-step {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timeline-step-content {
+            text-align: center;
+            position: relative;
+            z-index: 3;
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            padding: 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .timeline-step-name {
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 0.9em;
+            margin-bottom: 2px;
+        }
+
+        .timeline-step-time {
+            color: #666;
+            font-size: 0.8em;
+        }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: absolute;
+            z-index: 2;
+        }
+
+        .timeline-step:first-child .timeline-dot {
+            left: 0;
+            transform: translateX(-50%);
+        }
+
+        .timeline-step:last-child .timeline-dot {
+            right: 0;
+            transform: translateX(50%);
+        }
+
+        .timeline-step:not(:first-child):not(:last-child) .timeline-dot {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, #8B4513, #D2691E, #8B4513);
+            border-radius: 2px;
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .recipe-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            color: #8B4513;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .ingredients-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ingredients-list li {
+            margin-bottom: 10px;
+            padding: 8px 0 8px 20px;
+            position: relative;
+            border-bottom: 1px dotted #eee;
+        }
+
+        .ingredients-list li:before {
+            content: "🥄";
+            position: absolute;
+            left: 0;
+            top: 8px;
+        }
+
+        .instructions-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instruction-item {
+            margin-bottom: 18px;
+            padding: 15px;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            border-radius: 10px;
+            border-left: 5px solid #8B4513;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .instruction-checkbox {
+            margin-top: 4px;
+            transform: scale(1.3);
+            accent-color: #8B4513;
+        }
+
+        .instruction-text {
+            flex: 1;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .instruction-item.completed .instruction-text {
+            text-decoration: line-through;
+            color: #999;
+            opacity: 0.6;
+        }
+
+        .instruction-item.completed .instruction-number {
+            background: linear-gradient(135deg, #999 0%, #777 100%);
+            opacity: 0.6;
+        }
+
+        .instruction-item.completed {
+            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+            border-left-color: #999;
+        }
+
+        .instruction-number {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+        }
+
+        .nav-controls {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: rgba(255,255,255,0.9);
+            padding: 12px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .recipe-selector {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.95);
+            border: 2px solid #8B4513;
+            border-radius: 12px;
+            padding: 10px 15px;
+            z-index: 20;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .recipe-selector select {
+            border: none;
+            background: transparent;
+            color: #8B4513;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            outline: none;
+        }
+
+        /* Decorative corner elements */
+        .book-pages::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+            z-index: 5;
+        }
+
+        .book-pages::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            clip-path: polygon(100% 0, 100% 100%, 0 0);
+            z-index: 5;
+        }
+
+        @media (max-width: 768px) {
+            .book-container {
+                height: 95vh;
+                width: 95%;
+            }
+            
+            .book-pages {
+                flex-direction: column;
+                left: 1%;
+                width: 98%;
+            }
+            
+            .page {
+                width: 100%;
+                height: 50%;
+                padding: 20px 15px;
+            }
+            
+            .page-left {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+                background: linear-gradient(to bottom, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+            }
+            
+            .page-right {
+                background: linear-gradient(to top, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+            }
+            
+            .book-spine {
+                width: 100%;
+                height: 2px;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                background: linear-gradient(to right, 
+                    rgba(0,0,0,0.1) 0%, 
+                    rgba(0,0,0,0.3) 20%, 
+                    rgba(0,0,0,0.3) 80%, 
+                    rgba(0,0,0,0.1) 100%
+                );
+            }
+            
+            .page-stack-left,
+            .page-stack-right {
+                display: none;
+            }
+            
+            .recipe-title {
+                font-size: 1.8em;
+            }
+            
+            .nav-controls {
+                bottom: -70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="book-container">
+        <div class="page-stack-left"></div>
+        <div class="page-stack-right"></div>
+        
+        <div class="recipe-selector">
+            <select id="recipeSelect">
+                <option value="0">Chocolate Chip Cookies</option>
+                <option value="1">Homemade Pizza</option>
+                <option value="2">Beef Stew</option>
+            </select>
+        </div>
+        
+        <div class="book-pages">
+            <div class="book-spine"></div>
+            
+            <!-- Left Page -->
+            <div class="page page-left">
+                <div class="recipe-header">
+                    <h1 class="recipe-title" id="recipeTitle">Chocolate Chip Cookies</h1>
+                    <div class="recipe-time">
+                        <span>⏱️</span>
+                        <span id="recipeTime">45 mins</span>
+                    </div>
+                </div>
+                
+                <img id="recipeImage" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjVGNURDIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI0QyNjkxRSIvPgo8Y2lyY2xlIGN4PSIxMzAiIGN5PSI3NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNzAiIGN5PSI4NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNDAiIGN5PSIxMDUiIHI9IjMiIGZpbGw9IiM2NTQzMjEiLz4KPHN2ZyB4PSIxMzAiIHk9IjcwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNSIgZmlsbD0iIzY1NDMyMSI+8J+NqjwvdGV4dD4KPC9zdmc+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc3R5bGU9Iml0YWxpYyI+RnJlc2hseSBCYWtlZCBDb29raWVzPC90ZXh0Pgo8L3N2Zz4K" alt="Recipe Image" class="recipe-image">
+                
+                <div class="recipe-tags" id="recipeTags">
+                    <span class="tag">Dessert</span>
+                    <span class="tag">Baking</span>
+                    <span class="tag">Sweet</span>
+                </div>
+                
+                <div class="difficulty-rating">
+                    <span>Difficulty:</span>
+                    <div class="difficulty-stars" id="recipeDifficulty">★★☆☆☆</div>
+                </div>
+                
+                <div class="timeline">
+                    <div class="timeline-title">Cooking Timeline</div>
+                    <div class="timeline-steps" id="recipeTimeline">
+                        <div class="timeline-line"></div>
+                        <div class="timeline-start-dot"></div>
+                        <div class="timeline-step">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-step-content">
+                                <div class="timeline-step-name">Prep</div>
+                                <div class="timeline-step-time">15 min</div>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-step-content">
+                                <div class="timeline-step-name">Bake</div>
+                                <div class="timeline-step-time">12 min</div>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-step-content">
+                                <div class="timeline-step-name">Cool</div>
+                                <div class="timeline-step-time">10 min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="page-number">2</div>
+            </div>
+            
+            <!-- Right Page -->
+            <div class="page page-right">
+                <div class="recipe-section">
+                    <h2 class="section-title">Ingredients</h2>
+                    <ul class="ingredients-list" id="ingredientsList">
+                        <li>2¼ cups all-purpose flour</li>
+                        <li>1 tsp baking soda</li>
+                        <li>1 tsp salt</li>
+                        <li>1 cup butter, softened</li>
+                        <li>¾ cup granulated sugar</li>
+                        <li>¾ cup packed brown sugar</li>
+                        <li>2 large eggs</li>
+                        <li>2 tsp vanilla extract</li>
+                        <li>2 cups chocolate chips</li>
+                    </ul>
+                </div>
+                
+                <div class="recipe-section">
+                    <h2 class="section-title">Instructions</h2>
+                    <div class="instructions-list" id="instructionsList">
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step1">
+                            <div class="instruction-number">1</div>
+                            <div class="instruction-text">Preheat oven to 375°F. Line baking sheets with parchment paper.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step2">
+                            <div class="instruction-number">2</div>
+                            <div class="instruction-text">In a bowl, whisk together flour, baking soda, and salt.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step3">
+                            <div class="instruction-number">3</div>
+                            <div class="instruction-text">In a large bowl, cream butter and both sugars until light and fluffy.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step4">
+                            <div class="instruction-number">4</div>
+                            <div class="instruction-text">Beat in eggs and vanilla extract until well combined.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step5">
+                            <div class="instruction-number">5</div>
+                            <div class="instruction-text">Gradually mix in flour mixture until just combined. Stir in chocolate chips.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step6">
+                            <div class="instruction-number">6</div>
+                            <div class="instruction-text">Drop rounded tablespoons of dough onto prepared baking sheets.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step7">
+                            <div class="instruction-number">7</div>
+                            <div class="instruction-text">Bake for 9-11 minutes until golden brown. Cool on baking sheet for 5 minutes.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" onclick="resetChecklist()">Reset Checklist</button>
+                </div>
+                
+                <div class="page-number">3</div>
+            </div>
+        </div>
+        
+        <div class="nav-controls">
+            <button class="nav-btn" onclick="previousRecipe()">← Previous</button>
+            <span id="recipeCounter">1 of 3</span>
+            <button class="nav-btn" onclick="nextRecipe()">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        // Sample recipe data
+        const recipes = [
+            {
+                title: "Chocolate Chip Cookies",
+                time: "45 mins",
+                image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjVGNURDIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI0QyNjkxRSIvPgo8Y2lyY2xlIGN4PSIxMzAiIGN5PSI3NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNzAiIGN5PSI4NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNDAiIGN5PSIxMDUiIHI9IjMiIGZpbGw9IiM2NTQzMjEiLz4KPHN2ZyB4PSIxMzAiIHk9IjcwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNSIgZmlsbD0iIzY1NDMyMSI+8J+NqjwvdGV4dD4KPC9zdmc+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc3R5bGU9Iml0YWxpYyI+RnJlc2hseSBCYWtlZCBDb29raWVzPC90ZXh0Pgo8L3N2Zz4K",
+                tags: ["Dessert", "Baking", "Sweet"],
+                difficulty: "★★☆☆☆",
+                timeline: [
+                    {step: "Prep", time: "15 min"},
+                    {step: "Bake", time: "12 min"},
+                    {step: "Cool", time: "10 min"}
+                ],
+                ingredients: [
+                    "2¼ cups all-purpose flour",
+                    "1 tsp baking soda",
+                    "1 tsp salt",
+                    "1 cup butter, softened",
+                    "¾ cup granulated sugar",
+                    "¾ cup packed brown sugar",
+                    "2 large eggs",
+                    "2 tsp vanilla extract",
+                    "2 cups chocolate chips"
+                ],
+                instructions: [
+                    "Preheat oven to 375°F. Line baking sheets with parchment paper.",
+                    "In a bowl, whisk together flour, baking soda, and salt.",
+                    "In a large bowl, cream butter and both sugars until light and fluffy.",
+                    "Beat in eggs and vanilla extract until well combined.",
+                    "Gradually mix in flour mixture until just combined. Stir in chocolate chips.",
+                    "Drop rounded tablespoons of dough onto prepared baking sheets.",
+                    "Bake for 9-11 minutes until golden brown. Cool on baking sheet for 5 minutes."
+                ]
+            },
+            {
+                title: "Homemade Pizza",
+                time: "2 hours",
+                image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjVGNURDIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSI2MCIgZmlsbD0iI0ZGRDcwMCIvPgo8Y2lyY2xlIGN4PSIxMzAiIGN5PSI3NSIgcj0iOCIgZmlsbD0iI0ZGNDUwMCIvPgo8Y2lyY2xlIGN4PSIxNzAiIGN5PSI4NSIgcj0iNiIgZmlsbD0iI0ZGNDUwMCIvPgo8Y2lyY2xlIGN4PSIxNDAiIGN5PSIxMDUiIHI9IjciIGZpbGw9IiNGRjQ1MDAiLz4KPHN2ZyB4PSIxMjAiIHk9IjcwIiB3aWR0aD0iNjAiIGhlaWdodD0iNDAiPgo8dGV4dCB4PSIzMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNSIgZmlsbD0iI0ZGNDUwMCI+8J+NlTwvdGV4dD4KPC9zdmc+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc3R5bGU9Iml0YWxpYyI+SG9tZW1hZGUgUGl6emE8L3RleHQ+Cjwvc3ZnPgo=",
+                tags: ["Dinner", "Italian", "Comfort Food"],
+                difficulty: "★★★☆☆",
+                timeline: [
+                    {step: "Dough", time: "1 hr"},
+                    {step: "Prep", time: "30 min"},
+                    {step: "Bake", time: "15 min"}
+                ],
+                ingredients: [
+                    "3 cups all-purpose flour",
+                    "1 tsp salt",
+                    "1 tbsp sugar",
+                    "1 packet active dry yeast",
+                    "1 cup warm water",
+                    "2 tbsp olive oil",
+                    "1 cup pizza sauce",
+                    "2 cups mozzarella cheese",
+                    "Toppings of choice"
+                ],
+                instructions: [
+                    "Dissolve yeast in warm water with sugar. Let stand for 5 minutes until foamy.",
+                    "In a large bowl, combine flour and salt. Add yeast mixture and olive oil.",
+                    "Mix until a dough forms, then knead for 8-10 minutes until smooth.",
+                    "Place in oiled bowl, cover, and let rise for 1 hour until doubled.",
+                    "Punch down dough and roll out on floured surface to desired thickness.",
+                    "Transfer to pizza stone or baking sheet. Add sauce and toppings.",
+                    "Bake at 475°F for 12-15 minutes until crust is golden and cheese is bubbly."
+                ]
+            },
+            {
+                title: "Beef Stew",
+                time: "3 hours",
+                image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjVGNURDIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSI1MCIgZmlsbD0iIzhCNDUxMyIvPgo8Y2lyY2xlIGN4PSIxMzUiIGN5PSI4MCIgcj0iNiIgZmlsbD0iI0ZGNjM0NyIvPgo8Y2lyY2xlIGN4PSIxNjUiIGN5PSI4NSIgcj0iNSIgZmlsbD0iI0ZGNjM0NyIvPgo8Y2lyY2xlIGN4PSIxNDUiIGN5PSIxMDAiIHI9IjQiIGZpbGw9IiNGRkE1MDAiLz4KPHN2ZyB4PSIxMjUiIHk9IjcwIiB3aWR0aD0iNTAiIGhlaWdodD0iNDAiPgo8dGV4dCB4PSIyNSIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNSIgZmlsbD0iI0ZGRkZGRiI+8J+NsjwvdGV4dD4KPC9zdmc+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc3R5bGU9Iml0YWxpYyI+SGVhcnR5IEJlZWYgU3RldzwvdGV4dD4KPC9zdmc+",
+                tags: ["Dinner", "Comfort Food", "Slow Cook"],
+                difficulty: "★★★★☆",
+                timeline: [
+                    {step: "Prep", time: "30 min"},
+                    {step: "Brown", time: "15 min"},
+                    {step: "Simmer", time: "2 hrs"}
+                ],
+                ingredients: [
+                    "2 lbs beef chuck, cubed",
+                    "3 tbsp flour",
+                    "2 tbsp oil",
+                    "1 onion, diced",
+                    "3 carrots, sliced",
+                    "3 potatoes, cubed",
+                    "4 cups beef broth",
+                    "2 tsp thyme",
+                    "Salt and pepper to taste"
+                ],
+                instructions: [
+                    "Season beef with salt and pepper, then coat with flour.",
+                    "Heat oil in a large pot and brown beef on all sides.",
+                    "Add onion and cook until softened, about 5 minutes.",
+                    "Add broth, thyme, and bring to a boil.",
+                    "Reduce heat, cover, and simmer for 1.5 hours.",
+                    "Add carrots and potatoes, simmer for 30 minutes more.",
+                    "Season with salt and pepper before serving."
+                ]
+            }
+        ];
+
+        let currentRecipeIndex = 0;
+
+        function loadRecipe(index) {
+            const recipe = recipes[index];
+            
+            // Update basic info
+            document.getElementById('recipeTitle').textContent = recipe.title;
+            document.getElementById('recipeTime').textContent = recipe.time;
+            document.getElementById('recipeImage').src = recipe.image;
+            document.getElementById('recipeDifficulty').textContent = recipe.difficulty;
+            
+            // Update tags
+            const tagsContainer = document.getElementById('recipeTags');
+            tagsContainer.innerHTML = '';
+            recipe.tags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'tag';
+                tagElement.textContent = tag;
+                tagsContainer.appendChild(tagElement);
+            });
+            
+            // Update timeline
+            const timelineContainer = document.getElementById('recipeTimeline');
+            timelineContainer.innerHTML = '';
+            
+            // Create the continuous line
+            const timelineLine = document.createElement('div');
+            timelineLine.className = 'timeline-line';
+            timelineContainer.appendChild(timelineLine);
+            
+            // Create the start dot
+            const startDot = document.createElement('div');
+            startDot.className = 'timeline-start-dot';
+            timelineContainer.appendChild(startDot);
+            
+            recipe.timeline.forEach((step, index) => {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'timeline-step';
+                stepElement.innerHTML = `
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-step-content">
+                        <div class="timeline-step-name">${step.step}</div>
+                        <div class="timeline-step-time">${step.time}</div>
+                    </div>
+                `;
+                timelineContainer.appendChild(stepElement);
+            });
+            
+            // Update ingredients
+            const ingredientsList = document.getElementById('ingredientsList');
+            ingredientsList.innerHTML = '';
+            recipe.ingredients.forEach(ingredient => {
+                const li = document.createElement('li');
+                li.textContent = ingredient;
+                ingredientsList.appendChild(li);
+            });
+            
+            // Update instructions
+            const instructionsList = document.getElementById('instructionsList');
+            instructionsList.innerHTML = '';
+            recipe.instructions.forEach((instruction, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'instruction-item';
+                stepDiv.innerHTML = `
+                    <input type="checkbox" class="instruction-checkbox" id="step${index + 1}">
+                    <div class="instruction-number">${index + 1}</div>
+                    <div class="instruction-text">${instruction}</div>
+                `;
+                instructionsList.appendChild(stepDiv);
+            });
+            
+            // Update counter
+            document.getElementById('recipeCounter').textContent = `${index + 1} of ${recipes.length}`;
+            
+            // Update dropdown
+            document.getElementById('recipeSelect').value = index;
+            
+            // Load saved checklist state
+            loadChecklistState();
+        }
+
+        function resetChecklist() {
+            const checkboxes = document.querySelectorAll('.instruction-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                // Remove completed styling
+                const instructionItem = checkbox.closest('.instruction-item');
+                instructionItem.classList.remove('completed');
+            });
+            saveChecklistState();
+        }
+
+        function saveChecklistState() {
+            const checkboxes = document.querySelectorAll('.instruction-checkbox');
+            const state = {};
+            checkboxes.forEach((checkbox, index) => {
+                state[`recipe${currentRecipeIndex}_step${index}`] = checkbox.checked;
+            });
+            
+            Object.keys(state).forEach(key => {
+                if (state[key]) {
+                    localStorage.setItem(key, 'true');
+                } else {
+                    localStorage.removeItem(key);
+                }
+            });
+        }
+
+        function loadChecklistState() {
+            const checkboxes = document.querySelectorAll('.instruction-checkbox');
+            checkboxes.forEach((checkbox, index) => {
+                const key = `recipe${currentRecipeIndex}_step${index}`;
+                const isChecked = localStorage.getItem(key) === 'true';
+                checkbox.checked = isChecked;
+                
+                // Apply completed styling if checked
+                const instructionItem = checkbox.closest('.instruction-item');
+                if (isChecked) {
+                    instructionItem.classList.add('completed');
+                } else {
+                    instructionItem.classList.remove('completed');
+                }
+            });
+        }
+
+        function nextRecipe() {
+            currentRecipeIndex = (currentRecipeIndex + 1) % recipes.length;
+            loadRecipe(currentRecipeIndex);
+        }
+
+        function previousRecipe() {
+            currentRecipeIndex = (currentRecipeIndex - 1 + recipes.length) % recipes.length;
+            loadRecipe(currentRecipeIndex);
+        }
+
+        // Event listeners
+        document.getElementById('recipeSelect').addEventListener('change', function() {
+            currentRecipeIndex = parseInt(this.value);
+            loadRecipe(currentRecipeIndex);
+        });
+
+        // Save checkbox state when changed
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('instruction-checkbox')) {
+                const instructionItem = e.target.closest('.instruction-item');
+                if (e.target.checked) {
+                    instructionItem.classList.add('completed');
+                } else {
+                    instructionItem.classList.remove('completed');
+                }
+                saveChecklistState();
+            }
+        });
+
+        // Load initial recipe
+        loadRecipe(0);
+    </script>
+</body>
+</html>
+                    "
