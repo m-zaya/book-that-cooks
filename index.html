@@ -418,6 +418,100 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
+
+/* Table of Contents Controls */
+.toc-controls {
+    padding: 1rem;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 1rem;
+}
+
+.control-section {
+    margin-bottom: 1rem;
+}
+
+.control-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.toc-select {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Tag Filter Styling */
+.tag-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background-color: #f8f8f8;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tag-filter:hover {
+    background-color: #eee;
+}
+
+.filter-btn {
+    margin-right: 0.5rem;
+    margin-bottom: 0.7rem;
+    padding: 0.3rem 0.7rem;
+    background-color: #8B4513;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.filter-btn:hover {
+    background-color: #A0522D;
+}
+
+/* TOC Entry */
+.toc-recipe {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1rem;
+}
+
+.toc-recipe-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+}
+
+.toc-recipe-info {
+    flex-grow: 1;
+}
+
+.toc-recipe-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.toc-recipe-meta span {
+    display: inline-block;
+    margin-right: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
 /* =============================================================================
    12. NEW: NEW RECIPE FORM STYLES - Form inputs and styling
    ============================================================================= */
@@ -1191,17 +1285,48 @@ body {
                 </div>
                 
                 <!-- NEW: TABLE OF CONTENTS VIEW - Hidden by default, shown when TOC button clicked -->
+                <!-- (!!!) TODO 1.a: Fix it so that the tags/sorting is on the left, and the toc is on the right -->
                 <div id="tableOfContents" class="table-of-contents hidden">
                     <div class="toc-header">
                         <h1 class="toc-title">Recipe Collection</h1>
                         <p class="toc-subtitle">Browse our delicious recipes</p>
                     </div>
-                    
-                    <!-- Container for all recipe entries in table of contents -->
+
+                    <!-- NEW: Sorting and filtering controls -->
+                    <div class="toc-controls">
+                        <!-- Sorting options -->
+                        <div class="control-section">
+                            <h3 class="control-title">Sort By</h3>
+                            <select id="tocSortBy" class="toc-select" onchange="updateTableOfContents()">
+                                <option value="alphabetical">Alphabetical (A-Z)</option>
+                                <option value="difficulty">Difficulty (Easy to Hard)</option>
+                                <option value="time">Time (Short to Long)</option>
+                            </select>
+                        </div>
+
+                        <!-- Tag filtering options -->
+                        <div class="control-section">
+                            <h3 class="control-title">Filter by Tags</h3> 
+                             <!-- (!!!) TODO 1.b: Move buttons so they're next to h3 above -->
+                            <div class="filter-actions">
+                                <button class="filter-btn" onclick="selectAllTags()">Select All</button>
+                                <button class="filter-btn" onclick="clearAllTags()">Clear All</button>
+                            </div>
+                            <div class="tag-filters" id="tagFilters">
+                                <!-- Tag checkboxes will be dynamically populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Recipe count display -->
+                    <div id="recipeCount" class="recipe-count">Showing all recipes</div>
+
+                    <!-- Container for filtered/sorted recipe entries -->
                     <div class="toc-recipes" id="tocRecipesList">
                         <!-- Recipes will be dynamically populated here by JavaScript -->
                     </div>
                 </div>
+
                 
                 <div class="page-number">2</div>
             </div>
@@ -1832,28 +1957,105 @@ function showNewRecipeView() {
 }
 
 // =============================================================================
-// 6. NEW: TABLE OF CONTENTS FUNCTIONS - Generate and handle recipe index
+// 6. NEW: TABLE OF CONTENTS FUNCTIONS - ...
 // =============================================================================
 
 /**
- * Shows the table of contents with all available recipes
+ * Shows the table of contents with all available recipes, including sorting and filtering controls
  */
 function showTableOfContents() {
     showTOCView();
-    generateTableOfContents();
+    generateTagFilters();      // Generate the tag filter checkboxes
+    updateTableOfContents();   // Generate the sorted and filtered recipe list
 }
 
 /**
- * Generates the table of contents with recipe thumbnails and metadata
+ * NEW: Generates tag filter checkboxes based on all available tags in recipes
  */
-function generateTableOfContents() {
+function generateTagFilters() {
+    const tagFiltersContainer = document.getElementById('tagFilters');
+    
+    const allTags = new Set();
+    recipes.forEach(recipe => {
+        recipe.tags.forEach(tag => allTags.add(tag));
+    });
+    
+    const sortedTags = Array.from(allTags).sort();
+    tagFiltersContainer.innerHTML = '';
+    
+    sortedTags.forEach(tag => {
+        const filterElement = document.createElement('label');
+        filterElement.className = 'tag-filter';
+        
+        filterElement.innerHTML = `
+            <input type="checkbox" value="${tag}" checked onchange="updateTableOfContents()">
+            <span>${tag}</span>
+        `;
+        
+        tagFiltersContainer.appendChild(filterElement);
+    });
+}
+
+/**
+ * NEW: Updates the table of contents with current sorting and filtering options
+ */
+function updateTableOfContents() {
+    const sortBy = document.getElementById('tocSortBy').value;
+    const selectedTags = getSelectedTags();
+
+    let filteredRecipes = recipes.filter((recipe) => {
+        if (selectedTags.length === 0) return true;
+        return recipe.tags.some(tag => selectedTags.includes(tag));
+    }).map((recipe) => {
+        return {
+            ...recipe,
+            originalIndex: recipes.indexOf(recipe)
+        };
+    });
+
+    filteredRecipes.sort((a, b) => {
+        switch (sortBy) {
+            case 'alphabetical':
+                return a.title.localeCompare(b.title);
+            case 'difficulty':
+                const getDifficultyValue = (stars) => stars.length - stars.replace(/★/g, '').length;
+                return getDifficultyValue(a.difficulty) - getDifficultyValue(b.difficulty);
+            case 'time':
+                const getTimeValue = (timeStr) => {
+                    const match = timeStr.match(/(\d+)/);
+                    return match ? parseInt(match[1]) : 0;
+                };
+                return getTimeValue(a.time) - getTimeValue(b.time);
+            default:
+                return 0;
+        }
+    });
+
+    document.getElementById('recipeCount').textContent =
+        `Showing ${filteredRecipes.length} of ${recipes.length} recipes`;
+
+    generateFilteredTableOfContents(filteredRecipes);
+}
+
+/**
+ * NEW: Gets the currently selected tags from the filter checkboxes
+ */
+function getSelectedTags() {
+    const checkboxes = document.querySelectorAll('#tagFilters input[type="checkbox"]:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
+/**
+ * NEW: Generates the table of contents with filtered and sorted recipes
+ */
+function generateFilteredTableOfContents(recipesToShow) {
     const tocContainer = document.getElementById('tocRecipesList');
     tocContainer.innerHTML = '';
     
-    recipes.forEach((recipe, index) => {
+    recipesToShow.forEach((recipe) => {
         const tocEntry = document.createElement('div');
         tocEntry.className = 'toc-recipe';
-        tocEntry.onclick = () => loadRecipe(index);
+        tocEntry.onclick = () => loadRecipe(recipe.originalIndex);
         
         tocEntry.innerHTML = `
             <img src="${recipe.image}" alt="${recipe.title}" class="toc-recipe-image">
@@ -1865,12 +2067,32 @@ function generateTableOfContents() {
                     <span>${recipe.tags.join(', ')}</span>
                 </div>
             </div>
-            <div class="toc-page-number">${index + 1}</div>
         `;
         
         tocContainer.appendChild(tocEntry);
     });
 }
+
+/**
+ * NEW: Select all tag filters
+ */
+function selectAllTags() {
+    document.querySelectorAll('#tagFilters input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+    });
+    updateTableOfContents();
+}
+
+/**
+ * NEW: Clear all tag filters
+ */
+function clearAllTags() {
+    document.querySelectorAll('#tagFilters input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+    });
+    updateTableOfContents();
+}
+
 
 // =============================================================================
 // 7. NEW: RANDOM RECIPE FUNCTION - Select and display random recipe
