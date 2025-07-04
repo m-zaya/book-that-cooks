@@ -11,17 +11,16 @@ CONTENTS:
 - Meta tags for character encoding and responsive design
 - Links to external stylesheets and scripts
 - Main book container with left and right page stacks for 3D effect
-- Recipe selector dropdown for switching between recipes
+- NEW: Header buttons for Table of Contents, Random Recipe, and New Recipe
 - Book pages container with spine shadow effect
-- Left page: Recipe overview (title, image, tags, difficulty, timeline)
-- Right page: Ingredients list and step-by-step instructions
+- Left page: Recipe overview (title, image, tags, difficulty, timeline) OR Table of Contents
+- Right page: Ingredients list and step-by-step instructions OR New Recipe Form
 - Navigation controls for browsing recipes
 - Page numbers and decorative elements
 
 DEPENDENCIES:
-- styles.css: All visual styling and layout
-- recipes.js: Recipe data and content management
-- main.js: Interactive functionality and event handlers
+- Internal CSS: All visual styling and layout embedded
+- Internal JavaScript: Recipe data and interactive functionality embedded
 
 RESPONSIVE DESIGN:
 - Mobile-first approach with media queries in CSS
@@ -34,12 +33,1090 @@ RESPONSIVE DESIGN:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Digital Cookbook</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+/*
+DIGITAL COOKBOOK STYLESHEET
+============================
+
+This CSS file contains all styling for the Digital Cookbook interface.
+It creates a realistic 3D book appearance with interactive elements.
+
+CONTENTS OUTLINE:
+1. CSS Reset - Removes browser default styling
+2. Body & Container Layout - Main page background and book positioning
+3. 3D Page Stack Effects - Left and right page stacks with shadows
+4. Main Book Pages - Core book structure and spine effect
+5. Page Layout - Individual page styling and positioning
+6. Recipe Content Styles - Headers, images, tags, difficulty ratings
+7. Timeline Component - Interactive cooking timeline with steps
+8. Ingredients & Instructions - List styling and interactive checkboxes
+9. Navigation & Controls - Buttons and recipe selector
+10. NEW: Header Button Bar - Table of Contents, Random, New Recipe buttons
+11. NEW: Table of Contents Styles - Multi-column recipe index layout
+12. NEW: New Recipe Form Styles - Form inputs and styling
+13. Decorative Elements - Corner details and visual enhancements
+14. Responsive Design - Mobile and tablet adaptations
+
+DESIGN FEATURES:
+- 3D perspective transforms for realistic book appearance
+- Gradient backgrounds for depth and texture
+- Box shadows for realistic lighting effects
+- Smooth transitions and hover animations
+- Mobile-responsive layout with stacked pages
+- Interactive checkboxes with completion states
+- Timeline visualization with connecting lines and dots
+- NEW: Three-button header navigation system
+- NEW: Scrollable table of contents with recipe thumbnails
+- NEW: Interactive form for adding new recipes
+
+COLOR SCHEME:
+- Primary: Brown tones (#8B4513, #A0522D, #654321)
+- Background: Warm gradient (#2c1810 to #6b3e2e)
+- Paper: White/cream tones (#ffffff, #fafafa, #f8f8f8)
+- Accents: Gold stars (#FFD700), gray text (#666, #888)
+
+
+
+TO ADD:
+- Table of contents page: on the left side, a sorting order option (for difficulty, alphabetically, or time recipe takes), by default it is alphabetically sorted. Additionally on the left side tag(s) can be chosen to include or exclude certain tags. On the right side is where all the recipes show.
+*/
+
+/* =============================================================================
+   1. CSS RESET - Removes default browser styling for consistent appearance
+   ============================================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* =============================================================================
+   2. BODY & CONTAINER LAYOUT - Main page setup and book positioning
+   ============================================================================= */
+body {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #6b3e2e 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    perspective: 1200px;
+}
+
+.book-container {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    height: 80vh;
+    min-height: 650px;
+}
+
+/* =============================================================================
+   3. 3D PAGE STACK EFFECTS - Creates illusion of multiple stacked pages
+   ============================================================================= */
+
+/* Left page stack with 3D rotation */
+.page-stack-left {
+    position: absolute;
+    left: 0;
+    top: 60px; /* Moved down to make room for header buttons */
+    width: 48%;
+    height: calc(100% - 80px); /* Adjusted height for header space */
+    transform-origin: right center;
+    transform: perspective(1000px) rotateY(-15deg);
+}
+
+/* Shadow layers for left stack depth effect */
+.page-stack-left::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: 10px;
+    bottom: -5px;
+    background: linear-gradient(to right, #f8f8f8, #e8e8e8, #d8d8d8);
+    border-radius: 5px 0 0 5px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    z-index: -3;
+}
+
+.page-stack-left::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: 8px;
+    bottom: -3px;
+    background: linear-gradient(to right, #f0f0f0, #e0e0e0, #d0d0d0);
+    border-radius: 5px 0 0 5px;
+    box-shadow: -3px 0 10px rgba(0,0,0,0.15);
+    z-index: -2;
+}
+
+/* Right page stack with opposite 3D rotation */
+.page-stack-right {
+    position: absolute;
+    right: 0;
+    top: 60px; /* Moved down to make room for header buttons */
+    width: 48%;
+    height: calc(100% - 80px); /* Adjusted height for header space */
+    transform-origin: left center;
+    transform: perspective(1000px) rotateY(15deg);
+}
+
+/* Shadow layers for right stack depth effect */
+.page-stack-right::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 10px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(to left, #f8f8f8, #e8e8e8, #d8d8d8);
+    border-radius: 0 5px 5px 0;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+    z-index: -3;
+}
+
+.page-stack-right::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 8px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(to left, #f0f0f0, #e0e0e0, #d0d0d0);
+    border-radius: 0 5px 5px 0;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.15);
+    z-index: -2;
+}
+
+/* =============================================================================
+   10. NEW: HEADER BUTTON BAR - Table of Contents, Random, New Recipe buttons
+   ============================================================================= */
+
+/* Container for the three header buttons positioned above the book */
+.header-buttons {
+    position: absolute;
+    top: -50px; /* Positioned above the book */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px; /* Space between buttons */
+    background: rgba(255,255,255,0.95); /* Semi-transparent white background */
+    border: 2px solid #8B4513; /* Brown border matching book theme */
+    border-radius: 12px;
+    padding: 12px 20px;
+    z-index: 20; /* High z-index to appear above other elements */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Drop shadow for depth */
+    backdrop-filter: blur(10px); /* Blur effect for modern glass look */
+}
+
+/* Base styling for all header buttons */
+.header-btn {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease; /* Smooth transitions for hover effects */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between icon and text */
+}
+
+/* Uniform styling for all header buttons - consistent brown theme */
+.header-btn.toc,
+.header-btn.random,
+.header-btn.new {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+}
+
+.header-btn.toc:hover,
+.header-btn.random:hover,
+.header-btn.new:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* =============================================================================
+   4. MAIN BOOK PAGES - Core book structure and binding
+   ============================================================================= */
+.book-pages {
+    position: absolute;
+    left: 2%;
+    top: 50px; /* Moved down to accommodate header buttons */
+    width: 96%;
+    height: calc(100% - 60px); /* Adjusted height for header space */
+    display: flex;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow: hidden;
+    z-index: 10;
+}
+
+/* Book spine shadow effect down the center */
+.book-spine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, 
+        rgba(0,0,0,0.1) 0%,
+        rgba(0,0,0,0.3) 20%,
+        rgba(0,0,0,0.3) 80%,
+        rgba(0,0,0,0.1) 100%
+    );
+    transform: translateX(-50%);
+    z-index: 15;
+}
+
+/* =============================================================================
+   5. PAGE LAYOUT - Individual page styling and positioning
+   ============================================================================= */
+.page {
+    width: 50%;
+    height: 100%;
+    padding: 40px 30px;
+    position: relative;
+    overflow-y: auto;
+    background: linear-gradient(to bottom, #ffffff 0%, #fefefe 100%);
+}
+
+/* Left page with gradient shadow near spine */
+.page-left {
+    background: linear-gradient(to right, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+    border-right: 1px solid #eee;
+}
+
+/* Right page with gradient shadow near spine */
+.page-right {
+    background: linear-gradient(to left, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+}
+
+/* Page numbers at bottom corners */
+.page-number {
+    position: absolute;
+    bottom: 20px;
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+}
+
+.page-left .page-number {
+    left: 30px;
+}
+
+.page-right .page-number {
+    right: 30px;
+}
+
+/* =============================================================================
+   11. NEW: TABLE OF CONTENTS STYLES - Multi-column recipe index layout
+   ============================================================================= */
+
+/* Main container for table of contents page */
+.table-of-contents {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Header for table of contents page */
+.toc-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #8B4513;
+}
+
+.toc-title {
+    font-size: 2.2em;
+    color: #8B4513;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.toc-subtitle {
+    color: #666;
+    font-style: italic;
+    font-size: 1em;
+}
+
+/* Grid layout for recipe entries in table of contents */
+.toc-recipes {
+    display: grid;
+    grid-template-columns: 1fr; /* Single column layout */
+    gap: 15px;
+}
+
+/* Individual recipe entry in table of contents */
+.toc-recipe {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.toc-recipe:hover {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    transform: translateX(5px); /* Slide effect on hover */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Small thumbnail image for each recipe in TOC */
+.toc-recipe-image {
+    width: 60px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #ddd;
+}
+
+/* Recipe information in table of contents */
+.toc-recipe-info {
+    flex: 1;
+}
+
+.toc-recipe-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 5px;
+}
+
+.toc-recipe-meta {
+    color: #666;
+    font-size: 0.9em;
+    display: flex;
+    gap: 15px;
+}
+
+/* Page number indicator in table of contents */
+.toc-page-number {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* =============================================================================
+   12. NEW: NEW RECIPE FORM STYLES - Form inputs and styling
+   ============================================================================= */
+
+/* Main container for new recipe form */
+.new-recipe-form {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Header for new recipe form - uniform brown theme */
+.form-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #8B4513; /* Changed from green to brown */
+}
+
+.form-title {
+    font-size: 2em;
+    color: #8B4513; /* Changed from green to brown */
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-subtitle {
+    color: #666;
+    font-style: italic;
+}
+
+/* Form section containers - uniform brown theme */
+.form-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513; /* Changed from green to brown */
+}
+
+.form-section-title {
+    font-size: 1.2em;
+    color: #8B4513; /* Changed from green to brown */
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* Form input styling - uniform brown focus */
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1em;
+    transition: border-color 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #8B4513; /* Changed from green to brown */
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1); /* Changed from green to brown */
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Dynamic list containers for ingredients and instructions */
+.dynamic-list {
+    margin-top: 10px;
+}
+
+.dynamic-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.dynamic-item input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* Remove button for dynamic list items - keep red as specified */
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background-color 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+}
+
+/* Add button for dynamic lists - uniform brown theme */
+.add-btn {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); /* Changed from green to brown */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.add-btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%); /* Changed from green to brown */
+    transform: translateY(-1px);
+}
+
+/* Form submission buttons */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+}
+
+/* Save button - uniform brown theme */
+.form-submit {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); /* Changed from green to brown */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.form-submit:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%); /* Changed from green to brown */
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+}
+
+/* Cancel button - keep grey as specified */
+.form-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.form-cancel:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+}
+
+/* =============================================================================
+   6. RECIPE CONTENT STYLES - Headers, images, tags, and ratings
+   ============================================================================= */
+
+/* Recipe header section */
+.recipe-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #8B4513;
+}
+
+.recipe-title {
+    font-size: 2.4em;
+    color: #8B4513;
+    margin-bottom: 8px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.recipe-time {
+    color: #666;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1.1em;
+}
+
+/* Recipe image styling */
+.recipe-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    border: 3px solid #f0f0f0;
+}
+
+/* Recipe tags container and individual tags */
+.recipe-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.tag {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Difficulty rating with stars */
+.difficulty-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+.difficulty-stars {
+    color: #FFD700;
+    font-size: 1.2em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* =============================================================================
+   7. TIMELINE COMPONENT - Interactive cooking timeline with connecting elements
+   ============================================================================= */
+.timeline {
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-left: 5px solid #8B4513;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.timeline-title {
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.timeline-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    height: 80px;
+}
+
+/* Starting dot for timeline */
+.timeline-start-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+/* Individual timeline step container */
+.timeline-step {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Content box for each timeline step */
+.timeline-step-content {
+    text-align: center;
+    position: relative;
+    z-index: 3;
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.timeline-step-name {
+    font-weight: bold;
+    color: #8B4513;
+    font-size: 0.9em;
+    margin-bottom: 2px;
+}
+
+.timeline-step-time {
+    color: #666;
+    font-size: 0.8em;
+}
+
+/* Timeline dots positioning */
+.timeline-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: absolute;
+    z-index: 2;
+}
+
+.timeline-step:first-child .timeline-dot {
+    left: 0;
+    transform: translateX(-50%);
+}
+
+.timeline-step:last-child .timeline-dot {
+    right: 0;
+    transform: translateX(50%);
+}
+
+.timeline-step:not(:first-child):not(:last-child) .timeline-dot {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Connecting line along timeline */
+.timeline-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, #8B4513, #D2691E, #8B4513);
+    border-radius: 2px;
+    z-index: 1;
+    transform: translateY(-50%);
+}
+
+/* =============================================================================
+   8. INGREDIENTS & INSTRUCTIONS - Lists and interactive elements
+   ============================================================================= */
+
+/* General recipe section spacing */
+.recipe-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 1.4em;
+    color: #8B4513;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 8px;
+    font-weight: bold;
+}
+
+/* Ingredients list styling */
+.ingredients-list {
+    list-style: none;
+    padding: 0;
+}
+
+.ingredients-list li {
+    margin-bottom: 10px;
+    padding: 8px 0 8px 20px;
+    position: relative;
+    border-bottom: 1px dotted #eee;
+}
+
+/* Spoon emoji before each ingredient */
+.ingredients-list li:before {
+    content: "🥄";
+    position: absolute;
+    left: 0;
+    top: 8px;
+}
+
+/* Instructions list container */
+.instructions-list {
+    list-style: none;
+    padding: 0;
+}
+
+/* Individual instruction item with interactive checkbox */
+.instruction-item {
+    margin-bottom: 18px;
+    padding: 15px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.instruction-checkbox {
+    margin-top: 4px;
+    transform: scale(1.3);
+    accent-color: #8B4513;
+}
+
+.instruction-text {
+    flex: 1;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+}
+
+/* Completed instruction states */
+.instruction-item.completed .instruction-text {
+    text-decoration: line-through;
+    color: #999;
+    opacity: 0.6;
+}
+
+.instruction-item.completed .instruction-number {
+    background: linear-gradient(135deg, #999 0%, #777 100%);
+    opacity: 0.6;
+}
+
+.instruction-item.completed {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    border-left-color: #999;
+}
+
+/* Numbered circles for instructions */
+.instruction-number {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* =============================================================================
+   9. NAVIGATION & CONTROLS - Buttons and recipe selector
+   ============================================================================= */
+
+/* Control buttons in bottom right */
+.controls {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    display: flex;
+    gap: 12px;
+}
+
+/* General button styling */
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+}
+
+/* Navigation controls at bottom */
+.nav-controls {
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    background: rgba(255,255,255,0.9);
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+}
+
+.nav-btn {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.nav-btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-1px);
+}
+
+.nav-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Hidden class for toggling element visibility */
+.hidden {
+    display: none !important;
+}
+
+/* =============================================================================
+   13. DECORATIVE ELEMENTS - Corner details and visual enhancements
+   ============================================================================= */
+
+/* Top-left corner decoration */
+.book-pages::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    z-index: 5;
+}
+
+/* Top-right corner decoration */
+.book-pages::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    clip-path: polygon(100% 0, 100% 100%, 0 0);
+    z-index: 5;
+}
+
+/* =============================================================================
+   14. RESPONSIVE DESIGN - Mobile and tablet adaptations
+   ============================================================================= */
+@media (max-width: 768px) {
+    .book-container {
+        height: 95vh;
+        width: 95%;
+    }
+    
+    /* Stack header buttons vertically on mobile */
+    .header-buttons {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 15px;
+        top: -120px; /* More space needed for stacked buttons */
+    }
+    
+    .header-btn {
+        padding: 8px 15px;
+        font-size: 0.8em;
+        justify-content: center;
+    }
+    
+    .book-pages {
+        flex-direction: column;
+        left: 1%;
+        width: 98%;
+        top: 80px; /* Adjusted for mobile header layout */
+        height: calc(100% - 100px);
+    }
+    
+    .page {
+        width: 100%;
+        height: 50%;
+        padding: 20px 15px;
+    }
+    
+    .page-left {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        background: linear-gradient(to bottom, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+    }
+    
+    .page-right {
+        background: linear-gradient(to top, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+    }
+    
+    .book-spine {
+        width: 100%;
+        height: 2px;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(to right, 
+            rgba(0,0,0,0.1) 0%, 
+            rgba(0,0,0,0.3) 20%, 
+            rgba(0,0,0,0.3) 80%, 
+            rgba(0,0,0,0.1) 100%
+        );
+    }
+    
+    .page-stack-left,
+    .page-stack-right {
+        display: none;
+    }
+    
+    .recipe-title {
+        font-size: 1.8em;
+    }
+    
+    .nav-controls {
+        bottom: -90px; /* More space for mobile stacked header */
+    }
+    
+    /* Mobile form adaptations */
+    .form-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .form-submit,
+    .form-cancel {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    /* Table of contents mobile layout */
+    .toc-recipe {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .toc-recipe-image {
+        width: 80px;
+        height: 50px;
+    }
+}
+    </style>
 </head>
 
 <body>
     <!-- Main container that holds the entire book -->
     <div class="book-container">
+        
+        <!-- NEW: Header buttons for navigation - replaces dropdown selector -->
+        <div class="header-buttons">
+            <!-- Table of Contents button - shows recipe index with thumbnails -->
+            <button class="header-btn toc" onclick="showTableOfContents()">
+                <span>📚</span>
+                <span>Table of Contents</span>
+            </button>
+            
+            <!-- Random Recipe button - selects and displays a random recipe -->
+            <button class="header-btn random" onclick="showRandomRecipe()">
+                <span>🎲</span>
+                <span>Random Recipe</span>
+            </button>
+            
+            <!-- New Recipe button - opens form to create a new recipe -->
+            <button class="header-btn new" onclick="showNewRecipeForm()">
+                <span>➕</span>
+                <span>New Recipe</span>
+            </button>
+        </div>
         
         <!-- Left side page stack for 3D effect (hidden on mobile) -->
         <div class="page-stack-left"></div>
@@ -47,146 +1124,234 @@ RESPONSIVE DESIGN:
         <!-- Right side page stack for 3D effect (hidden on mobile) -->
         <div class="page-stack-right"></div>
         
-        <!-- Dropdown menu to select different recipes -->
-        <div class="recipe-selector">
-            <select id="recipeSelect">
-                <option value="0">Chocolate Chip Cookies</option>
-                <option value="1">Homemade Pizza</option>
-                <option value="2">Beef Stew</option>
-            </select>
-        </div>
-        
         <!-- The main book pages where content is displayed -->
         <div class="book-pages">
             <!-- The shadow line down the middle of the book -->
             <div class="book-spine"></div>
             
-            <!-- LEFT PAGE - Contains recipe overview information -->
+            <!-- LEFT PAGE - Contains recipe overview information OR table of contents -->
             <div class="page page-left">
                 
-                <!-- Recipe header section with title and time -->
-                <div class="recipe-header">
-                    <h1 class="recipe-title" id="recipeTitle">Chocolate Chip Cookies</h1>
-                    <div class="recipe-time">
-                        <span>⏱️</span>
-                        <span id="recipeTime">45 mins</span>
+                <!-- DEFAULT RECIPE VIEW - Recipe header section with title and time -->
+                <div id="recipeView" class="recipe-view">
+                    <div class="recipe-header">
+                        <h1 class="recipe-title" id="recipeTitle">Chocolate Chip Cookies</h1>
+                        <div class="recipe-time">
+                            <span>⏱️</span>
+                            <span id="recipeTime">45 mins</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Recipe image -->
+                    <img id="recipeImage" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjVGNURDIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI0QyNjkxRSIvPgo8Y2lyY2xlIGN4PSIxMzAiIGN5PSI3NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNzAiIGN5PSI4NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNDAiIGN5PSIxMDUiIHI9IjMiIGZpbGw9IiM2NTQzMjEiLz4KPHN2ZyB4PSIxMzAiIHk9IjcwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNSIgZmlsbD0iIzY1NDMyMSI+8J+NqjwvdGV4dD4KPC9zdmc+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc3R5bGU9Iml0YWxpYyI+RnJlc2hseSBCYWtlZCBDb29raWVzPC90ZXh0Pgo8L3N2Zz4K" alt="Recipe Image" class="recipe-image">
+                    
+                    <!-- Recipe tags -->
+                    <div class="recipe-tags" id="recipeTags">
+                        <span class="tag">Dessert</span>
+                        <span class="tag">Baking</span>
+                        <span class="tag">Sweet</span>
+                    </div>
+                    
+                    <!-- Difficulty rating with stars -->
+                    <div class="difficulty-rating">
+                        <span>Difficulty:</span>
+                        <div class="difficulty-stars" id="recipeDifficulty">★★☆☆☆</div>
+                    </div>
+                    
+                    <!-- Timeline showing cooking steps and timing -->
+                    <div class="timeline">
+                        <div class="timeline-title">Cooking Timeline</div>
+                        <div class="timeline-steps" id="recipeTimeline">
+                            <div class="timeline-line"></div>
+                            <div class="timeline-start-dot"></div>
+                            
+                            <div class="timeline-step">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-step-content">
+                                    <div class="timeline-step-name">Prep</div>
+                                    <div class="timeline-step-time">15 min</div>
+                                </div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-step-content">
+                                    <div class="timeline-step-name">Bake</div>
+                                    <div class="timeline-step-time">12 min</div>
+                                </div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-step-content">
+                                    <div class="timeline-step-name">Cool</div>
+                                    <div class="timeline-step-time">10 min</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Recipe image -->
-                <img id="recipeImage" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjVGNURDIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI0QyNjkxRSIvPgo8Y2lyY2xlIGN4PSIxMzAiIGN5PSI3NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNzAiIGN5PSI4NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNDAiIGN5PSIxMDUiIHI9IjMiIGZpbGw9IiM2NTQzMjEiLz4KPHN2ZyB4PSIxMzAiIHk9IjcwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNSIgZmlsbD0iIzY1NDMyMSI+8J+NqjwvdGV4dD4KPC9zdmc+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc3R5bGU9Iml0YWxpYyI+RnJlc2hseSBCYWtlZCBDb29raWVzPC90ZXh0Pgo8L3N2Zz4K" alt="Recipe Image" class="recipe-image">
-                
-                <!-- Recipe tags -->
-                <div class="recipe-tags" id="recipeTags">
-                    <span class="tag">Dessert</span>
-                    <span class="tag">Baking</span>
-                    <span class="tag">Sweet</span>
-                </div>
-                
-                <!-- Difficulty rating with stars -->
-                <div class="difficulty-rating">
-                    <span>Difficulty:</span>
-                    <div class="difficulty-stars" id="recipeDifficulty">★★☆☆☆</div>
-                </div>
-                
-                <!-- Timeline showing cooking steps and timing -->
-                <div class="timeline">
-                    <div class="timeline-title">Cooking Timeline</div>
-                    <div class="timeline-steps" id="recipeTimeline">
-                        <div class="timeline-line"></div>
-                        <div class="timeline-start-dot"></div>
-                        
-                        <div class="timeline-step">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-step-content">
-                                <div class="timeline-step-name">Prep</div>
-                                <div class="timeline-step-time">15 min</div>
-                            </div>
-                        </div>
-                        <div class="timeline-step">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-step-content">
-                                <div class="timeline-step-name">Bake</div>
-                                <div class="timeline-step-time">12 min</div>
-                            </div>
-                        </div>
-                        <div class="timeline-step">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-step-content">
-                                <div class="timeline-step-name">Cool</div>
-                                <div class="timeline-step-time">10 min</div>
-                            </div>
-                        </div>
+                <!-- NEW: TABLE OF CONTENTS VIEW - Hidden by default, shown when TOC button clicked -->
+                <div id="tableOfContents" class="table-of-contents hidden">
+                    <div class="toc-header">
+                        <h1 class="toc-title">Recipe Collection</h1>
+                        <p class="toc-subtitle">Browse our delicious recipes</p>
+                    </div>
+                    
+                    <!-- Container for all recipe entries in table of contents -->
+                    <div class="toc-recipes" id="tocRecipesList">
+                        <!-- Recipes will be dynamically populated here by JavaScript -->
                     </div>
                 </div>
                 
                 <div class="page-number">2</div>
             </div>
             
-            <!-- RIGHT PAGE - Contains ingredients and instructions -->
+            <!-- RIGHT PAGE - Contains ingredients and instructions OR new recipe form -->
             <div class="page page-right">
                 
-                <!-- Ingredients section -->
-                <div class="recipe-section">
-                    <h2 class="section-title">Ingredients</h2>
-                    <ul class="ingredients-list" id="ingredientsList">
-                        <li>2¼ cups all-purpose flour</li>
-                        <li>1 tsp baking soda</li>
-                        <li>1 tsp salt</li>
-                        <li>1 cup butter, softened</li>
-                        <li>¾ cup granulated sugar</li>
-                        <li>¾ cup packed brown sugar</li>
-                        <li>2 large eggs</li>
-                        <li>2 tsp vanilla extract</li>
-                        <li>2 cups chocolate chips</li>
-                    </ul>
-                </div>
-                
-                <!-- Instructions section -->
-                <div class="recipe-section">
-                    <h2 class="section-title">Instructions</h2>
-                    <div class="instructions-list" id="instructionsList">
-                        <div class="instruction-item">
-                            <input type="checkbox" class="instruction-checkbox" id="step1">
-                            <div class="instruction-number">1</div>
-                            <div class="instruction-text">Preheat oven to 375°F. Line baking sheets with parchment paper.</div>
+                <!-- DEFAULT INGREDIENTS AND INSTRUCTIONS VIEW -->
+                <div id="recipeDetailsView" class="recipe-details-view">
+                    <!-- Ingredients section -->
+                    <div class="recipe-section">
+                        <h2 class="section-title">Ingredients</h2>
+                        <ul class="ingredients-list" id="ingredientsList">
+                            <li>2¼ cups all-purpose flour</li>
+                            <li>1 tsp baking soda</li>
+                            <li>1 tsp salt</li>
+                            <li>1 cup butter, softened</li>
+                            <li>¾ cup granulated sugar</li>
+                            <li>¾ cup packed brown sugar</li>
+                            <li>2 large eggs</li>
+                            <li>2 tsp vanilla extract</li>
+                            <li>2 cups chocolate chips</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Instructions section -->
+                    <div class="recipe-section">
+                        <h2 class="section-title">Instructions</h2>
+                        <div class="instructions-list" id="instructionsList">
+                            <div class="instruction-item">
+                                <input type="checkbox" class="instruction-checkbox" id="step1">
+                                <div class="instruction-number">1</div>
+                                <div class="instruction-text">Preheat oven to 375°F. Line baking sheets with parchment paper.</div>
+                            </div>
+                            <div class="instruction-item">
+                                <input type="checkbox" class="instruction-checkbox" id="step2">
+                                <div class="instruction-number">2</div>
+                                <div class="instruction-text">In a bowl, whisk together flour, baking soda, and salt.</div>
+                            </div>
+                            <div class="instruction-item">
+                                <input type="checkbox" class="instruction-checkbox" id="step3">
+                                <div class="instruction-number">3</div>
+                                <div class="instruction-text">In a large bowl, cream butter and both sugars until light and fluffy.</div>
+                            </div>
+                            <div class="instruction-item">
+                                <input type="checkbox" class="instruction-checkbox" id="step4">
+                                <div class="instruction-number">4</div>
+                                <div class="instruction-text">Beat in eggs and vanilla extract until well combined.</div>
+                            </div>
+                            <div class="instruction-item">
+                                <input type="checkbox" class="instruction-checkbox" id="step5">
+                                <div class="instruction-number">5</div>
+                                <div class="instruction-text">Gradually mix in flour mixture until just combined. Stir in chocolate chips.</div>
+                            </div>
+                            <div class="instruction-item">
+                                <input type="checkbox" class="instruction-checkbox" id="step6">
+                                <div class="instruction-number">6</div>
+                                <div class="instruction-text">Drop rounded tablespoons of dough onto prepared baking sheets.</div>
+                            </div>
+                            <div class="instruction-item">
+                                <input type="checkbox" class="instruction-checkbox" id="step7">
+                                <div class="instruction-number">7</div>
+                                <div class="instruction-text">Bake for 9-11 minutes until golden brown. Cool on baking sheet for 5 minutes.</div>
+                            </div>
                         </div>
-                        <div class="instruction-item">
-                            <input type="checkbox" class="instruction-checkbox" id="step2">
-                            <div class="instruction-number">2</div>
-                            <div class="instruction-text">In a bowl, whisk together flour, baking soda, and salt.</div>
-                        </div>
-                        <div class="instruction-item">
-                            <input type="checkbox" class="instruction-checkbox" id="step3">
-                            <div class="instruction-number">3</div>
-                            <div class="instruction-text">In a large bowl, cream butter and both sugars until light and fluffy.</div>
-                        </div>
-                        <div class="instruction-item">
-                            <input type="checkbox" class="instruction-checkbox" id="step4">
-                            <div class="instruction-number">4</div>
-                            <div class="instruction-text">Beat in eggs and vanilla extract until well combined.</div>
-                        </div>
-                        <div class="instruction-item">
-                            <input type="checkbox" class="instruction-checkbox" id="step5">
-                            <div class="instruction-number">5</div>
-                            <div class="instruction-text">Gradually mix in flour mixture until just combined. Stir in chocolate chips.</div>
-                        </div>
-                        <div class="instruction-item">
-                            <input type="checkbox" class="instruction-checkbox" id="step6">
-                            <div class="instruction-number">6</div>
-                            <div class="instruction-text">Drop rounded tablespoons of dough onto prepared baking sheets.</div>
-                        </div>
-                        <div class="instruction-item">
-                            <input type="checkbox" class="instruction-checkbox" id="step7">
-                            <div class="instruction-number">7</div>
-                            <div class="instruction-text">Bake for 9-11 minutes until golden brown. Cool on baking sheet for 5 minutes.</div>
-                        </div>
+                    </div>
+                    
+                    <!-- Control buttons -->
+                    <div class="controls">
+                        <button class="btn" onclick="resetChecklist()">Reset Checklist</button>
                     </div>
                 </div>
                 
-                <!-- Control buttons -->
-                <div class="controls">
-                    <button class="btn" onclick="resetChecklist()">Reset Checklist</button>
+                <!-- NEW: NEW RECIPE FORM VIEW - Hidden by default, shown when New Recipe button clicked -->
+                <div id="newRecipeForm" class="new-recipe-form hidden">
+                    <div class="form-header">
+                        <h1 class="form-title">Create New Recipe</h1>
+                        <p class="form-subtitle">Share your culinary creation</p>
+                    </div>
+                    
+                    <!-- Recipe basic information section -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Basic Information</h3>
+                        
+                        <input type="text" id="newRecipeTitle" class="form-input" placeholder="Recipe Title" required>
+                        
+                        <input type="text" id="newRecipeTime" class="form-input" placeholder="Total Time (e.g., 45 mins)" required>
+                        
+                        <input type="url" id="newRecipeImage" class="form-input" placeholder="Image URL (optional)">
+                        
+                        <select id="newRecipeDifficulty" class="form-select" required>
+                            <option value="">Select Difficulty</option>
+                            <option value="★☆☆☆☆">★☆☆☆☆ Very Easy</option>
+                            <option value="★★☆☆☆">★★☆☆☆ Easy</option>
+                            <option value="★★★☆☆">★★★☆☆ Medium</option>
+                            <option value="★★★★☆">★★★★☆ Hard</option>
+                            <option value="★★★★★">★★★★★ Very Hard</option>
+                        </select>
+                        
+                        <input type="text" id="newRecipeTags" class="form-input" placeholder="Tags (comma-separated, e.g., Dessert, Baking, Sweet)">
+                    </div>
+                    
+                    <!-- Timeline section -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Cooking Timeline</h3>
+                        
+                        <div class="dynamic-list" id="timelineList">
+                            <div class="dynamic-item">
+                                <input type="text" placeholder="Step name (e.g., Prep)" class="form-input timeline-step-input">
+                                <input type="text" placeholder="Time (e.g., 15 min)" class="form-input timeline-time-input">
+                                <button type="button" class="remove-btn" onclick="removeTimelineItem(this)">Remove</button>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="add-btn" onclick="addTimelineItem()">Add Timeline Step</button>
+                    </div>
+                    
+                    <!-- Ingredients section -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Ingredients</h3>
+                        
+                        <div class="dynamic-list" id="ingredientsList">
+                            <div class="dynamic-item">
+                                <input type="text" placeholder="Ingredient with measurement" class="form-input ingredient-input">
+                                <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="add-btn" onclick="addIngredientItem()">Add Ingredient</button>
+                    </div>
+                    
+                    <!-- Instructions section -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Instructions</h3>
+                        
+                        <div class="dynamic-list" id="instructionsList">
+                            <div class="dynamic-item">
+                                <textarea placeholder="Instruction step" class="form-textarea instruction-input" rows="2"></textarea>
+                                <button type="button" class="remove-btn" onclick="removeInstructionItem(this)">Remove</button>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="add-btn" onclick="addInstructionItem()">Add Instruction</button>
+                    </div>
+                    
+                    <!-- Form action buttons -->
+                    <div class="form-actions">
+                        <button type="button" class="form-submit" onclick="saveNewRecipe()">Save Recipe</button>
+                        <button type="button" class="form-cancel" onclick="cancelNewRecipe()">Cancel</button>
+                    </div>
                 </div>
                 
                 <div class="page-number">3</div>
@@ -201,7 +1366,882 @@ RESPONSIVE DESIGN:
         </div>
     </div>
 
-    <script src="recipes.js"></script>
-    <script src="main.js"></script>
+    <script>
+/*
+RECIPE DATA MODULE
+==================
+
+This JavaScript section contains all recipe data for the Digital Cookbook.
+It provides a centralized data store with structured recipe information.
+
+CONTENTS OUTLINE:
+1. Recipe Data Structure - Complete recipe objects with all properties
+2. Data Organization - Array of recipe objects for easy iteration
+3. Recipe Properties - Standardized structure for each recipe
+
+RECIPE OBJECT STRUCTURE:
+Each recipe contains the following properties:
+- title: String - Display name of the recipe
+- time: String - Total cooking/preparation time
+- image: String - Base64 encoded SVG image or image URL
+- tags: Array - Category tags for filtering and display
+- difficulty: String - Star rating (★☆☆☆☆ format)
+- timeline: Array - Cooking steps with timing information
+  - step: String - Name of the cooking phase
+  - time: String - Duration for this step
+- ingredients: Array - List of ingredients with measurements
+- instructions: Array - Step-by-step cooking instructions
+
+USAGE:
+- Access recipes using: recipes[index]
+- Get recipe count using: recipes.length
+- Loop through recipes using: recipes.forEach() or for...of
+
+ADDING NEW RECIPES:
+New recipes can be added dynamically through the interface,
+or by pushing new objects to the recipes array following the existing structure.
+
+SVG IMAGES:
+The images are base64-encoded SVG graphics for consistent display.
+Replace with actual image URLs or base64-encoded photos as needed.
+*/
+
+// Main recipe data array - contains all available recipes
+const recipes = [
+    // Recipe 1: Chocolate Chip Cookies
+    {
+        title: "Chocolate Chip Cookies",
+        time: "45 mins",
+        image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjVGNURDIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI0QyNjkxRSIvPgo8Y2lyY2xlIGN4PSIxMzAiIGN5PSI3NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNzAiIGN5PSI4NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNDAiIGN5PSIxMDUiIHI9IjMiIGZpbGw9IiM2NTQzMjEiLz4KPHN2ZyB4PSIxMzAiIHk9IjcwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNSIgZmlsbD0iIzY1NDMyMSI+8J+NqjwvdGV4dD4KPC9zdmc+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc3R5bGU9Iml0YWxpYyI+RnJlc2hseSBCYWtlZCBDb29raWVzPC90ZXh0Pgo8L3N2Zz4K",
+        tags: ["Dessert", "Baking", "Sweet"],
+        difficulty: "★★☆☆☆",
+        timeline: [
+            { step: "Prep", time: "15 min" },
+            { step: "Bake", time: "12 min" },
+            { step: "Cool", time: "10 min" }
+        ],
+        ingredients: [
+            "2¼ cups all-purpose flour",
+            "1 tsp baking soda",
+            "1 tsp salt",
+            "1 cup butter, softened",
+            "¾ cup granulated sugar",
+            "¾ cup packed brown sugar",
+            "2 large eggs",
+            "2 tsp vanilla extract",
+            "2 cups chocolate chips"
+        ],
+        instructions: [
+            "Preheat oven to 375°F. Line baking sheets with parchment paper.",
+            "In a bowl, whisk together flour, baking soda, and salt.",
+            "In a large bowl, cream butter and both sugars until light and fluffy.",
+            "Beat in eggs and vanilla extract until well combined.",
+            "Gradually mix in flour mixture until just combined. Stir in chocolate chips.",
+            "Drop rounded tablespoons of dough onto prepared baking sheets.",
+            "Bake for 9-11 minutes until golden brown. Cool on baking sheet for 5 minutes."
+        ]
+    },
+
+    // Recipe 2: Homemade Pizza
+    {
+        title: "Homemade Pizza",
+        time: "2 hours",
+        image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjVGNURDIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSI2MCIgZmlsbD0iI0ZGRDcwMCIvPgo8Y2lyY2xlIGN4PSIxMzAiIGN5PSI3NSIgcj0iOCIgZmlsbD0iI0ZGNDUwMCIvPgo8Y2lyY2xlIGN4PSIxNzAiIGN5PSI4NSIgcj0iNiIgZmlsbD0iI0ZGNDUwMCIvPgo8Y2lyY2xlIGN4PSIxNDAiIGN5PSIxMDUiIHI9IjciIGZpbGw9IiNGRjQ1MDAiLz4KPHN2ZyB4PSIxMjAiIHk9IjcwIiB3aWR0aD0iNjAiIGhlaWdodD0iNDAiPgo8dGV4dCB4PSIzMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNSIgZmlsbD0iI0ZGNDUwMCI+8J+NlTwvdGV4dD4KPC9zdmc+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc3R5bGU9Iml0YWxpYyI+SG9tZW1hZGUgUGl6emE8L3RleHQ+Cjwvc3ZnPgo=",
+        tags: ["Dinner", "Italian", "Comfort Food"],
+        difficulty: "★★★☆☆",
+        timeline: [
+            { step: "Dough", time: "1 hr" },
+            { step: "Prep", time: "30 min" },
+            { step: "Bake", time: "15 min" }
+        ],
+        ingredients: [
+            "3 cups all-purpose flour",
+            "1 tsp salt",
+            "1 tbsp sugar",
+            "1 packet active dry yeast",
+            "1 cup warm water",
+            "2 tbsp olive oil",
+            "1 cup pizza sauce",
+            "2 cups mozzarella cheese",
+            "Toppings of choice"
+        ],
+        instructions: [
+            "Dissolve yeast in warm water with sugar. Let stand for 5 minutes until foamy.",
+            "In a large bowl, combine flour and salt. Add yeast mixture and olive oil.",
+            "Mix until a dough forms, then knead for 8-10 minutes until smooth.",
+            "Place in oiled bowl, cover, and let rise for 1 hour until doubled.",
+            "Punch down dough and roll out on floured surface to desired thickness.",
+            "Transfer to pizza stone or baking sheet. Add sauce and toppings.",
+            "Bake at 475°F for 12-15 minutes until crust is golden and cheese is bubbly."
+        ]
+    },
+
+    // Recipe 3: Beef Stew
+    {
+        title: "Beef Stew",
+        time: "3 hours",
+        image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjVGNURDIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSI1MCIgZmlsbD0iIzhCNDUxMyIvPgo8Y2lyY2xlIGN4PSIxMzUiIGN5PSI4MCIgcj0iNiIgZmlsbD0iI0ZGNjM0NyIvPgo8Y2lyY2xlIGN4PSIxNjUiIGN5PSI4NSIgcj0iNSIgZmlsbD0iI0ZGNjM0NyIvPgo8Y2lyY2xlIGN4PSIxNDUiIGN5PSIxMDAiIHI9IjQiIGZpbGw9IiNGRkE1MDAiLz4KPHN2ZyB4PSIxMjUiIHk9IjcwIiB3aWR0aD0iNTAiIGhlaWdodD0iNDAiPgo8dGV4dCB4PSIyNSIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNSIgZmlsbD0iI0ZGRkZGRiI+8J+NsjwvdGV4dD4KPC9zdmc+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc3R5bGU9Aml0YWxpYyI+SGVhcnR5IEJlZWYgU3RldzwvdGV4dD4KPC9zdmc+",
+        tags: ["Dinner", "Comfort Food", "Slow Cook"],
+        difficulty: "★★★★☆",
+        timeline: [
+            { step: "Prep", time: "30 min" },
+            { step: "Brown", time: "15 min" },
+            { step: "Simmer", time: "2 hrs" }
+        ],
+        ingredients: [
+            "2 lbs beef chuck, cubed",
+            "3 tbsp flour",
+            "2 tbsp oil",
+            "1 onion, diced",
+            "3 carrots, sliced",
+            "3 potatoes, cubed",
+            "4 cups beef broth",
+            "2 tsp thyme",
+            "Salt and pepper to taste"
+        ],
+        instructions: [
+            "Season beef with salt and pepper, then coat with flour.",
+            "Heat oil in a large pot and brown beef on all sides.",
+            "Add onion and cook until softened, about 5 minutes.",
+            "Add broth, thyme, and bring to a boil.",
+            "Reduce heat, cover, and simmer for 1.5 hours.",
+            "Add carrots and potatoes, simmer for 30 minutes more.",
+            "Season with salt and pepper before serving."
+        ]
+    }
+];
+
+/*
+MAIN JAVASCRIPT FUNCTIONALITY
+==============================
+
+This section contains all interactive functionality for the Digital Cookbook.
+It manages recipe loading, user interactions, dynamic content updates, and the new
+three-button navigation system (Table of Contents, Random Recipe, New Recipe).
+
+CONTENTS OUTLINE:
+1. Global Variables - Current recipe tracking and state management
+2. Recipe Loading Functions - Dynamic content population
+3. Timeline Generation - Creates interactive cooking timeline
+4. Navigation Functions - Recipe browsing and selection
+5. NEW: View Management - Toggle between recipe, TOC, and form views
+6. NEW: Table of Contents Functions - Generate and handle recipe index
+7. NEW: Random Recipe Function - Select and display random recipe
+8. NEW: New Recipe Form Functions - Handle form creation and submission
+9. Interactive Features - Checkbox handling and user interactions
+10. Event Listeners - User input handling and form management
+11. Initialization - Page setup and default content loading
+
+MAIN FUNCTIONS:
+- loadRecipe(index): Loads and displays a specific recipe
+- generateTimeline(timeline): Creates the cooking timeline visualization  
+- nextRecipe(): Navigates to the next recipe
+- previousRecipe(): Navigates to the previous recipe
+- resetChecklist(): Resets all instruction checkboxes
+- NEW: showTableOfContents(): Displays recipe index on left page
+- NEW: showRandomRecipe(): Selects and displays a random recipe
+- NEW: showNewRecipeForm(): Shows new recipe creation form
+- NEW: saveNewRecipe(): Processes and saves new recipe data
+- updateRecipeCounter(): Updates the recipe counter display
+
+INTERACTIVE FEATURES:
+- Recipe navigation with Previous/Next buttons
+- Interactive instruction checkboxes with completion styling
+- Responsive timeline generation
+- Dynamic content updates without page refresh
+- NEW: Three-button header navigation system
+- NEW: Clickable table of contents with recipe thumbnails
+- NEW: Dynamic form with add/remove ingredient and instruction functionality
+- NEW: Form validation and data processing
+
+DEPENDENCIES:
+- DOM elements: Requires specific HTML structure from the main document
+- Recipe data: Uses the recipes array defined above
+
+USAGE:
+- Functions are automatically bound to onclick events in HTML
+- Page initializes with the first recipe on load
+- View switching handled by show/hide functions for different page states
+*/
+
+// =============================================================================
+// 1. GLOBAL VARIABLES - State management and tracking
+// =============================================================================
+
+// Current recipe index tracker (starts with first recipe)
+let currentRecipeIndex = 0;
+
+// Current view state tracker ('recipe', 'toc', 'newRecipe')
+let currentView = 'recipe';
+
+// =============================================================================
+// 2. RECIPE LOADING FUNCTIONS - Dynamic content population
+// =============================================================================
+
+/**
+ * Main function to load and display a recipe
+ * @param {number} index - Index of the recipe to load from recipes array
+ */
+function loadRecipe(index) {
+    // Validate index to prevent errors
+    if (index < 0 || index >= recipes.length) {
+        console.error('Invalid recipe index:', index);
+        return;
+    }
+
+    // Switch back to recipe view if we're in a different view
+    showRecipeView();
+
+    // Get the recipe object from the data array
+    const recipe = recipes[index];
+    
+    // Update basic recipe information
+    document.getElementById('recipeTitle').textContent = recipe.title;
+    document.getElementById('recipeTime').textContent = recipe.time;
+    document.getElementById('recipeImage').src = recipe.image;
+    document.getElementById('recipeDifficulty').textContent = recipe.difficulty;
+    
+    // Update recipe tags
+    updateRecipeTags(recipe.tags);
+    
+    // Generate and update timeline
+    generateTimeline(recipe.timeline);
+    
+    // Update ingredients list
+    updateIngredientsList(recipe.ingredients);
+    
+    // Update instructions list
+    updateInstructionsList(recipe.instructions);
+    
+    // Update navigation counter
+    updateRecipeCounter();
+    
+    // Store current index
+    currentRecipeIndex = index;
+}
+
+/**
+ * Updates the recipe tags display
+ * @param {Array} tags - Array of tag strings
+ */
+function updateRecipeTags(tags) {
+    const tagsContainer = document.getElementById('recipeTags');
+    tagsContainer.innerHTML = '';
+    
+    tags.forEach(tag => {
+        const tagElement = document.createElement('span');
+        tagElement.className = 'tag';
+        tagElement.textContent = tag;
+        tagsContainer.appendChild(tagElement);
+    });
+}
+
+/**
+ * Updates the ingredients list
+ * @param {Array} ingredients - Array of ingredient strings
+ */
+function updateIngredientsList(ingredients) {
+    const ingredientsContainer = document.getElementById('ingredientsList');
+    ingredientsContainer.innerHTML = '';
+    
+    ingredients.forEach(ingredient => {
+        const listItem = document.createElement('li');
+        listItem.textContent = ingredient;
+        ingredientsContainer.appendChild(listItem);
+    });
+}
+
+/**
+ * Updates the instructions list with interactive checkboxes
+ * @param {Array} instructions - Array of instruction strings
+ */
+function updateInstructionsList(instructions) {
+    const instructionsContainer = document.getElementById('instructionsList');
+    instructionsContainer.innerHTML = '';
+    
+    instructions.forEach((instruction, index) => {
+        const instructionItem = document.createElement('div');
+        instructionItem.className = 'instruction-item';
+        
+        // Create checkbox for step completion
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'instruction-checkbox';
+        checkbox.id = `step${index + 1}`;
+        
+        // Add change event listener for completion styling
+        checkbox.addEventListener('change', function() {
+            toggleInstructionCompletion(instructionItem, this.checked);
+        });
+        
+        // Create step number circle
+        const stepNumber = document.createElement('div');
+        stepNumber.className = 'instruction-number';
+        stepNumber.textContent = index + 1;
+        
+        // Create instruction text
+        const instructionText = document.createElement('div');
+        instructionText.className = 'instruction-text';
+        instructionText.textContent = instruction;
+        
+        // Assemble the instruction item
+        instructionItem.appendChild(checkbox);
+        instructionItem.appendChild(stepNumber);
+        instructionItem.appendChild(instructionText);
+        
+        instructionsContainer.appendChild(instructionItem);
+    });
+}
+
+/**
+ * Toggles the completion state of an instruction
+ * @param {HTMLElement} instructionItem - The instruction container element
+ * @param {boolean} completed - Whether the instruction is completed
+ */
+function toggleInstructionCompletion(instructionItem, completed) {
+    if (completed) {
+        instructionItem.classList.add('completed');
+    } else {
+        instructionItem.classList.remove('completed');
+    }
+}
+
+// =============================================================================
+// 3. TIMELINE GENERATION - Interactive cooking timeline creation
+// =============================================================================
+
+/**
+ * Generates the interactive cooking timeline
+ * @param {Array} timeline - Array of timeline step objects {step, time}
+ */
+function generateTimeline(timeline) {
+    const timelineContainer = document.getElementById('recipeTimeline');
+    timelineContainer.innerHTML = '';
+    
+    // Create the connecting line
+    const timelineLine = document.createElement('div');
+    timelineLine.className = 'timeline-line';
+    timelineContainer.appendChild(timelineLine);
+    
+    // Create the starting dot
+    const startDot = document.createElement('div');
+    startDot.className = 'timeline-start-dot';
+    timelineContainer.appendChild(startDot);
+    
+    // Generate timeline steps
+    timeline.forEach((timelineStep, index) => {
+        const stepElement = document.createElement('div');
+        stepElement.className = 'timeline-step';
+        
+        stepElement.innerHTML = `
+            <div class="timeline-dot"></div>
+            <div class="timeline-step-content">
+                <div class="timeline-step-name">${timelineStep.step}</div>
+                <div class="timeline-step-time">${timelineStep.time}</div>
+            </div>
+        `;
+        
+        timelineContainer.appendChild(stepElement);
+    });
+}
+
+// =============================================================================
+// 4. NAVIGATION FUNCTIONS - Recipe browsing and selection
+// =============================================================================
+
+/**
+ * Navigates to the next recipe
+ */
+function nextRecipe() {
+    const nextIndex = (currentRecipeIndex + 1) % recipes.length;
+    loadRecipe(nextIndex);
+}
+
+/**
+ * Navigates to the previous recipe
+ */
+function previousRecipe() {
+    const prevIndex = currentRecipeIndex === 0 ? recipes.length - 1 : currentRecipeIndex - 1;
+    loadRecipe(prevIndex);
+}
+
+/**
+ * Updates the recipe counter display
+ */
+function updateRecipeCounter() {
+    const counter = document.getElementById('recipeCounter');
+    counter.textContent = `${currentRecipeIndex + 1} of ${recipes.length}`;
+}
+
+// =============================================================================
+// 5. NEW: VIEW MANAGEMENT - Toggle between recipe, TOC, and form views
+// =============================================================================
+
+/**
+ * Shows the main recipe view and hides other views
+ */
+function showRecipeView() {
+    // Hide table of contents
+    document.getElementById('tableOfContents').classList.add('hidden');
+    document.getElementById('recipeView').classList.remove('hidden');
+    
+    // Hide new recipe form
+    document.getElementById('newRecipeForm').classList.add('hidden');
+    document.getElementById('recipeDetailsView').classList.remove('hidden');
+    
+    // Show navigation controls
+    document.querySelector('.nav-controls').style.display = 'flex';
+    
+    currentView = 'recipe';
+}
+
+/**
+ * Shows the table of contents view and hides recipe content
+ */
+function showTOCView() {
+    // Show table of contents
+    document.getElementById('recipeView').classList.add('hidden');
+    document.getElementById('tableOfContents').classList.remove('hidden');
+    
+    // Hide new recipe form
+    document.getElementById('newRecipeForm').classList.add('hidden');
+    document.getElementById('recipeDetailsView').classList.remove('hidden');
+    
+    // Hide navigation controls (not relevant for TOC)
+    document.querySelector('.nav-controls').style.display = 'none';
+    
+    currentView = 'toc';
+}
+
+/**
+ * Shows the new recipe form and hides other content
+ */
+function showNewRecipeView() {
+    // Hide recipe view
+    document.getElementById('recipeView').classList.add('hidden');
+    document.getElementById('tableOfContents').classList.add('hidden');
+    
+    // Show new recipe form
+    document.getElementById('recipeDetailsView').classList.add('hidden');
+    document.getElementById('newRecipeForm').classList.remove('hidden');
+    
+    // Hide navigation controls (not relevant for form)
+    document.querySelector('.nav-controls').style.display = 'none';
+    
+    currentView = 'newRecipe';
+}
+
+// =============================================================================
+// 6. NEW: TABLE OF CONTENTS FUNCTIONS - Generate and handle recipe index
+// =============================================================================
+
+/**
+ * Shows the table of contents with all available recipes
+ */
+function showTableOfContents() {
+    showTOCView();
+    generateTableOfContents();
+}
+
+/**
+ * Generates the table of contents with recipe thumbnails and metadata
+ */
+function generateTableOfContents() {
+    const tocContainer = document.getElementById('tocRecipesList');
+    tocContainer.innerHTML = '';
+    
+    recipes.forEach((recipe, index) => {
+        const tocEntry = document.createElement('div');
+        tocEntry.className = 'toc-recipe';
+        tocEntry.onclick = () => loadRecipe(index);
+        
+        tocEntry.innerHTML = `
+            <img src="${recipe.image}" alt="${recipe.title}" class="toc-recipe-image">
+            <div class="toc-recipe-info">
+                <div class="toc-recipe-title">${recipe.title}</div>
+                <div class="toc-recipe-meta">
+                    <span>⏱️ ${recipe.time}</span>
+                    <span>${recipe.difficulty}</span>
+                    <span>${recipe.tags.join(', ')}</span>
+                </div>
+            </div>
+            <div class="toc-page-number">${index + 1}</div>
+        `;
+        
+        tocContainer.appendChild(tocEntry);
+    });
+}
+
+// =============================================================================
+// 7. NEW: RANDOM RECIPE FUNCTION - Select and display random recipe
+// =============================================================================
+
+/**
+ * Selects and displays a random recipe from the collection
+ */
+function showRandomRecipe() {
+    const randomIndex = Math.floor(Math.random() * recipes.length);
+    loadRecipe(randomIndex);
+}
+
+// =============================================================================
+// 8. NEW: NEW RECIPE FORM FUNCTIONS - Handle form creation and submission
+// =============================================================================
+
+/**
+ * Shows the new recipe form for creating a new recipe
+ */
+function showNewRecipeForm() {
+    showNewRecipeView();
+    clearNewRecipeForm();
+}
+
+/**
+ * Clears all fields in the new recipe form
+ */
+function clearNewRecipeForm() {
+    // Clear basic information fields
+    document.getElementById('newRecipeTitle').value = '';
+    document.getElementById('newRecipeTime').value = '';
+    document.getElementById('newRecipeImage').value = '';
+    document.getElementById('newRecipeDifficulty').value = '';
+    document.getElementById('newRecipeTags').value = '';
+    
+    // Reset dynamic lists to single items
+    resetTimelineList();
+    resetIngredientsList();
+    resetInstructionsList();
+}
+
+/**
+ * Resets the timeline list to a single empty item
+ */
+function resetTimelineList() {
+    const timelineList = document.querySelector('#timelineList');
+    timelineList.innerHTML = `
+        <div class="dynamic-item">
+            <input type="text" placeholder="Step name (e.g., Prep)" class="form-input timeline-step-input">
+            <input type="text" placeholder="Time (e.g., 15 min)" class="form-input timeline-time-input">
+            <button type="button" class="remove-btn" onclick="removeTimelineItem(this)">Remove</button>
+        </div>
+    `;
+}
+
+/**
+ * Resets the ingredients list to a single empty item
+ */
+function resetIngredientsList() {
+    const ingredientsList = document.querySelector('#ingredientsList');
+    ingredientsList.innerHTML = `
+        <div class="dynamic-item">
+            <input type="text" placeholder="Ingredient with measurement" class="form-input ingredient-input">
+            <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
+        </div>
+    `;
+}
+
+/**
+ * Resets the instructions list to a single empty item
+ */
+function resetInstructionsList() {
+    const instructionsList = document.querySelector('#instructionsList');
+    instructionsList.innerHTML = `
+        <div class="dynamic-item">
+            <textarea placeholder="Instruction step" class="form-textarea instruction-input" rows="2"></textarea>
+            <button type="button" class="remove-btn" onclick="removeInstructionItem(this)">Remove</button>
+        </div>
+    `;
+}
+
+/**
+ * Adds a new timeline item to the form
+ */
+function addTimelineItem() {
+    const timelineList = document.querySelector('#timelineList');
+    const newItem = document.createElement('div');
+    newItem.className = 'dynamic-item';
+    newItem.innerHTML = `
+        <input type="text" placeholder="Step name (e.g., Prep)" class="form-input timeline-step-input">
+        <input type="text" placeholder="Time (e.g., 15 min)" class="form-input timeline-time-input">
+        <button type="button" class="remove-btn" onclick="removeTimelineItem(this)">Remove</button>
+    `;
+    timelineList.appendChild(newItem);
+}
+
+/**
+ * Removes a timeline item from the form
+ * @param {HTMLElement} button - The remove button that was clicked
+ */
+function removeTimelineItem(button) {
+    const timelineList = document.querySelector('#timelineList');
+    if (timelineList.children.length > 1) {
+        button.parentElement.remove();
+    } else {
+        alert('You must have at least one timeline step.');
+    }
+}
+
+/**
+ * Adds a new ingredient item to the form
+ */
+function addIngredientItem() {
+    const ingredientsList = document.querySelector('#ingredientsList');
+    const newItem = document.createElement('div');
+    newItem.className = 'dynamic-item';
+    newItem.innerHTML = `
+        <input type="text" placeholder="Ingredient with measurement" class="form-input ingredient-input">
+        <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
+    `;
+    ingredientsList.appendChild(newItem);
+}
+
+/**
+ * Removes an ingredient item from the form
+ * @param {HTMLElement} button - The remove button that was clicked
+ */
+function removeIngredientItem(button) {
+    const ingredientsList = document.querySelector('#ingredientsList');
+    if (ingredientsList.children.length > 1) {
+        button.parentElement.remove();
+    } else {
+        alert('You must have at least one ingredient.');
+    }
+}
+
+/**
+ * Adds a new instruction item to the form
+ */
+function addInstructionItem() {
+    const instructionsList = document.querySelector('#instructionsList');
+    const newItem = document.createElement('div');
+    newItem.className = 'dynamic-item';
+    newItem.innerHTML = `
+        <textarea placeholder="Instruction step" class="form-textarea instruction-input" rows="2"></textarea>
+        <button type="button" class="remove-btn" onclick="removeInstructionItem(this)">Remove</button>
+    `;
+    instructionsList.appendChild(newItem);
+}
+
+/**
+ * Removes an instruction item from the form
+ * @param {HTMLElement} button - The remove button that was clicked
+ */
+function removeInstructionItem(button) {
+    const instructionsList = document.querySelector('#instructionsList');
+    if (instructionsList.children.length > 1) {
+        button.parentElement.remove();
+    } else {
+        alert('You must have at least one instruction.');
+    }
+}
+
+/**
+ * Validates and saves a new recipe from the form data
+ */
+function saveNewRecipe() {
+    // Collect basic information
+    const title = document.getElementById('newRecipeTitle').value.trim();
+    const time = document.getElementById('newRecipeTime').value.trim();
+    const image = document.getElementById('newRecipeImage').value.trim();
+    const difficulty = document.getElementById('newRecipeDifficulty').value;
+    const tagsInput = document.getElementById('newRecipeTags').value.trim();
+    
+    // Validate required fields
+    if (!title || !time || !difficulty) {
+        alert('Please fill in all required fields: Title, Time, and Difficulty.');
+        return;
+    }
+    
+    // Process tags
+    const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
+    
+    // Collect timeline data
+    const timelineItems = document.querySelectorAll('#timelineList .dynamic-item');
+    const timeline = [];
+    timelineItems.forEach(item => {
+        const step = item.querySelector('.timeline-step-input').value.trim();
+        const stepTime = item.querySelector('.timeline-time-input').value.trim();
+        if (step && stepTime) {
+            timeline.push({ step, time: stepTime });
+        }
+    });
+    
+    // Collect ingredients
+    const ingredientItems = document.querySelectorAll('#ingredientsList .dynamic-item');
+    const ingredients = [];
+    ingredientItems.forEach(item => {
+        const ingredient = item.querySelector('.ingredient-input').value.trim();
+        if (ingredient) {
+            ingredients.push(ingredient);
+        }
+    });
+    
+    // Collect instructions
+    const instructionItems = document.querySelectorAll('#instructionsList .dynamic-item');
+    const instructions = [];
+    instructionItems.forEach(item => {
+        const instruction = item.querySelector('.instruction-input').value.trim();
+        if (instruction) {
+            instructions.push(instruction);
+        }
+    });
+    
+    // Validate that we have at least one of each
+    if (timeline.length === 0) {
+        alert('Please add at least one timeline step.');
+        return;
+    }
+    if (ingredients.length === 0) {
+        alert('Please add at least one ingredient.');
+        return;
+    }
+    if (instructions.length === 0) {
+        alert('Please add at least one instruction.');
+        return;
+    }
+    
+    // Create new recipe object
+    const newRecipe = {
+        title,
+        time,
+        image: image || generateDefaultImage(title), // Use provided image or generate default
+        tags,
+        difficulty,
+        timeline,
+        ingredients,
+        instructions
+    };
+    
+    // Add to recipes array
+    recipes.push(newRecipe);
+    
+    // Load the new recipe and switch to recipe view
+    loadRecipe(recipes.length - 1);
+    
+    // Show success message
+    alert(`Recipe "${title}" has been added successfully!`);
+}
+
+/**
+ * Generates a default SVG image for recipes without custom images
+ * @param {string} title - The recipe title to include in the image
+ * @returns {string} Base64 encoded SVG image
+ */
+function generateDefaultImage(title) {
+    const svg = `
+        <svg width="300" height="180" viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="180" fill="#F5F5DC"/>
+            <circle cx="150" cy="90" r="40" fill="#D2691E"/>
+            <text x="150" y="100" font-family="Georgia, serif" font-size="16" fill="#8B4513" text-anchor="middle" font-weight="bold">${title.substring(0, 20)}</text>
+            <text x="150" y="160" font-family="Georgia, serif" font-size="12" fill="#8B4513" text-anchor="middle" font-style="italic">Custom Recipe</text>
+        </svg>
+    `;
+    return 'data:image/svg+xml;base64,' + btoa(svg);
+}
+
+/**
+ * Cancels new recipe creation and returns to recipe view
+ */
+function cancelNewRecipe() {
+    if (confirm('Are you sure you want to cancel? All entered data will be lost.')) {
+        showRecipeView();
+    }
+}
+
+// =============================================================================
+// 9. INTERACTIVE FEATURES - User interaction handlers
+// =============================================================================
+
+/**
+ * Resets all instruction checkboxes to unchecked state
+ */
+function resetChecklist() {
+    // Find all instruction checkboxes
+    const checkboxes = document.querySelectorAll('.instruction-checkbox');
+    const instructionItems = document.querySelectorAll('.instruction-item');
+    
+    // Uncheck all checkboxes and remove completed styling
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    instructionItems.forEach(item => {
+        item.classList.remove('completed');
+    });
+}
+
+// =============================================================================
+// 10. EVENT LISTENERS - DOM event binding and form management
+// =============================================================================
+
+/**
+ * Sets up all event listeners when the page loads
+ */
+function setupEventListeners() {
+    // Keyboard navigation support
+    document.addEventListener('keydown', function(event) {
+        // Only handle keyboard navigation when in recipe view
+        if (currentView !== 'recipe') return;
+        
+        switch(event.key) {
+            case 'ArrowLeft':
+                event.preventDefault();
+                previousRecipe();
+                break;
+            case 'ArrowRight':
+                event.preventDefault();
+                nextRecipe();
+                break;
+            case 'r':
+            case 'R':
+                if (event.ctrlKey || event.metaKey) {
+                    event.preventDefault();
+                    resetChecklist();
+                }
+                break;
+            case 't':
+            case 'T':
+                if (event.ctrlKey || event.metaKey) {
+                    event.preventDefault();
+                    showTableOfContents();
+                }
+                break;
+        }
+    });
+}
+
+// =============================================================================
+// 11. INITIALIZATION - Page setup and default loading
+// =============================================================================
+
+/**
+ * Initializes the application when the DOM is loaded
+ */
+function initializeApp() {
+    // Load the first recipe by default
+    loadRecipe(0);
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Ensure we start in recipe view
+    showRecipeView();
+    
+    // Add any additional initialization logic here
+    console.log('Digital Cookbook initialized successfully');
+    console.log(`Loaded ${recipes.length} recipes`);
+}
+
+// Wait for DOM to be fully loaded before initializing
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+// Alternative initialization for older browsers
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    // DOM is already loaded
+    initializeApp();
+}
+    </script>
 </body>
 </html>
