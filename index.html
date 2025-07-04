@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<!--
+MAIN HTML STRUCTURE FILE
+========================
+
+This is the main HTML file that creates the Digital Cookbook interface.
+It contains only the structural markup and links to external CSS and JavaScript files.
+
+CONTENTS:
+- Document structure with proper HTML5 semantics
+- Meta tags for character encoding and responsive design
+- Links to external stylesheets and scripts
+- Main book container with left and right page stacks for 3D effect
+- Recipe selector dropdown for switching between recipes
+- Book pages container with spine shadow effect
+- Left page: Recipe overview (title, image, tags, difficulty, timeline)
+- Right page: Ingredients list and step-by-step instructions
+- Navigation controls for browsing recipes
+- Page numbers and decorative elements
+
+DEPENDENCIES:
+- styles.css: All visual styling and layout
+- recipes.js: Recipe data and content management
+- main.js: Interactive functionality and event handlers
+
+RESPONSIVE DESIGN:
+- Mobile-first approach with media queries in CSS
+- Flexible layout that adapts from side-by-side pages to stacked layout
+- Touch-friendly navigation controls
+-->
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Digital Cookbook</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Main container that holds the entire book -->
+    <div class="book-container">
+        
+        <!-- Left side page stack for 3D effect (hidden on mobile) -->
+        <div class="page-stack-left"></div>
+        
+        <!-- Right side page stack for 3D effect (hidden on mobile) -->
+        <div class="page-stack-right"></div>
+        
+        <!-- Dropdown menu to select different recipes -->
+        <div class="recipe-selector">
+            <select id="recipeSelect">
+                <option value="0">Chocolate Chip Cookies</option>
+                <option value="1">Homemade Pizza</option>
+                <option value="2">Beef Stew</option>
+            </select>
+        </div>
+        
+        <!-- The main book pages where content is displayed -->
+        <div class="book-pages">
+            <!-- The shadow line down the middle of the book -->
+            <div class="book-spine"></div>
+            
+            <!-- LEFT PAGE - Contains recipe overview information -->
+            <div class="page page-left">
+                
+                <!-- Recipe header section with title and time -->
+                <div class="recipe-header">
+                    <h1 class="recipe-title" id="recipeTitle">Chocolate Chip Cookies</h1>
+                    <div class="recipe-time">
+                        <span>⏱️</span>
+                        <span id="recipeTime">45 mins</span>
+                    </div>
+                </div>
+                
+                <!-- Recipe image -->
+                <img id="recipeImage" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjVGNURDIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI0QyNjkxRSIvPgo8Y2lyY2xlIGN4PSIxMzAiIGN5PSI3NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNzAiIGN5PSI4NSIgcj0iNCIgZmlsbD0iIzY1NDMyMSIvPgo8Y2lyY2xlIGN4PSIxNDAiIGN5PSIxMDUiIHI9IjMiIGZpbGw9IiM2NTQzMjEiLz4KPHN2ZyB4PSIxMzAiIHk9IjcwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNSIgZmlsbD0iIzY1NDMyMSI+8J+NqjwvdGV4dD4KPC9zdmc+Cjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc3R5bGU9Iml0YWxpYyI+RnJlc2hseSBCYWtlZCBDb29raWVzPC90ZXh0Pgo8L3N2Zz4K" alt="Recipe Image" class="recipe-image">
+                
+                <!-- Recipe tags -->
+                <div class="recipe-tags" id="recipeTags">
+                    <span class="tag">Dessert</span>
+                    <span class="tag">Baking</span>
+                    <span class="tag">Sweet</span>
+                </div>
+                
+                <!-- Difficulty rating with stars -->
+                <div class="difficulty-rating">
+                    <span>Difficulty:</span>
+                    <div class="difficulty-stars" id="recipeDifficulty">★★☆☆☆</div>
+                </div>
+                
+                <!-- Timeline showing cooking steps and timing -->
+                <div class="timeline">
+                    <div class="timeline-title">Cooking Timeline</div>
+                    <div class="timeline-steps" id="recipeTimeline">
+                        <div class="timeline-line"></div>
+                        <div class="timeline-start-dot"></div>
+                        
+                        <div class="timeline-step">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-step-content">
+                                <div class="timeline-step-name">Prep</div>
+                                <div class="timeline-step-time">15 min</div>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-step-content">
+                                <div class="timeline-step-name">Bake</div>
+                                <div class="timeline-step-time">12 min</div>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-step-content">
+                                <div class="timeline-step-name">Cool</div>
+                                <div class="timeline-step-time">10 min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="page-number">2</div>
+            </div>
+            
+            <!-- RIGHT PAGE - Contains ingredients and instructions -->
+            <div class="page page-right">
+                
+                <!-- Ingredients section -->
+                <div class="recipe-section">
+                    <h2 class="section-title">Ingredients</h2>
+                    <ul class="ingredients-list" id="ingredientsList">
+                        <li>2¼ cups all-purpose flour</li>
+                        <li>1 tsp baking soda</li>
+                        <li>1 tsp salt</li>
+                        <li>1 cup butter, softened</li>
+                        <li>¾ cup granulated sugar</li>
+                        <li>¾ cup packed brown sugar</li>
+                        <li>2 large eggs</li>
+                        <li>2 tsp vanilla extract</li>
+                        <li>2 cups chocolate chips</li>
+                    </ul>
+                </div>
+                
+                <!-- Instructions section -->
+                <div class="recipe-section">
+                    <h2 class="section-title">Instructions</h2>
+                    <div class="instructions-list" id="instructionsList">
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step1">
+                            <div class="instruction-number">1</div>
+                            <div class="instruction-text">Preheat oven to 375°F. Line baking sheets with parchment paper.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step2">
+                            <div class="instruction-number">2</div>
+                            <div class="instruction-text">In a bowl, whisk together flour, baking soda, and salt.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step3">
+                            <div class="instruction-number">3</div>
+                            <div class="instruction-text">In a large bowl, cream butter and both sugars until light and fluffy.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step4">
+                            <div class="instruction-number">4</div>
+                            <div class="instruction-text">Beat in eggs and vanilla extract until well combined.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step5">
+                            <div class="instruction-number">5</div>
+                            <div class="instruction-text">Gradually mix in flour mixture until just combined. Stir in chocolate chips.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step6">
+                            <div class="instruction-number">6</div>
+                            <div class="instruction-text">Drop rounded tablespoons of dough onto prepared baking sheets.</div>
+                        </div>
+                        <div class="instruction-item">
+                            <input type="checkbox" class="instruction-checkbox" id="step7">
+                            <div class="instruction-number">7</div>
+                            <div class="instruction-text">Bake for 9-11 minutes until golden brown. Cool on baking sheet for 5 minutes.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Control buttons -->
+                <div class="controls">
+                    <button class="btn" onclick="resetChecklist()">Reset Checklist</button>
+                </div>
+                
+                <div class="page-number">3</div>
+            </div>
+        </div>
+        
+        <!-- Navigation controls below the book -->
+        <div class="nav-controls">
+            <button class="nav-btn" onclick="previousRecipe()">← Previous</button>
+            <span id="recipeCounter">1 of 3</span>
+            <button class="nav-btn" onclick="nextRecipe()">Next →</button>
+        </div>
+    </div>
+
+    <script src="recipes.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

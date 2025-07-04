@@ -1,0 +1,699 @@
+/*
+DIGITAL COOKBOOK STYLESHEET
+============================
+
+This CSS file contains all styling for the Digital Cookbook interface.
+It creates a realistic 3D book appearance with interactive elements.
+
+CONTENTS OUTLINE:
+1. CSS Reset - Removes browser default styling
+2. Body & Container Layout - Main page background and book positioning
+3. 3D Page Stack Effects - Left and right page stacks with shadows
+4. Main Book Pages - Core book structure and spine effect
+5. Page Layout - Individual page styling and positioning
+6. Recipe Content Styles - Headers, images, tags, difficulty ratings
+7. Timeline Component - Interactive cooking timeline with steps
+8. Ingredients & Instructions - List styling and interactive checkboxes
+9. Navigation & Controls - Buttons and recipe selector
+10. Decorative Elements - Corner details and visual enhancements
+11. Responsive Design - Mobile and tablet adaptations
+
+DESIGN FEATURES:
+- 3D perspective transforms for realistic book appearance
+- Gradient backgrounds for depth and texture
+- Box shadows for realistic lighting effects
+- Smooth transitions and hover animations
+- Mobile-responsive layout with stacked pages
+- Interactive checkboxes with completion states
+- Timeline visualization with connecting lines and dots
+
+COLOR SCHEME:
+- Primary: Brown tones (#8B4513, #A0522D, #654321)
+- Background: Warm gradient (#2c1810 to #6b3e2e)
+- Paper: White/cream tones (#ffffff, #fafafa, #f8f8f8)
+- Accents: Gold stars (#FFD700), gray text (#666, #888)
+*/
+
+/* =============================================================================
+   1. CSS RESET - Removes default browser styling for consistent appearance
+   ============================================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* =============================================================================
+   2. BODY & CONTAINER LAYOUT - Main page setup and book positioning
+   ============================================================================= */
+body {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #6b3e2e 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    perspective: 1200px;
+}
+
+.book-container {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    height: 80vh;
+    min-height: 650px;
+}
+
+/* =============================================================================
+   3. 3D PAGE STACK EFFECTS - Creates illusion of multiple stacked pages
+   ============================================================================= */
+
+/* Left page stack with 3D rotation */
+.page-stack-left {
+    position: absolute;
+    left: 0;
+    top: 20px;
+    width: 48%;
+    height: calc(100% - 40px);
+    transform-origin: right center;
+    transform: perspective(1000px) rotateY(-15deg);
+}
+
+/* Shadow layers for left stack depth effect */
+.page-stack-left::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: 10px;
+    bottom: -5px;
+    background: linear-gradient(to right, #f8f8f8, #e8e8e8, #d8d8d8);
+    border-radius: 5px 0 0 5px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    z-index: -3;
+}
+
+.page-stack-left::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: 8px;
+    bottom: -3px;
+    background: linear-gradient(to right, #f0f0f0, #e0e0e0, #d0d0d0);
+    border-radius: 5px 0 0 5px;
+    box-shadow: -3px 0 10px rgba(0,0,0,0.15);
+    z-index: -2;
+}
+
+/* Right page stack with opposite 3D rotation */
+.page-stack-right {
+    position: absolute;
+    right: 0;
+    top: 20px;
+    width: 48%;
+    height: calc(100% - 40px);
+    transform-origin: left center;
+    transform: perspective(1000px) rotateY(15deg);
+}
+
+/* Shadow layers for right stack depth effect */
+.page-stack-right::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 10px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(to left, #f8f8f8, #e8e8e8, #d8d8d8);
+    border-radius: 0 5px 5px 0;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+    z-index: -3;
+}
+
+.page-stack-right::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 8px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(to left, #f0f0f0, #e0e0e0, #d0d0d0);
+    border-radius: 0 5px 5px 0;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.15);
+    z-index: -2;
+}
+
+/* =============================================================================
+   4. MAIN BOOK PAGES - Core book structure and binding
+   ============================================================================= */
+.book-pages {
+    position: absolute;
+    left: 2%;
+    top: 10px;
+    width: 96%;
+    height: calc(100% - 20px);
+    display: flex;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow: hidden;
+    z-index: 10;
+}
+
+/* Book spine shadow effect down the center */
+.book-spine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, 
+        rgba(0,0,0,0.1) 0%,
+        rgba(0,0,0,0.3) 20%,
+        rgba(0,0,0,0.3) 80%,
+        rgba(0,0,0,0.1) 100%
+    );
+    transform: translateX(-50%);
+    z-index: 15;
+}
+
+/* =============================================================================
+   5. PAGE LAYOUT - Individual page styling and positioning
+   ============================================================================= */
+.page {
+    width: 50%;
+    height: 100%;
+    padding: 40px 30px;
+    position: relative;
+    overflow-y: auto;
+    background: linear-gradient(to bottom, #ffffff 0%, #fefefe 100%);
+}
+
+/* Left page with gradient shadow near spine */
+.page-left {
+    background: linear-gradient(to right, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+    border-right: 1px solid #eee;
+}
+
+/* Right page with gradient shadow near spine */
+.page-right {
+    background: linear-gradient(to left, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+}
+
+/* Page numbers at bottom corners */
+.page-number {
+    position: absolute;
+    bottom: 20px;
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+}
+
+.page-left .page-number {
+    left: 30px;
+}
+
+.page-right .page-number {
+    right: 30px;
+}
+
+/* =============================================================================
+   6. RECIPE CONTENT STYLES - Headers, images, tags, and ratings
+   ============================================================================= */
+
+/* Recipe header section */
+.recipe-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #8B4513;
+}
+
+.recipe-title {
+    font-size: 2.4em;
+    color: #8B4513;
+    margin-bottom: 8px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.recipe-time {
+    color: #666;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1.1em;
+}
+
+/* Recipe image styling */
+.recipe-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    border: 3px solid #f0f0f0;
+}
+
+/* Recipe tags container and individual tags */
+.recipe-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.tag {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Difficulty rating with stars */
+.difficulty-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+.difficulty-stars {
+    color: #FFD700;
+    font-size: 1.2em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* =============================================================================
+   7. TIMELINE COMPONENT - Interactive cooking timeline with connecting elements
+   ============================================================================= */
+.timeline {
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-left: 5px solid #8B4513;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.timeline-title {
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.timeline-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    height: 80px;
+}
+
+/* Starting dot for timeline */
+.timeline-start-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+/* Individual timeline step container */
+.timeline-step {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Content box for each timeline step */
+.timeline-step-content {
+    text-align: center;
+    position: relative;
+    z-index: 3;
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.timeline-step-name {
+    font-weight: bold;
+    color: #8B4513;
+    font-size: 0.9em;
+    margin-bottom: 2px;
+}
+
+.timeline-step-time {
+    color: #666;
+    font-size: 0.8em;
+}
+
+/* Timeline dots positioning */
+.timeline-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: absolute;
+    z-index: 2;
+}
+
+.timeline-step:first-child .timeline-dot {
+    left: 0;
+    transform: translateX(-50%);
+}
+
+.timeline-step:last-child .timeline-dot {
+    right: 0;
+    transform: translateX(50%);
+}
+
+.timeline-step:not(:first-child):not(:last-child) .timeline-dot {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Connecting line along timeline */
+.timeline-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, #8B4513, #D2691E, #8B4513);
+    border-radius: 2px;
+    z-index: 1;
+    transform: translateY(-50%);
+}
+
+/* =============================================================================
+   8. INGREDIENTS & INSTRUCTIONS - Lists and interactive elements
+   ============================================================================= */
+
+/* General recipe section spacing */
+.recipe-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 1.4em;
+    color: #8B4513;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 8px;
+    font-weight: bold;
+}
+
+/* Ingredients list styling */
+.ingredients-list {
+    list-style: none;
+    padding: 0;
+}
+
+.ingredients-list li {
+    margin-bottom: 10px;
+    padding: 8px 0 8px 20px;
+    position: relative;
+    border-bottom: 1px dotted #eee;
+}
+
+/* Spoon emoji before each ingredient */
+.ingredients-list li:before {
+    content: "🥄";
+    position: absolute;
+    left: 0;
+    top: 8px;
+}
+
+/* Instructions list container */
+.instructions-list {
+    list-style: none;
+    padding: 0;
+}
+
+/* Individual instruction item with interactive checkbox */
+.instruction-item {
+    margin-bottom: 18px;
+    padding: 15px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.instruction-checkbox {
+    margin-top: 4px;
+    transform: scale(1.3);
+    accent-color: #8B4513;
+}
+
+.instruction-text {
+    flex: 1;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+}
+
+/* Completed instruction states */
+.instruction-item.completed .instruction-text {
+    text-decoration: line-through;
+    color: #999;
+    opacity: 0.6;
+}
+
+.instruction-item.completed .instruction-number {
+    background: linear-gradient(135deg, #999 0%, #777 100%);
+    opacity: 0.6;
+}
+
+.instruction-item.completed {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    border-left-color: #999;
+}
+
+/* Numbered circles for instructions */
+.instruction-number {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* =============================================================================
+   9. NAVIGATION & CONTROLS - Buttons and recipe selector
+   ============================================================================= */
+
+/* Control buttons in bottom right */
+.controls {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    display: flex;
+    gap: 12px;
+}
+
+/* General button styling */
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+}
+
+/* Navigation controls at bottom */
+.nav-controls {
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    background: rgba(255,255,255,0.9);
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+}
+
+.nav-btn {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.nav-btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-1px);
+}
+
+.nav-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Recipe selector dropdown */
+.recipe-selector {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.95);
+    border: 2px solid #8B4513;
+    border-radius: 12px;
+    padding: 10px 15px;
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+}
+
+.recipe-selector select {
+    border: none;
+    background: transparent;
+    color: #8B4513;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1em;
+    outline: none;
+}
+
+/* =============================================================================
+   10. DECORATIVE ELEMENTS - Corner details and visual enhancements
+   ============================================================================= */
+
+/* Top-left corner decoration */
+.book-pages::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    z-index: 5;
+}
+
+/* Top-right corner decoration */
+.book-pages::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    clip-path: polygon(100% 0, 100% 100%, 0 0);
+    z-index: 5;
+}
+
+/* =============================================================================
+   11. RESPONSIVE DESIGN - Mobile and tablet adaptations
+   ============================================================================= */
+@media (max-width: 768px) {
+    .book-container {
+        height: 95vh;
+        width: 95%;
+    }
+    
+    .book-pages {
+        flex-direction: column;
+        left: 1%;
+        width: 98%;
+    }
+    
+    .page {
+        width: 100%;
+        height: 50%;
+        padding: 20px 15px;
+    }
+    
+    .page-left {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        background: linear-gradient(to bottom, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+    }
+    
+    .page-right {
+        background: linear-gradient(to top, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+    }
+    
+    .book-spine {
+        width: 100%;
+        height: 2px;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(to right, 
+            rgba(0,0,0,0.1) 0%, 
+            rgba(0,0,0,0.3) 20%, 
+            rgba(0,0,0,0.3) 80%, 
+            rgba(0,0,0,0.1) 100%
+        );
+    }
+    
+    .page-stack-left,
+    .page-stack-right {
+        display: none;
+    }
+    
+    .recipe-title {
+        font-size: 1.8em;
+    }
+    
+    .nav-controls {
+        bottom: -70px;
+    }
+}
