@@ -15,8 +15,11 @@ CONTENTS OUTLINE:
 7. Timeline Component - Interactive cooking timeline with steps
 8. Ingredients & Instructions - List styling and interactive checkboxes
 9. Navigation & Controls - Buttons and recipe selector
-10. Decorative Elements - Corner details and visual enhancements
-11. Responsive Design - Mobile and tablet adaptations
+10. Header Button Bar - Table of Contents, Random, New Recipe buttons
+11. Table of Contents Styles - Multi-column recipe index layout
+12. New Recipe Form Styles - Form inputs and styling
+13. Decorative Elements - Corner details and visual enhancements
+14. Responsive Design - Mobile and tablet adaptations
 
 DESIGN FEATURES:
 - 3D perspective transforms for realistic book appearance
@@ -26,6 +29,9 @@ DESIGN FEATURES:
 - Mobile-responsive layout with stacked pages
 - Interactive checkboxes with completion states
 - Timeline visualization with connecting lines and dots
+- Three-button header navigation system
+- Scrollable table of contents with recipe thumbnails
+- Interactive form for adding new recipes
 
 COLOR SCHEME:
 - Primary: Brown tones (#8B4513, #A0522D, #654321)
@@ -73,9 +79,9 @@ body {
 .page-stack-left {
     position: absolute;
     left: 0;
-    top: 20px;
+    top: 60px; /* Moved down to make room for header buttons */
     width: 48%;
-    height: calc(100% - 40px);
+    height: calc(100% - 80px); /* Adjusted height for header space */
     transform-origin: right center;
     transform: perspective(1000px) rotateY(-15deg);
 }
@@ -111,9 +117,9 @@ body {
 .page-stack-right {
     position: absolute;
     right: 0;
-    top: 20px;
+    top: 60px; /* Moved down to make room for header buttons */
     width: 48%;
-    height: calc(100% - 40px);
+    height: calc(100% - 80px); /* Adjusted height for header space */
     transform-origin: left center;
     transform: perspective(1000px) rotateY(15deg);
 }
@@ -146,14 +152,65 @@ body {
 }
 
 /* =============================================================================
+   10. HEADER BUTTON BAR - Table of Contents, Random, New Recipe buttons
+   ============================================================================= */
+
+/* Container for the three header buttons positioned above the book */
+.header-buttons {
+    position: absolute;
+    top: -50px; /* Positioned above the book */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px; /* Space between buttons */
+    background: rgba(255,255,255,0.95); /* Semi-transparent white background */
+    border: 2px solid #8B4513; /* Brown border matching book theme */
+    border-radius: 12px;
+    padding: 12px 20px;
+    z-index: 20; /* High z-index to appear above other elements */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Drop shadow for depth */
+    backdrop-filter: blur(10px); /* Blur effect for modern glass look */
+}
+
+/* Base styling for all header buttons */
+.header-btn {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease; /* Smooth transitions for hover effects */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between icon and text */
+}
+
+/* Uniform styling for all header buttons - consistent brown theme */
+.header-btn.toc,
+.header-btn.random,
+.header-btn.new {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+}
+
+.header-btn.toc:hover,
+.header-btn.random:hover,
+.header-btn.new:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* =============================================================================
    4. MAIN BOOK PAGES - Core book structure and binding
    ============================================================================= */
 .book-pages {
     position: absolute;
     left: 2%;
-    top: 10px;
+    top: 50px; /* Moved down to accommodate header buttons */
     width: 96%;
-    height: calc(100% - 20px);
+    height: calc(100% - 60px); /* Adjusted height for header space */
     display: flex;
     background: #ffffff;
     border-radius: 8px;
@@ -220,6 +277,342 @@ body {
 }
 
 /* =============================================================================
+   11. TABLE OF CONTENTS STYLES - Multi-column recipe index layout
+   ============================================================================= */
+
+/* Main container for table of contents page */
+.table-of-contents {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Header for table of contents page */
+.toc-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #8B4513;
+}
+
+.toc-title {
+    font-size: 2.2em;
+    color: #8B4513;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.toc-subtitle {
+    color: #666;
+    font-style: italic;
+    font-size: 1em;
+}
+
+/* Grid layout for recipe entries in table of contents */
+.toc-recipes {
+    display: grid;
+    grid-template-columns: 1fr; /* Single column layout */
+    gap: 15px;
+}
+
+/* Individual recipe entry in table of contents */
+.toc-recipe {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.toc-recipe:hover {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    transform: translateX(5px); /* Slide effect on hover */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Small thumbnail image for each recipe in TOC */
+.toc-recipe-image {
+    width: 60px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #ddd;
+}
+
+/* Recipe information in table of contents */
+.toc-recipe-info {
+    flex: 1;
+}
+
+.toc-recipe-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 5px;
+}
+
+.toc-recipe-meta {
+    color: #666;
+    font-size: 0.9em;
+    display: flex;
+    gap: 15px;
+}
+
+/* Page number indicator in table of contents */
+.toc-page-number {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Table of Contents Controls */
+.toc-controls {
+    padding: 1rem;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 1rem;
+}
+
+.control-section {
+    margin-bottom: 1rem;
+}
+
+.control-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.toc-select {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Tag Filter Styling */
+.tag-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background-color: #f8f8f8;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tag-filter:hover {
+    background-color: #eee;
+}
+
+.filter-btn {
+    margin-right: 0.5rem;
+    margin-bottom: 0.7rem;
+    padding: 0.3rem 0.7rem;
+    background-color: #8B4513;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.filter-btn:hover {
+    background-color: #A0522D;
+}
+
+/* =============================================================================
+   12. NEW RECIPE FORM STYLES - Form inputs and styling
+   ============================================================================= */
+
+/* Main container for new recipe form */
+.new-recipe-form {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Header for new recipe form - uniform brown theme */
+.form-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #8B4513; /* Changed from green to brown */
+}
+
+.form-title {
+    font-size: 2em;
+    color: #8B4513; /* Changed from green to brown */
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-subtitle {
+    color: #666;
+    font-style: italic;
+}
+
+/* Form section containers - uniform brown theme */
+.form-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513; /* Changed from green to brown */
+}
+
+.form-section-title {
+    font-size: 1.2em;
+    color: #8B4513; /* Changed from green to brown */
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* Form input styling - uniform brown focus */
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1em;
+    transition: border-color 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #8B4513; /* Changed from green to brown */
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1); /* Changed from green to brown */
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Dynamic list containers for ingredients and instructions */
+.dynamic-list {
+    margin-top: 10px;
+}
+
+.dynamic-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.dynamic-item input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* Remove button for dynamic list items - keep red as specified */
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background-color 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+}
+
+/* Add button for dynamic lists - uniform brown theme */
+.add-btn {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); /* Changed from green to brown */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.add-btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%); /* Changed from green to brown */
+    transform: translateY(-1px);
+}
+
+/* Form submission buttons */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+}
+
+/* Save button - uniform brown theme */
+.form-submit {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); /* Changed from green to brown */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.form-submit:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%); /* Changed from green to brown */
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+}
+
+/* Cancel button - keep grey as specified */
+.form-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.form-cancel:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+}
+
+/* =============================================================================
    6. RECIPE CONTENT STYLES - Headers, images, tags, and ratings
    ============================================================================= */
 
@@ -249,15 +642,22 @@ body {
     font-size: 1.1em;
 }
 
-/* Recipe image styling */
+/* Recipe image styling - ensures full image is always visible and scales with window */
 .recipe-image {
     width: 100%;
-    height: 180px;
-    object-fit: cover;
+    max-width: 100%;           /* Ensures image doesn't exceed container width */
+    height: auto;              /* Auto height maintains aspect ratio */
+    min-height: 120px;         /* Minimum height for very wide images */
+    max-height: 40vh;          /* Maximum height scales with viewport height */
+    object-fit: contain;       /* Shows entire image without cropping */
+    object-position: center;   /* Centers the image within container */
     border-radius: 12px;
     margin-bottom: 20px;
     box-shadow: 0 6px 16px rgba(0,0,0,0.15);
     border: 3px solid #f0f0f0;
+    display: block;            /* Ensures proper block display */
+    margin-left: auto;         /* Centers image horizontally */
+    margin-right: auto;        /* Centers image horizontally */
 }
 
 /* Recipe tags container and individual tags */
@@ -417,13 +817,29 @@ body {
     margin-bottom: 30px;
 }
 
+/* Section header with title and button on same line */
+.section-header {
+    display: flex;                    /* Makes title and button sit horizontally */
+    justify-content: space-between;   /* Pushes title left, button right */
+    align-items: center;              /* Vertically centers both elements */
+    margin-bottom: 15px;              /* Space below the header */
+    padding-bottom: 8px;              /* Space before the border line */
+    border-bottom: 2px solid #ddd;    /* Moved border from title to header container */
+}
+
 .section-title {
     font-size: 1.4em;
     color: #8B4513;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 8px;
+    margin: 0;                        /* Remove default margin since flexbox handles spacing */
     font-weight: bold;
+}
+
+/* Reset button styling when positioned in section header */
+.reset-btn {
+    padding: 8px 16px;                /* Smaller padding than regular buttons */
+    font-size: 0.8em;                 /* Smaller text to not compete with title */
+    border-radius: 20px;              /* Smaller radius for subtle appearance */
+    margin-left: 15px;                /* Space between title and button */
 }
 
 /* Ingredients list styling */
@@ -433,7 +849,8 @@ body {
 }
 
 .ingredients-list li {
-    margin-bottom: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     padding: 8px 0 8px 20px;
     position: relative;
     border-bottom: 1px dotted #eee;
@@ -584,33 +1001,128 @@ body {
     transform: none;
 }
 
-/* Recipe selector dropdown */
-.recipe-selector {
-    position: absolute;
-    top: -50px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255,255,255,0.95);
-    border: 2px solid #8B4513;
-    border-radius: 12px;
-    padding: 10px 15px;
-    z-index: 20;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    backdrop-filter: blur(10px);
-}
-
-.recipe-selector select {
-    border: none;
-    background: transparent;
-    color: #8B4513;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 1em;
-    outline: none;
+/* Hidden class for toggling element visibility */
+.hidden {
+    display: none !important;
 }
 
 /* =============================================================================
-   10. DECORATIVE ELEMENTS - Corner details and visual enhancements
+   Image Upload Styles
+   ============================================================================= */
+
+/* Image upload section styling */
+.image-upload-section {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+/* Individual upload option containers (file vs URL) */
+.upload-option {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 2px dashed #ddd;
+    transition: border-color 0.3s ease;
+}
+
+.upload-option:hover {
+    border-color: #8B4513;
+}
+
+.upload-label {
+    display: block;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* File input styling */
+.form-file-input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: #fafafa;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.form-file-input:hover {
+    border-color: #8B4513;
+}
+
+.form-file-input:focus {
+    outline: none;
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+/* Help text styling */
+.upload-help {
+    display: block;
+    color: #666;
+    font-style: italic;
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
+/* Image preview container */
+.image-preview {
+    margin-top: 20px;
+    padding: 15px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 2px solid #8B4513;
+    text-align: center;
+}
+
+.preview-label {
+    display: block;
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 10px;
+}
+
+/* Preview image styling */
+.preview-img {
+    max-width: 100%;
+    max-height: 200px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+/* Remove image button */
+.remove-image-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.remove-image-btn:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+/* =============================================================================
+   13. DECORATIVE ELEMENTS - Corner details and visual enhancements
    ============================================================================= */
 
 /* Top-left corner decoration */
@@ -640,7 +1152,7 @@ body {
 }
 
 /* =============================================================================
-   11. RESPONSIVE DESIGN - Mobile and tablet adaptations
+   14. RESPONSIVE DESIGN - Mobile and tablet adaptations
    ============================================================================= */
 @media (max-width: 768px) {
     .book-container {
@@ -648,10 +1160,26 @@ body {
         width: 95%;
     }
     
+    /* Stack header buttons vertically on mobile */
+    .header-buttons {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 15px;
+        top: -120px; /* More space needed for stacked buttons */
+    }
+    
+    .header-btn {
+        padding: 8px 15px;
+        font-size: 0.8em;
+        justify-content: center;
+    }
+    
     .book-pages {
         flex-direction: column;
         left: 1%;
         width: 98%;
+        top: 80px; /* Adjusted for mobile header layout */
+        height: calc(100% - 100px);
     }
     
     .page {
@@ -694,6 +1222,29 @@ body {
     }
     
     .nav-controls {
-        bottom: -70px;
+        bottom: -90px; /* More space for mobile stacked header */
+    }
+    
+    /* Mobile form adaptations */
+    .form-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .form-submit,
+    .form-cancel {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    /* Table of contents mobile layout */
+    .toc-recipe {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .toc-recipe-image {
+        width: 80px;
+        height: 50px;
     }
 }
