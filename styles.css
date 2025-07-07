@@ -4,6 +4,8 @@ DIGITAL COOKBOOK STYLESHEET
 
 This CSS file contains all styling for the Digital Cookbook interface.
 It creates a realistic 3D book appearance with interactive elements.
+Updated to support split Table of Contents layout with controls on left and results on right.
+Updated to support separated ingredient input fields (quantity, unit, ingredient).
 
 CONTENTS OUTLINE:
 1. CSS Reset - Removes browser default styling
@@ -16,10 +18,12 @@ CONTENTS OUTLINE:
 8. Ingredients & Instructions - List styling and interactive checkboxes
 9. Navigation & Controls - Buttons and recipe selector
 10. Header Button Bar - Table of Contents, Random, New Recipe buttons
-11. Table of Contents Styles - Multi-column recipe index layout
+11. Table of Contents Styles - Split layout with controls (left) and results (right)
 12. New Recipe Form Styles - Form inputs and styling
-13. Decorative Elements - Corner details and visual enhancements
-14. Responsive Design - Mobile and tablet adaptations
+13. Image Upload Styles - File upload and preview functionality
+14. Ingredient Input Styles - Separated quantity, unit, ingredient fields
+15. Decorative Elements - Corner details and visual enhancements
+16. Responsive Design - Mobile and tablet adaptations
 
 DESIGN FEATURES:
 - 3D perspective transforms for realistic book appearance
@@ -30,8 +34,9 @@ DESIGN FEATURES:
 - Interactive checkboxes with completion states
 - Timeline visualization with connecting lines and dots
 - Three-button header navigation system
-- Scrollable table of contents with recipe thumbnails
+- Split table of contents with search controls on left and results on right
 - Interactive form for adding new recipes
+- Separated ingredient input fields for better data entry
 
 COLOR SCHEME:
 - Primary: Brown tones (#8B4513, #A0522D, #654321)
@@ -152,57 +157,6 @@ body {
 }
 
 /* =============================================================================
-   10. HEADER BUTTON BAR - Table of Contents, Random, New Recipe buttons
-   ============================================================================= */
-
-/* Container for the three header buttons positioned above the book */
-.header-buttons {
-    position: absolute;
-    top: -50px; /* Positioned above the book */
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 15px; /* Space between buttons */
-    background: rgba(255,255,255,0.95); /* Semi-transparent white background */
-    border: 2px solid #8B4513; /* Brown border matching book theme */
-    border-radius: 12px;
-    padding: 12px 20px;
-    z-index: 20; /* High z-index to appear above other elements */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Drop shadow for depth */
-    backdrop-filter: blur(10px); /* Blur effect for modern glass look */
-}
-
-/* Base styling for all header buttons */
-.header-btn {
-    border: none;
-    padding: 10px 18px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.9em;
-    font-weight: bold;
-    transition: all 0.3s ease; /* Smooth transitions for hover effects */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    display: flex;
-    align-items: center;
-    gap: 8px; /* Space between icon and text */
-}
-
-/* Uniform styling for all header buttons - consistent brown theme */
-.header-btn.toc,
-.header-btn.random,
-.header-btn.new {
-    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-    color: white;
-}
-
-.header-btn.toc:hover,
-.header-btn.random:hover,
-.header-btn.new:hover {
-    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
-    transform: translateY(-2px); /* Lift effect on hover */
-}
-
-/* =============================================================================
    4. MAIN BOOK PAGES - Core book structure and binding
    ============================================================================= */
 .book-pages {
@@ -274,342 +228,6 @@ body {
 
 .page-right .page-number {
     right: 30px;
-}
-
-/* =============================================================================
-   11. TABLE OF CONTENTS STYLES - Multi-column recipe index layout
-   ============================================================================= */
-
-/* Main container for table of contents page */
-.table-of-contents {
-    height: 100%;
-    overflow-y: auto;
-}
-
-/* Header for table of contents page */
-.toc-header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 3px solid #8B4513;
-}
-
-.toc-title {
-    font-size: 2.2em;
-    color: #8B4513;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-.toc-subtitle {
-    color: #666;
-    font-style: italic;
-    font-size: 1em;
-}
-
-/* Grid layout for recipe entries in table of contents */
-.toc-recipes {
-    display: grid;
-    grid-template-columns: 1fr; /* Single column layout */
-    gap: 15px;
-}
-
-/* Individual recipe entry in table of contents */
-.toc-recipe {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
-    border-radius: 10px;
-    border-left: 5px solid #8B4513;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
-
-.toc-recipe:hover {
-    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
-    transform: translateX(5px); /* Slide effect on hover */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* Small thumbnail image for each recipe in TOC */
-.toc-recipe-image {
-    width: 60px;
-    height: 40px;
-    object-fit: cover;
-    border-radius: 6px;
-    border: 2px solid #ddd;
-}
-
-/* Recipe information in table of contents */
-.toc-recipe-info {
-    flex: 1;
-}
-
-.toc-recipe-title {
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #8B4513;
-    margin-bottom: 5px;
-}
-
-.toc-recipe-meta {
-    color: #666;
-    font-size: 0.9em;
-    display: flex;
-    gap: 15px;
-}
-
-/* Page number indicator in table of contents */
-.toc-page-number {
-    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 0.9em;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-/* Table of Contents Controls */
-.toc-controls {
-    padding: 1rem;
-    border-bottom: 1px solid #ccc;
-    margin-bottom: 1rem;
-}
-
-.control-section {
-    margin-bottom: 1rem;
-}
-
-.control-title {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.toc-select {
-    width: 100%;
-    padding: 0.5rem;
-    font-size: 1rem;
-}
-
-/* Tag Filter Styling */
-.tag-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.tag-filter {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    background-color: #f8f8f8;
-    padding: 0.3rem 0.6rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.tag-filter:hover {
-    background-color: #eee;
-}
-
-.filter-btn {
-    margin-right: 0.5rem;
-    margin-bottom: 0.7rem;
-    padding: 0.3rem 0.7rem;
-    background-color: #8B4513;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.filter-btn:hover {
-    background-color: #A0522D;
-}
-
-/* =============================================================================
-   12. NEW RECIPE FORM STYLES - Form inputs and styling
-   ============================================================================= */
-
-/* Main container for new recipe form */
-.new-recipe-form {
-    height: 100%;
-    overflow-y: auto;
-}
-
-/* Header for new recipe form - uniform brown theme */
-.form-header {
-    text-align: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 3px solid #8B4513; /* Changed from green to brown */
-}
-
-.form-title {
-    font-size: 2em;
-    color: #8B4513; /* Changed from green to brown */
-    margin-bottom: 8px;
-    font-weight: bold;
-}
-
-.form-subtitle {
-    color: #666;
-    font-style: italic;
-}
-
-/* Form section containers - uniform brown theme */
-.form-section {
-    margin-bottom: 25px;
-    padding: 20px;
-    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
-    border-radius: 10px;
-    border-left: 5px solid #8B4513; /* Changed from green to brown */
-}
-
-.form-section-title {
-    font-size: 1.2em;
-    color: #8B4513; /* Changed from green to brown */
-    margin-bottom: 15px;
-    font-weight: bold;
-}
-
-/* Form input styling - uniform brown focus */
-.form-input,
-.form-textarea,
-.form-select {
-    width: 100%;
-    padding: 10px 12px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 1em;
-    transition: border-color 0.3s ease;
-    margin-bottom: 10px;
-}
-
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
-    outline: none;
-    border-color: #8B4513; /* Changed from green to brown */
-    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1); /* Changed from green to brown */
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-/* Dynamic list containers for ingredients and instructions */
-.dynamic-list {
-    margin-top: 10px;
-}
-
-.dynamic-item {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    align-items: center;
-}
-
-.dynamic-item input {
-    flex: 1;
-    margin-bottom: 0;
-}
-
-/* Remove button for dynamic list items - keep red as specified */
-.remove-btn {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8em;
-    transition: background-color 0.3s ease;
-}
-
-.remove-btn:hover {
-    background: #c82333;
-}
-
-/* Add button for dynamic lists - uniform brown theme */
-.add-btn {
-    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); /* Changed from green to brown */
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9em;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    margin-top: 10px;
-}
-
-.add-btn:hover {
-    background: linear-gradient(135deg, #654321 0%, #8B4513 100%); /* Changed from green to brown */
-    transform: translateY(-1px);
-}
-
-/* Form submission buttons */
-.form-actions {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 2px solid #ddd;
-}
-
-/* Save button - uniform brown theme */
-.form-submit {
-    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); /* Changed from green to brown */
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-}
-
-.form-submit:hover {
-    background: linear-gradient(135deg, #654321 0%, #8B4513 100%); /* Changed from green to brown */
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
-}
-
-/* Cancel button - keep grey as specified */
-.form-cancel {
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-}
-
-.form-cancel:hover {
-    background: #5a6268;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
 }
 
 /* =============================================================================
@@ -1007,7 +625,513 @@ body {
 }
 
 /* =============================================================================
-   Image Upload Styles
+   10. HEADER BUTTON BAR - Table of Contents, Random, New Recipe buttons
+   ============================================================================= */
+
+/* Container for the three header buttons positioned above the book */
+.header-buttons {
+    position: absolute;
+    top: -50px; /* Positioned above the book */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px; /* Space between buttons */
+    background: rgba(255,255,255,0.95); /* Semi-transparent white background */
+    border: 2px solid #8B4513; /* Brown border matching book theme */
+    border-radius: 12px;
+    padding: 12px 20px;
+    z-index: 20; /* High z-index to appear above other elements */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Drop shadow for depth */
+    backdrop-filter: blur(10px); /* Blur effect for modern glass look */
+}
+
+/* Base styling for all header buttons */
+.header-btn {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease; /* Smooth transitions for hover effects */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between icon and text */
+}
+
+/* Uniform styling for all header buttons - consistent brown theme */
+.header-btn.toc,
+.header-btn.random,
+.header-btn.new {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+}
+
+.header-btn.toc:hover,
+.header-btn.random:hover,
+.header-btn.new:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* =============================================================================
+   11. TABLE OF CONTENTS STYLES - Split layout with controls (left) and results (right)
+   ============================================================================= */
+
+/* TABLE OF CONTENTS CONTROLS - Left page styling */
+.table-of-contents-controls {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Header for table of contents controls page */
+.toc-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #8B4513;
+}
+
+.toc-title {
+    font-size: 2em;
+    color: #8B4513;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.toc-subtitle {
+    color: #666;
+    font-style: italic;
+    font-size: 1em;
+}
+
+/* Search section styling */
+.toc-search-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.control-title {
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Search input styling */
+.search-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    font-family: inherit;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1), inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-input::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+.search-help {
+    display: block;
+    color: #666;
+    font-style: italic;
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+
+/* Table of Contents Controls */
+.toc-controls {
+    padding: 1rem;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 1rem;
+}
+
+.control-section {
+    margin-bottom: 1rem;
+}
+
+.toc-select {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: #ffffff;
+    transition: border-color 0.3s ease;
+}
+
+.toc-select:focus {
+    outline: none;
+    border-color: #8B4513;
+}
+
+/* Tag Filter Styling */
+.tag-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background-color: #f8f8f8;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tag-filter:hover {
+    background-color: #eee;
+}
+
+.filter-btn {
+    margin-right: 0.5rem;
+    margin-bottom: 0.7rem;
+    padding: 0.3rem 0.7rem;
+    background-color: #8B4513;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-btn:hover {
+    background-color: #A0522D;
+}
+
+/* Recipe count display */
+.recipe-count {
+    text-align: center;
+    font-weight: bold;
+    color: #8B4513;
+    padding: 10px;
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+}
+
+/* TABLE OF CONTENTS RESULTS - Right page styling */
+.table-of-contents-results {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Header for table of contents results page */
+.toc-results-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #8B4513;
+}
+
+.toc-results-title {
+    font-size: 1.8em;
+    color: #8B4513;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.toc-results-subtitle {
+    color: #666;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+/* Grid layout for recipe entries in table of contents results */
+.toc-recipes {
+    display: grid;
+    grid-template-columns: 1fr; /* Single column layout */
+    gap: 12px;
+}
+
+/* Individual recipe entry in table of contents */
+.toc-recipe {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.toc-recipe:hover {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    transform: translateX(5px); /* Slide effect on hover */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Small thumbnail image for each recipe in TOC */
+.toc-recipe-image {
+    width: 60px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #ddd;
+    flex-shrink: 0;
+}
+
+/* Recipe information in table of contents */
+.toc-recipe-info {
+    flex: 1;
+    min-width: 0; /* Prevents flex item from overflowing */
+}
+
+.toc-recipe-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 5px;
+    word-wrap: break-word;
+}
+
+.toc-recipe-meta {
+    color: #666;
+    font-size: 0.9em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* No results message styling */
+.no-results-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.no-results-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.no-results-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #8B4513;
+}
+
+.no-results-suggestion {
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+/* =============================================================================
+   12. NEW RECIPE FORM STYLES - Form inputs and styling
+   ============================================================================= */
+
+/* Main container for new recipe form */
+.new-recipe-form {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Header for new recipe form - uniform brown theme */
+.form-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #8B4513;
+}
+
+.form-title {
+    font-size: 2em;
+    color: #8B4513;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-subtitle {
+    color: #666;
+    font-style: italic;
+}
+
+/* Form section containers - uniform brown theme */
+.form-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513;
+}
+
+.form-section-title {
+    font-size: 1.2em;
+    color: #8B4513;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* Form help text for guidance */
+.form-help-text {
+    color: #666;
+    font-style: italic;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+/* Form input styling - uniform brown focus */
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1em;
+    transition: border-color 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Dynamic list containers for ingredients and instructions */
+.dynamic-list {
+    margin-top: 10px;
+}
+
+.dynamic-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.dynamic-item input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* Remove button for dynamic list items - keep red as specified */
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background-color 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+}
+
+/* Add button for dynamic lists - uniform brown theme */
+.add-btn {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.add-btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-1px);
+}
+
+/* Form submission buttons */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+}
+
+/* Save button - uniform brown theme */
+.form-submit {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.form-submit:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+}
+
+/* Cancel button - keep grey as specified */
+.form-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.form-cancel:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+}
+
+/* =============================================================================
+   13. IMAGE UPLOAD STYLES - File upload and preview functionality
    ============================================================================= */
 
 /* Image upload section styling */
@@ -1122,7 +1246,151 @@ body {
 }
 
 /* =============================================================================
-   13. DECORATIVE ELEMENTS - Corner details and visual enhancements
+   14. INGREDIENT INPUT STYLES - Separated quantity, unit, ingredient fields
+   ============================================================================= */
+
+/* Specific styling for ingredient input items with three separate fields */
+.ingredient-item {
+    display: flex;
+    gap: 8px; /* Smaller gap for better field grouping */
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+/* Container for quantity input with fraction helper */
+.quantity-input-container {
+    position: relative;
+    flex: 0 0 80px; /* Fixed width for quantity field - fits numbers and fractions */
+    min-width: 80px;
+}
+
+/* Individual ingredient input field sizing and styling */
+.ingredient-quantity-input {
+    width: 100%; /* Fill the container */
+    margin-bottom: 0;
+    text-align: center; /* Center-align numbers for better readability */
+}
+
+.ingredient-unit-input {
+    flex: 0 0 100px; /* Fixed width for unit field - fits common units like "cups", "tbsp" */
+    min-width: 100px;
+    margin-bottom: 0;
+}
+
+.ingredient-name-input {
+    flex: 1; /* Takes remaining space - allows longer ingredient names */
+    margin-bottom: 0;
+}
+
+/* Fraction helper popup styling */
+.fraction-helper {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    background: #ffffff;
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin-top: 2px;
+    animation: fadeIn 0.2s ease-out;
+    /* Fixed sizing - make it wider than the container */
+    width: 240px; /* Fixed width regardless of container */
+    min-width: 240px;
+    /* Prevent it from going off screen on the right */
+    right: auto;
+}
+
+/* If the helper would go off the right edge, position it to the right instead */
+.fraction-helper.align-right {
+    left: auto;
+    right: 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fraction-helper-title {
+    font-size: 0.8em;
+    color: #8B4513;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+.fraction-buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 6 columns for compact layout */
+    gap: 4px;
+}
+
+.fraction-btn {
+    background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px 2px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fraction-btn:hover {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.fraction-btn:active {
+    transform: translateY(0);
+}
+
+/* Hover and focus states for ingredient inputs */
+.ingredient-quantity-input:focus,
+.ingredient-unit-input:focus,
+.ingredient-name-input:focus {
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+/* Placeholder styling for ingredient inputs */
+.ingredient-quantity-input::placeholder {
+    color: #999;
+    font-size: 0.9em;
+}
+
+.ingredient-unit-input::placeholder {
+    color: #999;
+    font-size: 0.9em;
+}
+
+.ingredient-name-input::placeholder {
+    color: #999;
+    font-size: 0.9em;
+}
+
+/* Remove button spacing for ingredient items */
+.ingredient-item .remove-btn {
+    flex-shrink: 0; /* Prevent button from shrinking */
+    margin-left: 5px; /* Small gap between inputs and remove button */
+}
+
+/* =============================================================================
+   15. DECORATIVE ELEMENTS - Corner details and visual enhancements
    ============================================================================= */
 
 /* Top-left corner decoration */
@@ -1152,7 +1420,7 @@ body {
 }
 
 /* =============================================================================
-   14. RESPONSIVE DESIGN - Mobile and tablet adaptations
+   16. RESPONSIVE DESIGN - Mobile and tablet adaptations
    ============================================================================= */
 @media (max-width: 768px) {
     .book-container {
@@ -1246,5 +1514,85 @@ body {
     .toc-recipe-image {
         width: 80px;
         height: 50px;
+    }
+    
+    /* Mobile search input adjustments */
+    .search-input {
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
+    
+    /* Mobile TOC controls */
+    .toc-controls {
+        padding: 0.8rem;
+    }
+    
+    .tag-filters {
+        gap: 0.3rem;
+    }
+    
+    .tag-filter {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.8em;
+    }
+    
+    /* Mobile TOC results */
+    .toc-results-title {
+        font-size: 1.5em;
+    }
+    
+    .toc-recipe-meta {
+        flex-direction: column;
+        gap: 5px;
+        font-size: 0.8em;
+    }
+    
+    /* Mobile ingredient input adaptations */
+    .ingredient-item {
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+        background: #f9f9f9;
+        border-radius: 8px;
+    }
+    
+    .quantity-input-container,
+    .ingredient-unit-input,
+    .ingredient-name-input {
+        flex: none;
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .ingredient-quantity-input {
+        width: 100%;
+    }
+    
+    .ingredient-item .remove-btn {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 5px;
+    }
+    
+    /* Mobile fraction helper adjustments */
+    .fraction-helper {
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2000;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+    
+    .fraction-buttons {
+        grid-template-columns: repeat(4, 1fr); /* Fewer columns on mobile */
+        gap: 6px;
+    }
+    
+    .fraction-btn {
+        min-height: 32px;
+        font-size: 1em;
     }
 }

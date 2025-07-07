@@ -20,7 +20,10 @@ Each recipe contains the following properties:
 - timeline: Array - Cooking steps with timing information
   - step: String - Name of the cooking phase
   - time: String - Duration for this step
-- ingredients: Array - List of ingredients with measurements
+- ingredients: Array - List of ingredient objects with separate components
+  - quantity: String - Amount/number (e.g., "2¼", "1", "¾")
+  - unit: String - Measurement unit (e.g., "cups", "tsp", "large")
+  - ingredient: String - Ingredient name (e.g., "all-purpose flour", "eggs")
 - instructions: Array - Step-by-step cooking instructions
 
 USAGE:
@@ -37,6 +40,13 @@ to include the new recipe.
 SVG IMAGES:
 The images are base64-encoded SVG graphics for consistent display.
 Replace with actual image URLs or base64-encoded photos as needed.
+
+INGREDIENT DATA STRUCTURE:
+Each ingredient is now an object with three properties:
+- quantity: The numeric amount (can include fractions like "2¼")
+- unit: The measurement unit (cups, teaspoons, etc.)
+- ingredient: The actual ingredient name
+This allows for better data manipulation, searching, and display formatting.
 */
 
 // Main recipe data array - contains all available recipes
@@ -53,16 +63,17 @@ const recipes = [
             { step: "Bake", time: "12 min" },
             { step: "Cool", time: "10 min" }
         ],
+        // Updated ingredients structure with separate quantity, unit, and ingredient components
         ingredients: [
-            "2¼ cups all-purpose flour",
-            "1 tsp baking soda",
-            "1 tsp salt",
-            "1 cup butter, softened",
-            "¾ cup granulated sugar",
-            "¾ cup packed brown sugar",
-            "2 large eggs",
-            "2 tsp vanilla extract",
-            "2 cups chocolate chips"
+            { quantity: "2¼", unit: "cups", ingredient: "all-purpose flour" },
+            { quantity: "1", unit: "tsp", ingredient: "baking soda" },
+            { quantity: "1", unit: "tsp", ingredient: "salt" },
+            { quantity: "1", unit: "cup", ingredient: "butter, softened" },
+            { quantity: "¾", unit: "cup", ingredient: "granulated sugar" },
+            { quantity: "¾", unit: "cup", ingredient: "packed brown sugar" },
+            { quantity: "2", unit: "large", ingredient: "eggs" },
+            { quantity: "2", unit: "tsp", ingredient: "vanilla extract" },
+            { quantity: "2", unit: "cups", ingredient: "chocolate chips" }
         ],
         instructions: [
             "Preheat oven to 375°F. Line baking sheets with parchment paper.",
@@ -87,16 +98,17 @@ const recipes = [
             { step: "Prep", time: "30 min" },
             { step: "Bake", time: "15 min" }
         ],
+        // Updated ingredients structure with separate quantity, unit, and ingredient components
         ingredients: [
-            "3 cups all-purpose flour",
-            "1 tsp salt",
-            "1 tbsp sugar",
-            "1 packet active dry yeast",
-            "1 cup warm water",
-            "2 tbsp olive oil",
-            "1 cup pizza sauce",
-            "2 cups mozzarella cheese",
-            "Toppings of choice"
+            { quantity: "3", unit: "cups", ingredient: "all-purpose flour" },
+            { quantity: "1", unit: "tsp", ingredient: "salt" },
+            { quantity: "1", unit: "tbsp", ingredient: "sugar" },
+            { quantity: "1", unit: "packet", ingredient: "active dry yeast" },
+            { quantity: "1", unit: "cup", ingredient: "warm water" },
+            { quantity: "2", unit: "tbsp", ingredient: "olive oil" },
+            { quantity: "1", unit: "cup", ingredient: "pizza sauce" },
+            { quantity: "2", unit: "cups", ingredient: "mozzarella cheese" },
+            { quantity: "", unit: "", ingredient: "Toppings of choice" }
         ],
         instructions: [
             "Dissolve yeast in warm water with sugar. Let stand for 5 minutes until foamy.",
@@ -121,16 +133,17 @@ const recipes = [
             { step: "Brown", time: "15 min" },
             { step: "Simmer", time: "2 hrs" }
         ],
+        // Updated ingredients structure with separate quantity, unit, and ingredient components
         ingredients: [
-            "2 lbs beef chuck, cubed",
-            "3 tbsp flour",
-            "2 tbsp oil",
-            "1 onion, diced",
-            "3 carrots, sliced",
-            "3 potatoes, cubed",
-            "4 cups beef broth",
-            "2 tsp thyme",
-            "Salt and pepper to taste"
+            { quantity: "2", unit: "lbs", ingredient: "beef chuck, cubed" },
+            { quantity: "3", unit: "tbsp", ingredient: "flour" },
+            { quantity: "2", unit: "tbsp", ingredient: "oil" },
+            { quantity: "1", unit: "", ingredient: "onion, diced" },
+            { quantity: "3", unit: "", ingredient: "carrots, sliced" },
+            { quantity: "3", unit: "", ingredient: "potatoes, cubed" },
+            { quantity: "4", unit: "cups", ingredient: "beef broth" },
+            { quantity: "2", unit: "tsp", ingredient: "thyme" },
+            { quantity: "", unit: "", ingredient: "Salt and pepper to taste" }
         ],
         instructions: [
             "Season beef with salt and pepper, then coat with flour.",

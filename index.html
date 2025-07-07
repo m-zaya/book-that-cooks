@@ -5,6 +5,8 @@ MAIN HTML STRUCTURE FILE
 
 This is the main HTML file that creates the Digital Cookbook interface.
 It contains only the structural markup and links to external CSS and JavaScript files.
+Updated to support universal HH:MM time format throughout the application.
+Updated to support separated ingredient components (quantity, unit, ingredient).
 
 CONTENTS:
 - Document structure with proper HTML5 semantics
@@ -13,10 +15,21 @@ CONTENTS:
 - Main book container with left and right page stacks for 3D effect
 - Header buttons for Table of Contents, Random Recipe, and New Recipe
 - Book pages container with spine shadow effect
-- Left page: Recipe overview (title, image, tags, difficulty, timeline) OR Table of Contents
-- Right page: Ingredients list and step-by-step instructions OR New Recipe Form
+- Left page: Recipe overview (title, image, tags, difficulty, timeline) OR Table of Contents Controls/Search
+- Right page: Ingredients list and step-by-step instructions OR Table of Contents Results OR New Recipe Form
 - Navigation controls for browsing recipes
 - Page numbers and decorative elements
+
+TIME FORMAT UPDATES:
+- Default recipe time display updated to show human-readable format
+- Timeline steps display human-readable times
+- New recipe form includes HH:MM format guidance and validation
+- All time inputs now expect and validate HH:MM format (e.g., 01:30, 00:45)
+
+INGREDIENT STRUCTURE UPDATES:
+- Each ingredient now has three separate input fields: quantity, unit, and ingredient name
+- Form validation ensures proper ingredient data entry
+- Display logic formats ingredients properly from separated components
 
 DEPENDENCIES:
 - External CSS: styles.css for all visual styling and layout
@@ -74,7 +87,7 @@ RESPONSIVE DESIGN:
             <!-- The shadow line down the middle of the book -->
             <div class="book-spine"></div>
             
-            <!-- LEFT PAGE - Contains recipe overview information OR table of contents -->
+            <!-- LEFT PAGE - Contains recipe overview information OR table of contents controls -->
             <div class="page page-left">
                 
                 <!-- DEFAULT RECIPE VIEW - Recipe header section with title and time -->
@@ -83,7 +96,9 @@ RESPONSIVE DESIGN:
                         <h1 class="recipe-title" id="recipeTitle">Chocolate Chip Cookies</h1>
                         <div class="recipe-time">
                             <span>⏱️</span>
-                            <span id="recipeTime">45 mins</span>
+                            <!-- Updated: Time will display in human-readable format (e.g., "45 min") -->
+                            <!-- JavaScript converts from HH:MM format to readable display -->
+                            <span id="recipeTime">45 min</span>
                         </div>
                     </div>
                     
@@ -110,6 +125,8 @@ RESPONSIVE DESIGN:
                             <div class="timeline-line"></div>
                             <div class="timeline-start-dot"></div>
                             
+                            <!-- Updated: Timeline steps display times in human-readable format -->
+                            <!-- JavaScript converts from HH:MM format (e.g., "00:15") to readable display (e.g., "15 min") -->
                             <div class="timeline-step">
                                 <div class="timeline-dot"></div>
                                 <div class="timeline-step-content">
@@ -135,28 +152,39 @@ RESPONSIVE DESIGN:
                     </div>
                 </div>
                 
-                <!-- TABLE OF CONTENTS VIEW - Hidden by default, shown when TOC button clicked -->
-                <div id="tableOfContents" class="table-of-contents hidden">
+                <!-- TABLE OF CONTENTS CONTROLS - LEFT SIDE (Search and filters) -->
+                <div id="tableOfContentsControls" class="table-of-contents-controls hidden">
                     <div class="toc-header">
-                        <h1 class="toc-title">Recipe Collection</h1>
-                        <p class="toc-subtitle">Browse our delicious recipes</p>
+                        <h1 class="toc-title">Recipe Search</h1>
+                        <p class="toc-subtitle">Find your perfect recipe</p>
+                    </div>
+
+                    <!-- Search bar section -->
+                    <div class="toc-search-section">
+                        <h3 class="control-title">🔍 Search Recipes</h3>
+                        <input type="text" id="recipeSearchBar" class="search-input" 
+                               placeholder="Search by recipe title..." 
+                               onkeyup="updateTableOfContents()">
+                        <small class="search-help">Search recipe names</small>
                     </div>
 
                     <!-- Sorting and filtering controls -->
                     <div class="toc-controls">
                         <!-- Sorting options -->
                         <div class="control-section">
-                            <h3 class="control-title">Sort By</h3>
+                            <h3 class="control-title">📊 Sort By</h3>
                             <select id="tocSortBy" class="toc-select" onchange="updateTableOfContents()">
                                 <option value="alphabetical">Alphabetical (A-Z)</option>
                                 <option value="difficulty">Difficulty (Easy to Hard)</option>
+                                <!-- Updated: Time sorting now uses proper HH:MM comparison -->
+                                <!-- JavaScript parseTimeToMinutes() ensures "02:00" sorts after "00:45" -->
                                 <option value="time">Time (Short to Long)</option>
                             </select>
                         </div>
 
                         <!-- Tag filtering options -->
                         <div class="control-section">
-                            <h3 class="control-title">Filter by Tags</h3> 
+                            <h3 class="control-title">🏷️ Filter by Tags</h3> 
                             <div class="filter-actions">
                                 <button class="filter-btn" onclick="selectAllTags()">Select All</button>
                                 <button class="filter-btn" onclick="clearAllTags()">Clear All</button>
@@ -169,11 +197,6 @@ RESPONSIVE DESIGN:
 
                     <!-- Recipe count display -->
                     <div id="recipeCount" class="recipe-count">Showing all recipes</div>
-
-                    <!-- Container for filtered/sorted recipe entries -->
-                    <div class="toc-recipes" id="tocRecipesList">
-                        <!-- Recipes will be dynamically populated here by JavaScript -->
-                    </div>
                 </div>
 
                 <!-- NEW RECIPE FORM - LEFT SIDE (Basic Information) -->
@@ -191,8 +214,15 @@ RESPONSIVE DESIGN:
                         <!-- Recipe title input field -->
                         <input type="text" id="newRecipeTitle" class="form-input" placeholder="Recipe Title" required>
                         
-                        <!-- Recipe cooking time input field -->
-                        <input type="text" id="newRecipeTime" class="form-input" placeholder="Total Time (e.g., 45 mins)" required>
+                        <!-- Recipe cooking time input field - Updated for HH:MM format -->
+                        <!-- Users must enter time in HH:MM format (e.g., 01:30 for 1.5 hours, 00:45 for 45 minutes) -->
+                        <!-- JavaScript validates format and converts to human-readable display -->
+                        <input type="text" id="newRecipeTime" class="form-input" 
+                               placeholder="Total Time in HH:MM format" 
+                               pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$" 
+                               title="Enter time in HH:MM format (e.g., 01:30)" 
+                               required>
+                        <!-- Added pattern attribute for HTML5 validation and helpful title tooltip -->
                         
                         <!-- Image upload section with both file upload and URL options -->
                         <div class="image-upload-section">
@@ -239,14 +269,16 @@ RESPONSIVE DESIGN:
                 <div class="page-number">2</div>
             </div>
             
-            <!-- RIGHT PAGE - Contains ingredients and instructions OR new recipe form -->
+            <!-- RIGHT PAGE - Contains ingredients and instructions OR TOC results OR new recipe form -->
             <div class="page page-right">
                 
                 <!-- DEFAULT INGREDIENTS AND INSTRUCTIONS VIEW -->
                 <div id="recipeDetailsView" class="recipe-details-view">
-                    <!-- Ingredients section -->
+                    <!-- Ingredients section - Updated to display separated ingredient components -->
                     <div class="recipe-section">
                         <h2 class="section-title">Ingredients</h2>
+                        <!-- Updated: Ingredients list now displays from separated quantity, unit, and ingredient components -->
+                        <!-- JavaScript formatIngredientDisplay() combines the components for proper display -->
                         <ul class="ingredients-list" id="ingredientsList">
                             <li>2¼ cups all-purpose flour</li>
                             <li>1 tsp baking soda</li>
@@ -307,18 +339,41 @@ RESPONSIVE DESIGN:
                     </div>
                 </div>
                 
+                <!-- TABLE OF CONTENTS RESULTS - RIGHT SIDE (Recipe listings) -->
+                <div id="tableOfContentsResults" class="table-of-contents-results hidden">
+                    <div class="toc-results-header">
+                        <h1 class="toc-results-title">Recipe Collection</h1>
+                        <p class="toc-results-subtitle">Click any recipe to view it</p>
+                    </div>
+
+                    <!-- Container for filtered/sorted recipe entries -->
+                    <!-- Updated: Recipe time displays will show human-readable format -->
+                    <!-- JavaScript converts HH:MM format to readable display in TOC entries -->
+                    <div class="toc-recipes" id="tocRecipesList">
+                        <!-- Recipes will be dynamically populated here by JavaScript -->
+                        <!-- Time format: JavaScript converts "02:00" → "2 hr", "00:45" → "45 min" -->
+                    </div>
+                </div>
+                
                 <!-- NEW RECIPE FORM - RIGHT SIDE (Timeline, Ingredients, Instructions) -->
                 <div id="newRecipeFormRight" class="new-recipe-form hidden">
                     
-                    <!-- Timeline section -->
+                    <!-- Timeline section - Updated for HH:MM format -->
                     <div class="form-section">
                         <h3 class="form-section-title">Cooking Timeline</h3>
+                        <!-- Updated instructions and examples for HH:MM format -->
+                        <p class="form-help-text">Enter each cooking step with time in HH:MM format (e.g., 00:15 for 15 minutes, 01:30 for 1 hour 30 minutes)</p>
                         
                         <!-- Dynamic list container for timeline steps -->
                         <div class="dynamic-list" id="timelineList">
                             <div class="dynamic-item">
-                                <input type="text" placeholder="Step name (e.g., Prep)" class="form-input timeline-step-input">
-                                <input type="text" placeholder="Time (e.g., 15 min)" class="form-input timeline-time-input">
+                                <input type="text" placeholder="Step - ex: Prep" class="form-input timeline-step-input">
+                                <!-- Updated: Timeline time input with HH:MM format guidance -->
+                                <!-- Added pattern attribute for HTML5 validation -->
+                                <input type="text" placeholder="HH:MM" 
+                                       class="form-input timeline-time-input"
+                                       pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+                                       title="Enter time in HH:MM format (e.g., 00:15 for 15 minutes)">
                                 <button type="button" class="remove-btn" onclick="removeTimelineItem(this)">Remove</button>
                             </div>
                         </div>
@@ -326,13 +381,37 @@ RESPONSIVE DESIGN:
                         <button type="button" class="add-btn" onclick="addTimelineItem()">Add Timeline Step</button>
                     </div>
                     
-                    <!-- Ingredients section -->
+                    <!-- Ingredients section - Updated to support separated quantity, unit, and ingredient inputs -->
                     <div class="form-section">
                         <h3 class="form-section-title">Ingredients</h3>
+                        <!-- Updated help text explaining the separated ingredient input fields -->
+                        <p class="form-help-text">Enter each ingredient with separate quantity, unit, and ingredient name (e.g., "2", "cups", "flour")</p>
                         
+                        <!-- Updated dynamic list container for ingredients with three separate input fields -->
                         <div class="dynamic-list" id="newRecipeIngredientsList">
-                            <div class="dynamic-item">
-                                <input type="text" placeholder="Ingredient with measurement" class="form-input ingredient-input">
+                            <div class="dynamic-item ingredient-item">
+                                <!-- Quantity input field with fraction helper -->
+                                <div class="quantity-input-container">
+                                    <input type="text" placeholder="Qty" class="form-input ingredient-quantity-input" 
+                                           title="Enter quantity (e.g., 2, 1½, ¾) - click for fraction help"
+                                           onfocus="showFractionHelper(this)" 
+                                           onblur="hideFractionHelper(this)">
+                                    <!-- Fraction helper popup - appears on focus -->
+                                    <div class="fraction-helper hidden">
+                                        <div class="fraction-helper-title">Common Fractions:</div>
+                                        <div class="fraction-buttons">
+                                            <button type="button" class="fraction-btn" onclick="insertFraction(this, '½')">½</button>
+                                            <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')">¼</button>
+                                            <button type="button" class="fraction-btn" onclick="insertFraction(this, '¾')">¾</button>
+                                            <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅓')">⅓</button>
+                                            <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅔')">⅔</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Unit input field (measurement units) -->
+                                <input type="text" placeholder="Unit" class="form-input ingredient-unit-input" title="Enter unit (e.g., cups, tsp, tbsp, large)">
+                                <!-- Ingredient name input field -->
+                                <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" title="Enter ingredient name (e.g., flour, eggs, salt)">
                                 <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
                             </div>
                         </div>
@@ -356,6 +435,8 @@ RESPONSIVE DESIGN:
                     
                     <!-- Form action buttons -->
                     <div class="form-actions">
+                        <!-- Updated: Save button with enhanced validation for HH:MM format and ingredient components -->
+                        <!-- JavaScript validates all time inputs and ingredient components before saving -->
                         <button type="button" class="form-submit" onclick="saveNewRecipe()">Save Recipe</button>
                         <button type="button" class="form-cancel" onclick="cancelNewRecipe()">Cancel</button>
                     </div>

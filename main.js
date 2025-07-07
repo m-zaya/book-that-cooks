@@ -5,6 +5,9 @@ MAIN JAVASCRIPT FUNCTIONALITY
 This file contains all interactive functionality for the Digital Cookbook.
 It manages recipe loading, user interactions, dynamic content updates, and the new
 three-button navigation system (Table of Contents, Random Recipe, New Recipe).
+Updated to support split Table of Contents layout with controls on left and results on right.
+Updated to support universal HH:MM time format throughout the application.
+Updated to support separated ingredient components (quantity, unit, ingredient).
 */
 
 // =============================================================================
@@ -18,7 +21,129 @@ let currentRecipeIndex = 0;
 let currentView = 'recipe';
 
 // =============================================================================
-// 2. RECIPE LOADING FUNCTIONS - Dynamic content population
+// 2. TIME FORMATTING UTILITY FUNCTIONS - Convert between HH:MM and display formats
+// =============================================================================
+
+/**
+ * Converts HH:MM time format to human-readable display format
+ * @param {string} timeStr - Time in HH:MM format (e.g., "01:30", "00:45")
+ * @returns {string} Human-readable time (e.g., "1 hr 30 min", "45 min")
+ */
+function formatTimeForDisplay(timeStr) {
+    // Handle legacy format - if it doesn't match HH:MM, return as-is
+    if (!timeStr || !timeStr.includes(':')) {
+        return timeStr;
+    }
+    
+    const [hours, minutes] = timeStr.split(':').map(num => parseInt(num, 10));
+    
+    if (isNaN(hours) || isNaN(minutes)) {
+        return timeStr; // Return original if parsing fails
+    }
+    
+    let result = '';
+    
+    if (hours > 0) {
+        result += `${hours} hr`;
+        if (minutes > 0) {
+            result += ` ${minutes} min`;
+        }
+    } else {
+        result = `${minutes} min`;
+    }
+    
+    return result;
+}
+
+/**
+ * Converts time string to total minutes for comparison/sorting
+ * @param {string} timeStr - Time in HH:MM format or legacy format
+ * @returns {number} Total minutes
+ */
+function parseTimeToMinutes(timeStr) {
+    if (!timeStr) return 0;
+    
+    // Handle HH:MM format
+    if (timeStr.includes(':')) {
+        const [hours, minutes] = timeStr.split(':').map(num => parseInt(num, 10));
+        if (!isNaN(hours) && !isNaN(minutes)) {
+            return hours * 60 + minutes;
+        }
+    }
+    
+    // Handle legacy formats like "45 mins", "2 hours", "1.5 hrs"
+    const timeMatch = timeStr.toLowerCase().match(/(\d+\.?\d*)\s*(hr|hour|min|minute)/);
+    if (timeMatch) {
+        const value = parseFloat(timeMatch[1]);
+        const unit = timeMatch[2];
+        if (unit.startsWith('hr') || unit.startsWith('hour')) {
+            return Math.round(value * 60);
+        } else {
+            return Math.round(value);
+        }
+    }
+    
+    return 0; // Default fallback
+}
+
+// =============================================================================
+// 3. INGREDIENT FORMATTING UTILITY FUNCTIONS - Handle separated components
+// =============================================================================
+
+/**
+ * Formats ingredient object into display string
+ * @param {Object} ingredient - Ingredient object with quantity, unit, ingredient properties
+ * @returns {string} Formatted ingredient string for display
+ */
+function formatIngredientForDisplay(ingredient) {
+    if (!ingredient) return '';
+    
+    // Handle both old string format and new object format for backward compatibility
+    if (typeof ingredient === 'string') {
+        return ingredient;
+    }
+    
+    const { quantity, unit, ingredient: name } = ingredient;
+    
+    // Build the display string with proper spacing
+    let result = '';
+    
+    if (quantity && quantity.trim()) {
+        result += quantity.trim();
+    }
+    
+    if (unit && unit.trim()) {
+        if (result) result += ' ';
+        result += unit.trim();
+    }
+    
+    if (name && name.trim()) {
+        if (result) result += ' ';
+        result += name.trim();
+    }
+    
+    return result || 'Unknown ingredient';
+}
+
+/**
+ * Validates ingredient object has required components
+ * @param {Object} ingredient - Ingredient object to validate
+ * @returns {boolean} True if ingredient has at least an ingredient name
+ */
+function isValidIngredient(ingredient) {
+    if (!ingredient) return false;
+    
+    // For backward compatibility with string format
+    if (typeof ingredient === 'string') {
+        return ingredient.trim().length > 0;
+    }
+    
+    // For new object format, require at least the ingredient name
+    return ingredient.ingredient && ingredient.ingredient.trim().length > 0;
+}
+
+// =============================================================================
+// 4. RECIPE LOADING FUNCTIONS - Dynamic content population
 // =============================================================================
 
 /**
@@ -40,7 +165,10 @@ function loadRecipe(index) {
     
     // Update basic recipe information
     document.getElementById('recipeTitle').textContent = recipe.title;
-    document.getElementById('recipeTime').textContent = recipe.time;
+    
+    // Convert HH:MM time format to human-readable display
+    document.getElementById('recipeTime').textContent = formatTimeForDisplay(recipe.time);
+    
     document.getElementById('recipeImage').src = recipe.image;
     document.getElementById('recipeDifficulty').textContent = recipe.difficulty;
     
@@ -50,7 +178,7 @@ function loadRecipe(index) {
     // Generate and update timeline
     generateTimeline(recipe.timeline);
     
-    // Update ingredients list
+    // Update ingredients list with separated component support
     updateIngredientsList(recipe.ingredients);
     
     // Update instructions list
@@ -80,8 +208,8 @@ function updateRecipeTags(tags) {
 }
 
 /**
- * Updates the ingredients list
- * @param {Array} ingredients - Array of ingredient strings
+ * Updates the ingredients list with support for separated components
+ * @param {Array} ingredients - Array of ingredient objects or strings
  */
 function updateIngredientsList(ingredients) {
     const ingredientsContainer = document.getElementById('ingredientsList');
@@ -89,7 +217,8 @@ function updateIngredientsList(ingredients) {
     
     ingredients.forEach(ingredient => {
         const listItem = document.createElement('li');
-        listItem.textContent = ingredient;
+        // Use formatting function to handle both old and new ingredient formats
+        listItem.textContent = formatIngredientForDisplay(ingredient);
         ingredientsContainer.appendChild(listItem);
     });
 }
@@ -150,7 +279,7 @@ function toggleInstructionCompletion(instructionItem, completed) {
 }
 
 // =============================================================================
-// 3. TIMELINE GENERATION - Interactive cooking timeline creation
+// 5. TIMELINE GENERATION - Interactive cooking timeline creation
 // =============================================================================
 
 /**
@@ -176,11 +305,14 @@ function generateTimeline(timeline) {
         const stepElement = document.createElement('div');
         stepElement.className = 'timeline-step';
         
+        // Convert HH:MM time format to human-readable display for timeline steps
+        const displayTime = formatTimeForDisplay(timelineStep.time);
+        
         stepElement.innerHTML = `
             <div class="timeline-dot"></div>
             <div class="timeline-step-content">
                 <div class="timeline-step-name">${timelineStep.step}</div>
-                <div class="timeline-step-time">${timelineStep.time}</div>
+                <div class="timeline-step-time">${displayTime}</div>
             </div>
         `;
         
@@ -189,7 +321,7 @@ function generateTimeline(timeline) {
 }
 
 // =============================================================================
-// 4. NAVIGATION FUNCTIONS - Recipe browsing and selection
+// 6. NAVIGATION FUNCTIONS - Recipe browsing and selection
 // =============================================================================
 
 /**
@@ -217,23 +349,26 @@ function updateRecipeCounter() {
 }
 
 // =============================================================================
-// 5. VIEW MANAGEMENT - Toggle between recipe, TOC, and form views
+// 7. VIEW MANAGEMENT - Toggle between recipe, TOC, and form views
 // =============================================================================
 
 /**
  * Shows the main recipe view and hides other views
  */
 function showRecipeView() {
-    // Hide table of contents
-    document.getElementById('tableOfContents').classList.add('hidden');
+    // Hide table of contents CONTROLS (left page)
+    document.getElementById('tableOfContentsControls').classList.add('hidden');
     document.getElementById('recipeView').classList.remove('hidden');
+    
+    // Hide table of contents RESULTS (right page)
+    document.getElementById('tableOfContentsResults').classList.add('hidden');
+    document.getElementById('recipeDetailsView').classList.remove('hidden');
     
     // Hide new recipe form LEFT side
     document.getElementById('newRecipeFormLeft').classList.add('hidden');
     
     // Hide new recipe form RIGHT side  
     document.getElementById('newRecipeFormRight').classList.add('hidden');
-    document.getElementById('recipeDetailsView').classList.remove('hidden');
     
     // Show navigation controls
     document.querySelector('.nav-controls').style.display = 'flex';
@@ -242,19 +377,24 @@ function showRecipeView() {
 }
 
 /**
- * Shows the table of contents view and hides recipe content
+ * Shows the table of contents view with controls on left and results on right
  */
 function showTOCView() {
-    // Show table of contents
+    // Hide recipe view from left page
     document.getElementById('recipeView').classList.add('hidden');
-    document.getElementById('tableOfContents').classList.remove('hidden');
+    // Show table of contents CONTROLS on left page
+    document.getElementById('tableOfContentsControls').classList.remove('hidden');
+    
+    // Hide recipe details from right page
+    document.getElementById('recipeDetailsView').classList.add('hidden');
+    // Show table of contents RESULTS on right page
+    document.getElementById('tableOfContentsResults').classList.remove('hidden');
     
     // Hide new recipe form LEFT side
     document.getElementById('newRecipeFormLeft').classList.add('hidden');
     
     // Hide new recipe form RIGHT side
     document.getElementById('newRecipeFormRight').classList.add('hidden');
-    document.getElementById('recipeDetailsView').classList.remove('hidden');
     
     // Hide navigation controls (not relevant for TOC)
     document.querySelector('.nav-controls').style.display = 'none';
@@ -268,13 +408,15 @@ function showTOCView() {
 function showNewRecipeView() {
     // Hide recipe view from left page
     document.getElementById('recipeView').classList.add('hidden');
-    // Hide table of contents from left page  
-    document.getElementById('tableOfContents').classList.add('hidden');
+    // Hide table of contents CONTROLS from left page  
+    document.getElementById('tableOfContentsControls').classList.add('hidden');
     // Show new recipe form LEFT SIDE on left page
     document.getElementById('newRecipeFormLeft').classList.remove('hidden');
     
     // Hide recipe details from right page
     document.getElementById('recipeDetailsView').classList.add('hidden');
+    // Hide table of contents RESULTS from right page
+    document.getElementById('tableOfContentsResults').classList.add('hidden');
     // Show new recipe form RIGHT SIDE on right page
     document.getElementById('newRecipeFormRight').classList.remove('hidden');
     
@@ -285,20 +427,28 @@ function showNewRecipeView() {
 }
 
 // =============================================================================
-// 6. TABLE OF CONTENTS FUNCTIONS - Generate and handle recipe index
+// 8. TABLE OF CONTENTS FUNCTIONS - Generate and handle recipe index with search
 // =============================================================================
 
 /**
- * Shows the table of contents with all available recipes
+ * Shows the table of contents with search controls on left and results on right
  */
 function showTableOfContents() {
     showTOCView();
     generateTagFilters();
     updateTableOfContents();
+    
+    // Clear and focus the search bar when TOC opens
+    const searchBar = document.getElementById('recipeSearchBar');
+    if (searchBar) {
+        searchBar.value = '';
+        // Small delay to ensure the page is visible before focusing
+        setTimeout(() => searchBar.focus(), 100);
+    }
 }
 
 /**
- * Generates tag filter checkboxes
+ * Generates tag filter checkboxes in the left page controls
  */
 function generateTagFilters() {
     const tagFiltersContainer = document.getElementById('tagFilters');
@@ -325,15 +475,24 @@ function generateTagFilters() {
 }
 
 /**
- * Updates the table of contents with current sorting and filtering
+ * Updates the table of contents with current search, sorting and filtering
  */
 function updateTableOfContents() {
     const sortBy = document.getElementById('tocSortBy').value;
     const selectedTags = getSelectedTags();
+    const searchTerm = getSearchTerm();
 
+    // Filter recipes based on search term and selected tags
     let filteredRecipes = recipes.filter((recipe) => {
-        if (selectedTags.length === 0) return true;
-        return recipe.tags.some(tag => selectedTags.includes(tag));
+        // Search filter - check if title contains search term (case insensitive)
+        const matchesSearch = searchTerm === '' || 
+            recipe.title.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        // Tag filter - if no tags selected, show all; otherwise check for tag overlap
+        const matchesTags = selectedTags.length === 0 || 
+            recipe.tags.some(tag => selectedTags.includes(tag));
+        
+        return matchesSearch && matchesTags;
     }).map((recipe) => {
         return {
             ...recipe,
@@ -341,6 +500,7 @@ function updateTableOfContents() {
         };
     });
 
+    // Sort filtered recipes
     filteredRecipes.sort((a, b) => {
         switch (sortBy) {
             case 'alphabetical':
@@ -349,9 +509,9 @@ function updateTableOfContents() {
                 const getDifficultyValue = (stars) => stars.split('★').length - 1;
                 return getDifficultyValue(a.difficulty) - getDifficultyValue(b.difficulty);
             case 'time':
+                // Updated to use parseTimeToMinutes for proper HH:MM comparison
                 const getTimeValue = (timeStr) => {
-                    const match = timeStr.match(/(\d+)/);
-                    return match ? parseInt(match[1]) : 0;
+                    return parseTimeToMinutes(timeStr);
                 };
                 return getTimeValue(a.time) - getTimeValue(b.time);
             default:
@@ -359,14 +519,16 @@ function updateTableOfContents() {
         }
     });
 
+    // Update recipe count display
+    const searchMessage = searchTerm ? ` matching "${searchTerm}"` : '';
     document.getElementById('recipeCount').textContent =
-        `Showing ${filteredRecipes.length} of ${recipes.length} recipes`;
+        `Showing ${filteredRecipes.length} of ${recipes.length} recipes${searchMessage}`;
 
     generateFilteredTableOfContents(filteredRecipes);
 }
 
 /**
- * Gets the currently selected tags
+ * Gets the currently selected tags from checkboxes
  */
 function getSelectedTags() {
     const checkboxes = document.querySelectorAll('#tagFilters input[type="checkbox"]:checked');
@@ -374,23 +536,47 @@ function getSelectedTags() {
 }
 
 /**
- * Generates the filtered table of contents
+ * Gets the current search term from the search bar
+ */
+function getSearchTerm() {
+    const searchBar = document.getElementById('recipeSearchBar');
+    return searchBar ? searchBar.value.trim() : '';
+}
+
+/**
+ * Generates the filtered table of contents results on the right page
  */
 function generateFilteredTableOfContents(recipesToShow) {
     const tocContainer = document.getElementById('tocRecipesList');
     tocContainer.innerHTML = '';
+    
+    if (recipesToShow.length === 0) {
+        // Show "no results" message when no recipes match
+        const noResultsMessage = document.createElement('div');
+        noResultsMessage.className = 'no-results-message';
+        noResultsMessage.innerHTML = `
+            <div class="no-results-icon">🔍</div>
+            <div class="no-results-text">No recipes found</div>
+            <div class="no-results-suggestion">Try adjusting your search or filters</div>
+        `;
+        tocContainer.appendChild(noResultsMessage);
+        return;
+    }
     
     recipesToShow.forEach((recipe) => {
         const tocEntry = document.createElement('div');
         tocEntry.className = 'toc-recipe';
         tocEntry.onclick = () => loadRecipe(recipe.originalIndex);
         
+        // Convert HH:MM time format to human-readable display for TOC entries
+        const displayTime = formatTimeForDisplay(recipe.time);
+        
         tocEntry.innerHTML = `
             <img src="${recipe.image}" alt="${recipe.title}" class="toc-recipe-image">
             <div class="toc-recipe-info">
                 <div class="toc-recipe-title">${recipe.title}</div>
                 <div class="toc-recipe-meta">
-                    <span>⏱️ ${recipe.time}</span>
+                    <span>⏱️ ${displayTime}</span>
                     <span>${recipe.difficulty}</span>
                     <span>${recipe.tags.join(', ')}</span>
                 </div>
@@ -422,7 +608,7 @@ function clearAllTags() {
 }
 
 // =============================================================================
-// 7. RANDOM RECIPE FUNCTION
+// 9. RANDOM RECIPE FUNCTION
 // =============================================================================
 
 /**
@@ -434,7 +620,7 @@ function showRandomRecipe() {
 }
 
 // =============================================================================
-// 8. NEW RECIPE FORM FUNCTIONS
+// 10. NEW RECIPE FORM FUNCTIONS - Updated to support HH:MM time format and separated ingredients
 // =============================================================================
 
 /**
@@ -472,8 +658,11 @@ function resetTimelineList() {
     const timelineList = document.querySelector('#timelineList');
     timelineList.innerHTML = `
         <div class="dynamic-item">
-            <input type="text" placeholder="Step name (e.g., Prep)" class="form-input timeline-step-input">
-            <input type="text" placeholder="Time (e.g., 15 min)" class="form-input timeline-time-input">
+            <input type="text" placeholder="Step - ex: Prep" class="form-input timeline-step-input">
+            <input type="text" placeholder="HH:MM" 
+                   class="form-input timeline-time-input"
+                   pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+                   title="Enter time in HH:MM format (e.g., 00:15 for 15 minutes)">
             <button type="button" class="remove-btn" onclick="removeTimelineItem(this)">Remove</button>
         </div>
     `;
@@ -481,9 +670,27 @@ function resetTimelineList() {
 
 function resetIngredientsList() {
     const ingredientsList = document.querySelector('#newRecipeIngredientsList');
+    // Updated to include separated ingredient input fields with fraction helper
     ingredientsList.innerHTML = `
-        <div class="dynamic-item">
-            <input type="text" placeholder="Ingredient with measurement" class="form-input ingredient-input">
+        <div class="dynamic-item ingredient-item">
+            <div class="quantity-input-container">
+                <input type="text" placeholder="Qty" class="form-input ingredient-quantity-input" 
+                       title="Enter quantity (e.g., 2, 1½, ¾) - click for fraction help"
+                       onfocus="showFractionHelper(this)" 
+                       onblur="hideFractionHelper(this)">
+                <div class="fraction-helper hidden">
+                    <div class="fraction-helper-title">Common Fractions:</div>
+                    <div class="fraction-buttons">
+                        <button type="button" class="fraction-btn" onclick="insertFraction(this, '½')">½</button>
+                        <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')">¼</button>
+                        <button type="button" class="fraction-btn" onclick="insertFraction(this, '¾')">¾</button>
+                        <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅓')">⅓</button>
+                        <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅔')">⅔</button>
+                    </div>
+                </div>
+            </div>
+            <input type="text" placeholder="Unit" class="form-input ingredient-unit-input" title="Enter unit (e.g., cups, tsp, tbsp, large)">
+            <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" title="Enter ingredient name (e.g., flour, eggs, salt)">
             <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
         </div>
     `;
@@ -500,15 +707,18 @@ function resetInstructionsList() {
 }
 
 /**
- * Dynamic list management functions
+ * Dynamic list management functions - Updated with HH:MM time format for timeline and separated ingredients
  */
 function addTimelineItem() {
     const timelineList = document.querySelector('#timelineList');
     const newItem = document.createElement('div');
     newItem.className = 'dynamic-item';
     newItem.innerHTML = `
-        <input type="text" placeholder="Step name (e.g., Prep)" class="form-input timeline-step-input">
-        <input type="text" placeholder="Time (e.g., 15 min)" class="form-input timeline-time-input">
+        <input type="text" placeholder="Step - ex: Prep" class="form-input timeline-step-input">
+        <input type="text" placeholder="HH:MM" 
+               class="form-input timeline-time-input"
+               pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+               title="Enter time in HH:MM format (e.g., 00:15 for 15 minutes)">
         <button type="button" class="remove-btn" onclick="removeTimelineItem(this)">Remove</button>
     `;
     timelineList.appendChild(newItem);
@@ -523,12 +733,44 @@ function removeTimelineItem(button) {
     }
 }
 
+// Updated ingredient functions to support separated input fields and fraction helper
 function addIngredientItem() {
     const ingredientsList = document.querySelector('#newRecipeIngredientsList');
     const newItem = document.createElement('div');
-    newItem.className = 'dynamic-item';
+    newItem.className = 'dynamic-item ingredient-item';
+    // Updated to include three separate input fields with fraction helper for quantity
     newItem.innerHTML = `
-        <input type="text" placeholder="Ingredient with measurement" class="form-input ingredient-input">
+        <div class="quantity-input-container">
+            <input type="text" placeholder="Qty" class="form-input ingredient-quantity-input" 
+                   title="Enter quantity (e.g., 2, 1½, ¾) - click for fraction help"
+                   onfocus="showFractionHelper(this)" 
+                   onblur="hideFractionHelper(this)">
+            <div class="fraction-helper hidden">
+                <div class="fraction-helper-title">Common Fractions:</div>
+                <div class="fraction-buttons">
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')">¼</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '½')">½</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¾')">¾</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅐')">⅐</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅛')">⅛</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅑')">⅑</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅒')">⅒</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅓')">⅓</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅔')">⅔</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅕')">⅕</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅖')">⅖</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅗')">⅗</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅘')">⅘</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅙')">⅙</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅚')">⅚</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅜')">⅜</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅝')">⅝</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅞')">⅞</button>
+                </div>
+            </div>
+        </div>
+        <input type="text" placeholder="Unit" class="form-input ingredient-unit-input" title="Enter unit (e.g., cups, tsp, tbsp, large)">
+        <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" title="Enter ingredient name (e.g., flour, eggs, salt)">
         <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
     `;
     ingredientsList.appendChild(newItem);
@@ -564,40 +806,74 @@ function removeInstructionItem(button) {
 }
 
 /**
- * Saves a new recipe
+ * Time validation helper function for HH:MM format
+ * @param {string} timeStr - Time string to validate
+ * @returns {boolean} True if valid HH:MM format
+ */
+function isValidTimeFormat(timeStr) {
+    if (!timeStr || typeof timeStr !== 'string') {
+        return false;
+    }
+    
+    // Check if format matches HH:MM
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    return timeRegex.test(timeStr);
+}
+
+/**
+ * Saves a new recipe - Updated to handle HH:MM time format validation and separated ingredients
  */
 function saveNewRecipe() {
     const title = document.getElementById('newRecipeTitle').value.trim();
-    const time = document.getElementById('newRecipeTime').value.trim();
+    const timeInput = document.getElementById('newRecipeTime').value.trim();
     const imageData = getCurrentImageData();
     const difficulty = document.getElementById('newRecipeDifficulty').value;
     const tagsInput = document.getElementById('newRecipeTags').value.trim();
     
-    if (!title || !time || !difficulty) {
+    if (!title || !timeInput || !difficulty) {
         alert('Please fill in all required fields: Title, Time, and Difficulty.');
+        return;
+    }
+    
+    // Validate time format
+    if (!isValidTimeFormat(timeInput)) {
+        alert('Please enter time in HH:MM format (e.g., 01:30 for 1 hour 30 minutes, 00:45 for 45 minutes).');
         return;
     }
     
     const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
     
-    // Collect timeline data
+    // Collect timeline data with time format validation
     const timelineItems = document.querySelectorAll('#timelineList .dynamic-item');
     const timeline = [];
-    timelineItems.forEach(item => {
+    for (let item of timelineItems) {
         const step = item.querySelector('.timeline-step-input').value.trim();
         const stepTime = item.querySelector('.timeline-time-input').value.trim();
+        
         if (step && stepTime) {
+            if (!isValidTimeFormat(stepTime)) {
+                alert(`Invalid time format in timeline step "${step}". Please use HH:MM format (e.g., 00:15).`);
+                return;
+            }
             timeline.push({ step, time: stepTime });
         }
-    });
+    }
     
-    // Collect ingredients
-    const ingredientItems = document.querySelectorAll('#newRecipeIngredientsList .dynamic-item');
+    // Collect ingredients with separated components
+    const ingredientItems = document.querySelectorAll('#newRecipeIngredientsList .ingredient-item');
     const ingredients = [];
     ingredientItems.forEach(item => {
-        const ingredient = item.querySelector('.ingredient-input').value.trim();
+        const quantity = item.querySelector('.ingredient-quantity-input').value.trim();
+        const unit = item.querySelector('.ingredient-unit-input').value.trim();
+        const ingredient = item.querySelector('.ingredient-name-input').value.trim();
+        
+        // Require at least the ingredient name
         if (ingredient) {
-            ingredients.push(ingredient);
+            ingredients.push({
+                quantity: quantity || '',
+                unit: unit || '',
+                ingredient: ingredient
+            });
         }
     });
     
@@ -626,12 +902,12 @@ function saveNewRecipe() {
     
     const newRecipe = {
         title,
-        time,
+        time: timeInput, // Now stores in HH:MM format
         image: imageData || generateDefaultImage(title),
         tags,
         difficulty,
         timeline,
-        ingredients,
+        ingredients, // Now stores as array of objects with quantity, unit, ingredient properties
         instructions
     };
     
@@ -659,7 +935,7 @@ function cancelNewRecipe() {
 }
 
 // =============================================================================
-// 9. IMAGE HANDLING FUNCTIONS
+// 11. IMAGE HANDLING FUNCTIONS
 // =============================================================================
 
 function handleImageUpload(input) {
@@ -748,7 +1024,6 @@ function showImagePreview(imageSrc) {
     }
 }
 
-
 function hideImagePreview() {
     const previewContainer = document.getElementById('imagePreview');
     const previewImage = document.getElementById('previewImage');
@@ -792,7 +1067,7 @@ function getCurrentImageData() {
 }
 
 // =============================================================================
-// 10. INTERACTIVE FEATURES
+// 12. INTERACTIVE FEATURES
 // =============================================================================
 
 function resetChecklist() {
@@ -809,7 +1084,99 @@ function resetChecklist() {
 }
 
 // =============================================================================
-// 11. EVENT LISTENERS AND INITIALIZATION
+// 14. FRACTION HELPER FUNCTIONS - Easy fraction symbol insertion
+// =============================================================================
+
+/**
+ * Shows the fraction helper popup when quantity input is focused
+ * @param {HTMLElement} input - The quantity input field that was focused
+ */
+function showFractionHelper(input) {
+    // Find the fraction helper within the same container
+    const container = input.closest('.quantity-input-container');
+    if (container) {
+        const helper = container.querySelector('.fraction-helper');
+        if (helper) {
+            // Store reference to the input for later use
+            helper.dataset.targetInput = input.id || 'temp_' + Date.now();
+            if (!input.id) {
+                input.id = helper.dataset.targetInput;
+            }
+            
+            // Show the helper with a small delay to ensure focus is established
+            setTimeout(() => {
+                helper.classList.remove('hidden');
+                
+                // Check if helper would go off the right edge of the screen
+                const helperRect = helper.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+                
+                if (helperRect.right > viewportWidth - 10) {
+                    // Position to the right instead
+                    helper.classList.add('align-right');
+                } else {
+                    helper.classList.remove('align-right');
+                }
+            }, 100);
+        }
+    }
+}
+
+/**
+ * Hides the fraction helper popup when quantity input loses focus
+ * @param {HTMLElement} input - The quantity input field that lost focus
+ */
+function hideFractionHelper(input) {
+    // Find the fraction helper within the same container
+    const container = input.closest('.quantity-input-container');
+    if (container) {
+        const helper = container.querySelector('.fraction-helper');
+        if (helper) {
+            // Add a delay to allow clicking on fraction buttons before hiding
+            setTimeout(() => {
+                // Only hide if the input is still not focused and no button is being clicked
+                if (document.activeElement !== input && !helper.contains(document.activeElement)) {
+                    helper.classList.add('hidden');
+                }
+            }, 150);
+        }
+    }
+}
+
+/**
+ * Inserts a fraction symbol into the quantity input field
+ * @param {HTMLElement} button - The fraction button that was clicked
+ * @param {string} fraction - The fraction symbol to insert
+ */
+function insertFraction(button, fraction) {
+    // Find the associated input field
+    const helper = button.closest('.fraction-helper');
+    if (helper && helper.dataset.targetInput) {
+        const input = document.getElementById(helper.dataset.targetInput);
+        if (input) {
+            // Get current cursor position or use end of text
+            const start = input.selectionStart || input.value.length;
+            const end = input.selectionEnd || input.value.length;
+            
+            // Insert the fraction at cursor position
+            const currentValue = input.value;
+            const newValue = currentValue.substring(0, start) + fraction + currentValue.substring(end);
+            
+            input.value = newValue;
+            
+            // Set cursor position after the inserted fraction
+            const newPosition = start + fraction.length;
+            input.focus();
+            input.setSelectionRange(newPosition, newPosition);
+            
+            // Keep the helper visible for multiple selections
+            // Users can click multiple fractions or click outside to hide
+        }
+    }
+}
+
+// =============================================================================
+// 15. EVENT LISTENERS AND INITIALIZATION
 // =============================================================================
 
 function setupEventListeners() {
@@ -850,6 +1217,9 @@ function initializeApp() {
     
     console.log('Digital Cookbook initialized successfully');
     console.log(`Loaded ${recipes.length} recipes`);
+    console.log('Features: Separated ingredient components (quantity, unit, ingredient)');
+    console.log('Features: HH:MM time format with automatic display conversion');
+    console.log('Features: Fraction helper for easy Unicode fraction symbols');
 }
 
 // Initialize when DOM is ready
