@@ -1424,46 +1424,55 @@ body {
   ============================================================================= */
 @media (max-width: 768px) {
    .book-container {
-       height: 95vh;
+       height: 90vh; /* Reduced height to give more breathing room */
        width: 95%;
+       padding-top: 60px; /* Add top padding to accommodate header buttons */
+       padding-bottom: 80px; /* Add bottom padding for navigation controls */
    }
    
-   /* Keep header buttons horizontal on mobile but make them smaller and more compact */
+   /* Keep header buttons horizontal on mobile but make them properly sized */
    .header-buttons {
        flex-direction: row; /* Keep horizontal layout */
-       gap: 8px; /* Smaller gap between buttons */
-       padding: 8px 12px; /* Smaller padding */
-       top: -50px; /* Back to single row height */
-       /* Make the container narrower to fit mobile screens */
-       max-width: 90vw; /* Limit width to 90% of viewport */
-       overflow: hidden; /* Prevent overflow if buttons are too wide */
+       gap: 6px; /* Smaller gap between buttons */
+       padding: 8px 16px; /* Better padding for mobile */
+       top: -45px; /* Position above the book with proper clearance */
+       /* Make the container fit mobile screens properly */
+       max-width: 85vw; /* Slightly smaller to ensure it fits */
+       left: 50%; /* Center the container */
+       transform: translateX(-50%); /* Perfect centering */
+       box-sizing: border-box; /* Include padding in width calculation */
    }
    
    .header-btn {
-       padding: 6px 10px; /* Smaller padding for mobile */
-       font-size: 0.7em; /* Smaller font size */
+       padding: 8px 12px; /* Better padding for mobile touch targets */
+       font-size: 0.75em; /* Slightly larger font for readability */
        justify-content: center;
-       /* Make buttons more compact */
+       /* Make buttons more compact but still usable */
        min-width: 0; /* Allow buttons to shrink */
        flex: 1; /* Distribute space evenly between buttons */
-       gap: 4px; /* Smaller gap between icon and text */
+       gap: 4px; /* Small gap between icon and text */
+       border-radius: 16px; /* Smaller border radius for mobile */
    }
    
-   /* Hide text on very small screens and show only icons */
-   .header-btn span:last-child {
-       display: none; /* Hide button text on mobile */
+   /* Keep text visible but make it shorter on mobile */
+   .header-btn.toc span:last-child {
+       content: "TOC"; /* Shorter text */
    }
    
-   .header-btn span:first-child {
-       font-size: 1.2em; /* Make icons slightly larger when text is hidden */
+   .header-btn.random span:last-child {
+       content: "Random"; /* Keep as is */
+   }
+   
+   .header-btn.new span:last-child {
+       content: "New"; /* Shorter text */
    }
    
    .book-pages {
        flex-direction: column;
-       left: 1%;
-       width: 98%;
-       top: 60px; /* Adjusted back to single row header height */
-       height: calc(100% - 80px); /* Adjusted for single row header */
+       left: 2.5%; /* Center the book better */
+       width: 95%; /* Slightly smaller width */
+       top: 20px; /* Smaller top offset since container has padding */
+       height: calc(100% - 40px); /* Adjust for container padding */
    }
    
    .page {
@@ -1506,7 +1515,27 @@ body {
    }
    
    .nav-controls {
-       bottom: -70px; /* Adjusted back for single row header */
+       bottom: -60px; /* Position below the book with proper clearance */
+       padding: 10px 16px; /* Better padding for mobile */
+       gap: 12px; /* Better spacing between elements */
+       border-radius: 20px; /* Smaller border radius for mobile */
+       box-shadow: 0 3px 10px rgba(0,0,0,0.25); /* Stronger shadow for better visibility */
+       background: rgba(255,255,255,0.95); /* Slightly more opaque background */
+       backdrop-filter: blur(8px); /* Blur effect */
+   }
+   
+   .nav-btn {
+       padding: 10px 16px; /* Better touch targets for mobile */
+       font-size: 0.85em; /* Slightly larger font */
+       border-radius: 16px; /* Consistent with header buttons */
+       min-width: 80px; /* Ensure buttons have minimum width */
+   }
+   
+   #recipeCounter {
+       font-size: 0.9em; /* Slightly larger counter text */
+       font-weight: bold;
+       color: #8B4513; /* Match the theme color */
+       padding: 0 8px; /* Add some padding around the counter */
    }
    
    /* Mobile form adaptations */
