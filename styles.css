@@ -1420,179 +1420,195 @@ body {
 }
 
 /* =============================================================================
-   16. RESPONSIVE DESIGN - Mobile and tablet adaptations
-   ============================================================================= */
+  16. RESPONSIVE DESIGN - Mobile and tablet adaptations
+  ============================================================================= */
 @media (max-width: 768px) {
-    .book-container {
-        height: 95vh;
-        width: 95%;
-    }
-    
-    /* Stack header buttons vertically on mobile */
-    .header-buttons {
-        flex-direction: column;
-        gap: 8px;
-        padding: 10px 15px;
-        top: -120px; /* More space needed for stacked buttons */
-    }
-    
-    .header-btn {
-        padding: 8px 15px;
-        font-size: 0.8em;
-        justify-content: center;
-    }
-    
-    .book-pages {
-        flex-direction: column;
-        left: 1%;
-        width: 98%;
-        top: 80px; /* Adjusted for mobile header layout */
-        height: calc(100% - 100px);
-    }
-    
-    .page {
-        width: 100%;
-        height: 50%;
-        padding: 20px 15px;
-    }
-    
-    .page-left {
-        border-right: none;
-        border-bottom: 1px solid #eee;
-        background: linear-gradient(to bottom, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
-    }
-    
-    .page-right {
-        background: linear-gradient(to top, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
-    }
-    
-    .book-spine {
-        width: 100%;
-        height: 2px;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        background: linear-gradient(to right, 
-            rgba(0,0,0,0.1) 0%, 
-            rgba(0,0,0,0.3) 20%, 
-            rgba(0,0,0,0.3) 80%, 
-            rgba(0,0,0,0.1) 100%
-        );
-    }
-    
-    .page-stack-left,
-    .page-stack-right {
-        display: none;
-    }
-    
-    .recipe-title {
-        font-size: 1.8em;
-    }
-    
-    .nav-controls {
-        bottom: -90px; /* More space for mobile stacked header */
-    }
-    
-    /* Mobile form adaptations */
-    .form-actions {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .form-submit,
-    .form-cancel {
-        width: 100%;
-        max-width: 200px;
-    }
-    
-    /* Table of contents mobile layout */
-    .toc-recipe {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .toc-recipe-image {
-        width: 80px;
-        height: 50px;
-    }
-    
-    /* Mobile search input adjustments */
-    .search-input {
-        padding: 10px 12px;
-        font-size: 0.9em;
-    }
-    
-    /* Mobile TOC controls */
-    .toc-controls {
-        padding: 0.8rem;
-    }
-    
-    .tag-filters {
-        gap: 0.3rem;
-    }
-    
-    .tag-filter {
-        padding: 0.2rem 0.4rem;
-        font-size: 0.8em;
-    }
-    
-    /* Mobile TOC results */
-    .toc-results-title {
-        font-size: 1.5em;
-    }
-    
-    .toc-recipe-meta {
-        flex-direction: column;
-        gap: 5px;
-        font-size: 0.8em;
-    }
-    
-    /* Mobile ingredient input adaptations */
-    .ingredient-item {
-        flex-direction: column;
-        gap: 5px;
-        padding: 10px;
-        background: #f9f9f9;
-        border-radius: 8px;
-    }
-    
-    .quantity-input-container,
-    .ingredient-unit-input,
-    .ingredient-name-input {
-        flex: none;
-        width: 100%;
-        min-width: auto;
-    }
-    
-    .ingredient-quantity-input {
-        width: 100%;
-    }
-    
-    .ingredient-item .remove-btn {
-        width: 100%;
-        margin-left: 0;
-        margin-top: 5px;
-    }
-    
-    /* Mobile fraction helper adjustments */
-    .fraction-helper {
-        position: fixed;
-        left: 10px;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 2000;
-        max-height: 60vh;
-        overflow-y: auto;
-    }
-    
-    .fraction-buttons {
-        grid-template-columns: repeat(4, 1fr); /* Fewer columns on mobile */
-        gap: 6px;
-    }
-    
-    .fraction-btn {
-        min-height: 32px;
-        font-size: 1em;
-    }
+   .book-container {
+       height: 95vh;
+       width: 95%;
+   }
+   
+   /* Keep header buttons horizontal on mobile but make them smaller and more compact */
+   .header-buttons {
+       flex-direction: row; /* Keep horizontal layout */
+       gap: 8px; /* Smaller gap between buttons */
+       padding: 8px 12px; /* Smaller padding */
+       top: -50px; /* Back to single row height */
+       /* Make the container narrower to fit mobile screens */
+       max-width: 90vw; /* Limit width to 90% of viewport */
+       overflow: hidden; /* Prevent overflow if buttons are too wide */
+   }
+   
+   .header-btn {
+       padding: 6px 10px; /* Smaller padding for mobile */
+       font-size: 0.7em; /* Smaller font size */
+       justify-content: center;
+       /* Make buttons more compact */
+       min-width: 0; /* Allow buttons to shrink */
+       flex: 1; /* Distribute space evenly between buttons */
+       gap: 4px; /* Smaller gap between icon and text */
+   }
+   
+   /* Hide text on very small screens and show only icons */
+   .header-btn span:last-child {
+       display: none; /* Hide button text on mobile */
+   }
+   
+   .header-btn span:first-child {
+       font-size: 1.2em; /* Make icons slightly larger when text is hidden */
+   }
+   
+   .book-pages {
+       flex-direction: column;
+       left: 1%;
+       width: 98%;
+       top: 60px; /* Adjusted back to single row header height */
+       height: calc(100% - 80px); /* Adjusted for single row header */
+   }
+   
+   .page {
+       width: 100%;
+       height: 50%;
+       padding: 20px 15px;
+   }
+   
+   .page-left {
+       border-right: none;
+       border-bottom: 1px solid #eee;
+       background: linear-gradient(to bottom, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+   }
+   
+   .page-right {
+       background: linear-gradient(to top, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+   }
+   
+   .book-spine {
+       width: 100%;
+       height: 2px;
+       left: 0;
+       top: 50%;
+       transform: translateY(-50%);
+       background: linear-gradient(to right, 
+           rgba(0,0,0,0.1) 0%, 
+           rgba(0,0,0,0.3) 20%, 
+           rgba(0,0,0,0.3) 80%, 
+           rgba(0,0,0,0.1) 100%
+       );
+   }
+   
+   .page-stack-left,
+   .page-stack-right {
+       display: none;
+   }
+   
+   .recipe-title {
+       font-size: 1.8em;
+   }
+   
+   .nav-controls {
+       bottom: -70px; /* Adjusted back for single row header */
+   }
+   
+   /* Mobile form adaptations */
+   .form-actions {
+       flex-direction: column;
+       align-items: center;
+   }
+   
+   .form-submit,
+   .form-cancel {
+       width: 100%;
+       max-width: 200px;
+   }
+   
+   /* Table of contents mobile layout */
+   .toc-recipe {
+       flex-direction: column;
+       text-align: center;
+   }
+   
+   .toc-recipe-image {
+       width: 80px;
+       height: 50px;
+   }
+   
+   /* Mobile search input adjustments */
+   .search-input {
+       padding: 10px 12px;
+       font-size: 0.9em;
+   }
+   
+   /* Mobile TOC controls */
+   .toc-controls {
+       padding: 0.8rem;
+   }
+   
+   .tag-filters {
+       gap: 0.3rem;
+   }
+   
+   .tag-filter {
+       padding: 0.2rem 0.4rem;
+       font-size: 0.8em;
+   }
+   
+   /* Mobile TOC results */
+   .toc-results-title {
+       font-size: 1.5em;
+   }
+   
+   .toc-recipe-meta {
+       flex-direction: column;
+       gap: 5px;
+       font-size: 0.8em;
+   }
+   
+   /* Mobile ingredient input adaptations */
+   .ingredient-item {
+       flex-direction: column;
+       gap: 5px;
+       padding: 10px;
+       background: #f9f9f9;
+       border-radius: 8px;
+   }
+   
+   .quantity-input-container,
+   .ingredient-unit-input,
+   .ingredient-name-input {
+       flex: none;
+       width: 100%;
+       min-width: auto;
+   }
+   
+   .ingredient-quantity-input {
+       width: 100%;
+   }
+   
+   .ingredient-item .remove-btn {
+       width: 100%;
+       margin-left: 0;
+       margin-top: 5px;
+   }
+   
+   /* Mobile fraction helper adjustments */
+   .fraction-helper {
+       position: fixed;
+       left: 10px;
+       right: 10px;
+       top: 50%;
+       transform: translateY(-50%);
+       z-index: 2000;
+       max-height: 60vh;
+       overflow-y: auto;
+   }
+   
+   .fraction-buttons {
+       grid-template-columns: repeat(4, 1fr); /* Fewer columns on mobile */
+       gap: 6px;
+   }
+   
+   .fraction-btn {
+       min-height: 32px;
+       font-size: 1em;
+   }
 }
