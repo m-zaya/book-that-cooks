@@ -30,9 +30,8 @@ function initializeApp() {
 
 // =============================================================================
 // Your existing main.js code continues below...
+// But REMOVE the saveNewRecipe() function since it's handled by supabase-database.js
 // =============================================================================
-
-
 
 /*
 MAIN JAVASCRIPT FUNCTIONALITY
@@ -44,6 +43,10 @@ three-button navigation system (Table of Contents, Random Recipe, New Recipe).
 Updated to support split Table of Contents layout with controls on left and results on right.
 Updated to support universal HH:MM time format throughout the application.
 Updated to support separated ingredient components (quantity, unit, ingredient).
+
+NOTE: The saveNewRecipe() function has been REMOVED from this file because
+it's now handled by supabase-database.js to ensure recipes are saved permanently
+to the Supabase database instead of just local memory.
 */
 
 // =============================================================================
@@ -656,7 +659,7 @@ function showRandomRecipe() {
 }
 
 // =============================================================================
-// 10. NEW RECIPE FORM FUNCTIONS - Updated to support HH:MM time format and separated ingredients
+// 10. NEW RECIPE FORM FUNCTIONS - Updated to use Supabase backend
 // =============================================================================
 
 /**
@@ -784,24 +787,11 @@ function addIngredientItem() {
             <div class="fraction-helper hidden">
                 <div class="fraction-helper-title">Common Fractions:</div>
                 <div class="fraction-buttons">
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')">¼</button>
                     <button type="button" class="fraction-btn" onclick="insertFraction(this, '½')">½</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')">¼</button>
                     <button type="button" class="fraction-btn" onclick="insertFraction(this, '¾')">¾</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅐')">⅐</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅛')">⅛</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅑')">⅑</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅒')">⅒</button>
                     <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅓')">⅓</button>
                     <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅔')">⅔</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅕')">⅕</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅖')">⅖</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅗')">⅗</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅘')">⅘</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅙')">⅙</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅚')">⅚</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅜')">⅜</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅝')">⅝</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅞')">⅞</button>
                 </div>
             </div>
         </div>
@@ -856,101 +846,11 @@ function isValidTimeFormat(timeStr) {
     return timeRegex.test(timeStr);
 }
 
-/**
- * Saves a new recipe - Updated to handle HH:MM time format validation and separated ingredients
- */
-function saveNewRecipe() {
-    const title = document.getElementById('newRecipeTitle').value.trim();
-    const timeInput = document.getElementById('newRecipeTime').value.trim();
-    const imageData = getCurrentImageData();
-    const difficulty = document.getElementById('newRecipeDifficulty').value;
-    const tagsInput = document.getElementById('newRecipeTags').value.trim();
-    
-    if (!title || !timeInput || !difficulty) {
-        alert('Please fill in all required fields: Title, Time, and Difficulty.');
-        return;
-    }
-    
-    // Validate time format
-    if (!isValidTimeFormat(timeInput)) {
-        alert('Please enter time in HH:MM format (e.g., 01:30 for 1 hour 30 minutes, 00:45 for 45 minutes).');
-        return;
-    }
-    
-    const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
-    
-    // Collect timeline data with time format validation
-    const timelineItems = document.querySelectorAll('#timelineList .dynamic-item');
-    const timeline = [];
-    for (let item of timelineItems) {
-        const step = item.querySelector('.timeline-step-input').value.trim();
-        const stepTime = item.querySelector('.timeline-time-input').value.trim();
-        
-        if (step && stepTime) {
-            if (!isValidTimeFormat(stepTime)) {
-                alert(`Invalid time format in timeline step "${step}". Please use HH:MM format (e.g., 00:15).`);
-                return;
-            }
-            timeline.push({ step, time: stepTime });
-        }
-    }
-    
-    // Collect ingredients with separated components
-    const ingredientItems = document.querySelectorAll('#newRecipeIngredientsList .ingredient-item');
-    const ingredients = [];
-    ingredientItems.forEach(item => {
-        const quantity = item.querySelector('.ingredient-quantity-input').value.trim();
-        const unit = item.querySelector('.ingredient-unit-input').value.trim();
-        const ingredient = item.querySelector('.ingredient-name-input').value.trim();
-        
-        // Require at least the ingredient name
-        if (ingredient) {
-            ingredients.push({
-                quantity: quantity || '',
-                unit: unit || '',
-                ingredient: ingredient
-            });
-        }
-    });
-    
-    // Collect instructions
-    const instructionItems = document.querySelectorAll('#newRecipeInstructionsList .dynamic-item');
-    const instructions = [];
-    instructionItems.forEach(item => {
-        const instruction = item.querySelector('.instruction-input').value.trim();
-        if (instruction) {
-            instructions.push(instruction);
-        }
-    });
-    
-    if (timeline.length === 0) {
-        alert('Please add at least one timeline step.');
-        return;
-    }
-    if (ingredients.length === 0) {
-        alert('Please add at least one ingredient.');
-        return;
-    }
-    if (instructions.length === 0) {
-        alert('Please add at least one instruction.');
-        return;
-    }
-    
-    const newRecipe = {
-        title,
-        time: timeInput, // Now stores in HH:MM format
-        image: imageData || generateDefaultImage(title),
-        tags,
-        difficulty,
-        timeline,
-        ingredients, // Now stores as array of objects with quantity, unit, ingredient properties
-        instructions
-    };
-    
-    recipes.push(newRecipe);
-    loadRecipe(recipes.length - 1);
-    alert(`Recipe "${title}" has been added successfully!`);
-}
+// =============================================================================
+// NOTE: saveNewRecipe() function has been REMOVED from this file
+// It's now handled by supabase-database.js to ensure recipes are saved 
+// permanently to the Supabase database instead of just local memory
+// =============================================================================
 
 function generateDefaultImage(title) {
     const svg = `
@@ -1120,7 +1020,7 @@ function resetChecklist() {
 }
 
 // =============================================================================
-// 14. FRACTION HELPER FUNCTIONS - Easy fraction symbol insertion
+// 13. FRACTION HELPER FUNCTIONS - Easy fraction symbol insertion
 // =============================================================================
 
 /**
@@ -1212,7 +1112,7 @@ function insertFraction(button, fraction) {
 }
 
 // =============================================================================
-// 15. EVENT LISTENERS AND INITIALIZATION
+// 14. EVENT LISTENERS AND INITIALIZATION
 // =============================================================================
 
 function setupEventListeners() {
@@ -1246,19 +1146,12 @@ function setupEventListeners() {
     });
 }
 
-function initializeApp() {
-    loadRecipe(0);
-    setupEventListeners();
-    showRecipeView();
-    
-    console.log('Digital Cookbook initialized successfully');
-    console.log(`Loaded ${recipes.length} recipes`);
-    console.log('Features: Separated ingredient components (quantity, unit, ingredient)');
-    console.log('Features: HH:MM time format with automatic display conversion');
-    console.log('Features: Fraction helper for easy Unicode fraction symbols');
-}
+// =============================================================================
+// NOTE: This initializeApp function is now called by supabase-database.js
+// after the database connection is established and recipes are loaded
+// =============================================================================
 
-// Initialize when DOM is ready
+// Initialize when DOM is ready - but wait for Supabase
 document.addEventListener('DOMContentLoaded', initializeApp);
 
 if (document.readyState === 'loading') {
