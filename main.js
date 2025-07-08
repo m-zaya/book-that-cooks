@@ -1,3 +1,39 @@
+// =============================================================================
+// SUPABASE COMPATIBILITY - Add this to the TOP of main.js
+// =============================================================================
+
+// Override initializeApp to wait for database
+function initializeApp() {
+    if (typeof isLoading !== 'undefined' && isLoading) {
+        setTimeout(initializeApp, 100);
+        return;
+    }
+    
+    if (typeof recipes === 'undefined') {
+        setTimeout(initializeApp, 100);
+        return;
+    }
+    
+    console.log(`🕧 Initializing app with ${recipes.length} recipes from Supabase`);
+    
+    if (recipes.length === 0) {
+        showNewRecipeForm();
+        return;
+    }
+    
+    loadRecipe(0);
+    setupEventListeners();
+    showRecipeView();
+    
+    console.log('✔ Digital Cookbook initialized successfully with Supabase backend');
+}
+
+// =============================================================================
+// Your existing main.js code continues below...
+// =============================================================================
+
+
+
 /*
 MAIN JAVASCRIPT FUNCTIONALITY
 ==============================
