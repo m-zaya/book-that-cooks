@@ -10,6 +10,9 @@ cooking timeline -- if more than 2 steps, for it to curve to fit on the screen
 
 if steps are filled in, total time is calculated automatically - but can be overwritten. If no steps are provided (make them optional) then total time is a required manual field
 
+figure out checklist - save for people even on re-load, but do not synch up different people (same recipe different step scenario)
+
+
 done: 
 
 edit button to recipes (all fields)
