@@ -675,19 +675,19 @@ function clearAllTags() {
 function showRandomRecipe() {
     const randomIndex = Math.floor(Math.random() * recipes.length) + 1;
 
+    console.log("recipes length:", recipes.length);
+    console.log("randomIndex:", randomIndex);
+
     // Check if the random index is the same as the current recipe index
     if (randomIndex === currentRecipeIndex) {
-        // Update index to new recipe
-        currentRecipeIndex = randomIndex + 1; 
+        showRandomRecipe(); // If it's the same, call again to get a new random index
+        return;
+    }
 
-        loadRecipe(randomIndex + 1); // Increment to ensure we load a different recipe
-    }
-    else {
-        // Force update currentRecipeIndex and reload recipe even if it's the same
-        // This ensures the display always refreshes
-        currentRecipeIndex = randomIndex;
-        loadRecipe(randomIndex);
-    }
+    // Force update currentRecipeIndex and reload recipe even if it's the same
+    // This ensures the display always refreshes
+    currentRecipeIndex = randomIndex;
+    loadRecipe(randomIndex);
 }
 
 // =============================================================================
