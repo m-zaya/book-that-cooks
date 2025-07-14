@@ -456,10 +456,15 @@ RESPONSIVE DESIGN:
             <button class="nav-btn" onclick="nextRecipe()">Next →</button>
         </div>
 
-        <!-- Delete recipe button - admin only, positioned bottom right -->
-        <button class="delete-recipe-btn admin-only" onclick="deleteCurrentRecipe()" title="Delete this recipe">
-            🗑️
-        </button>
+        <!-- Admin recipe controls - positioned bottom right -->
+        <div class="admin-recipe-controls admin-only">
+            <button class="edit-recipe-btn" onclick="editCurrentRecipe()" title="Edit this recipe">
+                EDIT RECIPE
+            </button>
+            <button class="delete-recipe-btn" onclick="deleteCurrentRecipe()" title="Delete this recipe">
+                🗑️
+            </button>
+        </div>
     </div>
 
     <!-- Admin Login Modal - Hidden by default -->

@@ -167,6 +167,9 @@ function parseSupabaseRecords(supabaseRecords) {
 
 async function saveNewRecipe() {
     try {
+        // Check if we're editing an existing recipe
+        const isEditing = window.editingRecipeIndex && window.editingRecipeId;
+
         // Get form data
         const title = document.getElementById('newRecipeTitle').value.trim();
         const timeInput = document.getElementById('newRecipeTime').value.trim();
@@ -257,17 +260,48 @@ async function saveNewRecipe() {
             instructions
         };
         
-        // Save to Supabase
-        showLoadingIndicator();
-        await saveRecipeToSupabase(newRecipe);
-        hideLoadingIndicator();
-        
-        // Load the new recipe
-        // Using 1-based indexing
-        loadRecipe(recipes.length);
-        
-        // Show success message
-        alert(`Recipe "${title}" has been saved to your database successfully!`);
+        if (isEditing) {
+            // Update existing recipe
+            newRecipe.id = window.editingRecipeId;
+            
+            // Update in Supabase
+            showLoadingIndicator();
+            const result = await supabaseRequest('PATCH', `/recipes?id=eq.${window.editingRecipeId}`, {
+                title: newRecipe.title,
+                time: newRecipe.time,
+                image_url: newRecipe.image,
+                tags: newRecipe.tags,
+                difficulty: newRecipe.difficulty,
+                timeline: newRecipe.timeline,
+                ingredients: newRecipe.ingredients,
+                instructions: newRecipe.instructions
+            });
+            
+            // Update local array
+            const arrayIndex = window.editingRecipeIndex - 1;
+            recipes[arrayIndex] = newRecipe;
+            
+            // Clean up editing state
+            delete window.editingRecipeIndex;
+            delete window.editingRecipeId;
+            
+            hideLoadingIndicator();
+            
+            // Load the updated recipe
+            loadRecipe(window.editingRecipeIndex || 1);
+            
+            alert(`Recipe "${title}" has been updated successfully!`);
+        } else {
+            // Save new recipe (existing code)
+            showLoadingIndicator();
+            await saveRecipeToSupabase(newRecipe);
+            hideLoadingIndicator();
+            
+            // Load the new recipe
+            loadRecipe(recipes.length);
+            
+            alert(`Recipe "${title}" has been saved to your database successfully!`);
+        }
         
         // Return to recipe view
         showRecipeView();

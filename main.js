@@ -1230,6 +1230,172 @@ function handleAdminLogin(event) {
 // =============================================================================
 
 /**
+ * Edits the currently displayed recipe (admin only)
+ */
+function editCurrentRecipe() {
+    // Double-check admin authentication
+    if (!isAdminAuthenticated()) {
+        alert('Admin authentication required to edit recipes.');
+        return;
+    }
+    
+    // Safety check - ensure we have a valid recipe
+    if (!recipes || recipes.length === 0 || currentRecipeIndex < 1 || currentRecipeIndex > recipes.length) {
+        alert('No recipe to edit.');
+        return;
+    }
+    
+    // Get current recipe
+    const currentRecipe = recipes[currentRecipeIndex - 1]; // Convert to 0-based index
+    
+    console.log('Editing recipe:', currentRecipe.title);
+    
+    // Switch to new recipe form view
+    showNewRecipeView();
+    
+    // Populate form with current recipe data
+    populateFormWithRecipe(currentRecipe);
+    
+    // Store the recipe being edited for later use
+    window.editingRecipeIndex = currentRecipeIndex;
+    window.editingRecipeId = currentRecipe.id;
+}
+
+/**
+ * Populates the new recipe form with existing recipe data
+ * @param {Object} recipe - The recipe object to populate form with
+ */
+function populateFormWithRecipe(recipe) {
+    // Basic information
+    document.getElementById('newRecipeTitle').value = recipe.title || '';
+    document.getElementById('newRecipeTime').value = recipe.time || '';
+    document.getElementById('newRecipeDifficulty').value = recipe.difficulty || '';
+    document.getElementById('newRecipeTags').value = recipe.tags ? recipe.tags.join(', ') : '';
+    
+    // Handle image
+    if (recipe.image) {
+        document.getElementById('newRecipeImage').value = recipe.image;
+        showImagePreview(recipe.image);
+    } else {
+        hideImagePreview();
+    }
+    
+    // Populate timeline
+    populateTimelineList(recipe.timeline || []);
+    
+    // Populate ingredients
+    populateIngredientsList(recipe.ingredients || []);
+    
+    // Populate instructions
+    populateInstructionsList(recipe.instructions || []);
+}
+
+/**
+ * Helper function to populate timeline list
+ */
+function populateTimelineList(timeline) {
+    const timelineList = document.querySelector('#timelineList');
+    timelineList.innerHTML = '';
+    
+    timeline.forEach((step, index) => {
+        const newItem = document.createElement('div');
+        newItem.className = 'dynamic-item';
+        newItem.innerHTML = `
+            <input type="text" placeholder="Step - ex: Prep" class="form-input timeline-step-input" value="${step.step || ''}">
+            <input type="text" placeholder="HH:MM" 
+                   class="form-input timeline-time-input"
+                   pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+                   title="Enter time in HH:MM format (e.g., 00:15 for 15 minutes)"
+                   value="${step.time || ''}">
+            <button type="button" class="remove-btn" onclick="removeTimelineItem(this)">Remove</button>
+        `;
+        timelineList.appendChild(newItem);
+    });
+    
+    // Add empty item if none exist
+    if (timeline.length === 0) {
+        addTimelineItem();
+    }
+}
+
+/**
+ * Helper function to populate ingredients list
+ */
+function populateIngredientsList(ingredients) {
+    const ingredientsList = document.querySelector('#newRecipeIngredientsList');
+    ingredientsList.innerHTML = '';
+    
+    ingredients.forEach((ingredient, index) => {
+        const newItem = document.createElement('div');
+        newItem.className = 'dynamic-item ingredient-item';
+        
+        // Handle both old string format and new object format
+        let quantity = '', unit = '', name = '';
+        if (typeof ingredient === 'string') {
+            name = ingredient;
+        } else {
+            quantity = ingredient.quantity || '';
+            unit = ingredient.unit || '';
+            name = ingredient.ingredient || '';
+        }
+        
+        newItem.innerHTML = `
+            <div class="quantity-input-container">
+                <input type="text" placeholder="Qty" class="form-input ingredient-quantity-input" 
+                       title="Enter quantity (e.g., 2, 1½, ¾) - click for fraction help"
+                       onfocus="showFractionHelper(this)" 
+                       onblur="hideFractionHelper(this)"
+                       value="${quantity}">
+                <div class="fraction-helper hidden">
+                    <div class="fraction-helper-title">Common Fractions:</div>
+                    <div class="fraction-buttons">
+                        <button type="button" class="fraction-btn" onclick="insertFraction(this, '½')">½</button>
+                        <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')">¼</button>
+                        <button type="button" class="fraction-btn" onclick="insertFraction(this, '¾')">¾</button>
+                        <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅓')">⅓</button>
+                        <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅔')">⅔</button>
+                    </div>
+                </div>
+            </div>
+            <input type="text" placeholder="Unit" class="form-input ingredient-unit-input" 
+                   title="Enter unit (e.g., cups, tsp, tbsp, large)" value="${unit}">
+            <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" 
+                   title="Enter ingredient name (e.g., flour, eggs, salt)" value="${name}">
+            <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
+        `;
+        ingredientsList.appendChild(newItem);
+    });
+    
+    // Add empty item if none exist
+    if (ingredients.length === 0) {
+        addIngredientItem();
+    }
+}
+
+/**
+ * Helper function to populate instructions list
+ */
+function populateInstructionsList(instructions) {
+    const instructionsList = document.querySelector('#newRecipeInstructionsList');
+    instructionsList.innerHTML = '';
+    
+    instructions.forEach((instruction, index) => {
+        const newItem = document.createElement('div');
+        newItem.className = 'dynamic-item';
+        newItem.innerHTML = `
+            <textarea placeholder="Instruction step" class="form-textarea instruction-input" rows="2">${instruction || ''}</textarea>
+            <button type="button" class="remove-btn" onclick="removeInstructionItem(this)">Remove</button>
+        `;
+        instructionsList.appendChild(newItem);
+    });
+    
+    // Add empty item if none exist
+    if (instructions.length === 0) {
+        addInstructionItem();
+    }
+}
+
+/**
  * Deletes the currently displayed recipe (admin only)
  */
 async function deleteCurrentRecipe() {
