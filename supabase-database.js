@@ -161,156 +161,407 @@ function parseSupabaseRecords(supabaseRecords) {
     return recipes;
 }
 
-// =============================================================================
-// ENHANCED SAVE FUNCTION - Replaces the one in main.js
-// =============================================================================
+
+/** 
+ * ===================================================================
+ * ENHANCED SAVE NEW RECIPE FUNCTION WITH AIRTABLE BACKUP INTEGRATION
+ * ==================================================================
+ * 
+ * This function handles both creating new recipes and editing existing recipes.
+ * It integrates with the Airtable backup system to ensure data redundancy.
+ * 
+ * FEATURES:
+ * - Creates new recipes with automatic backup to Airtable
+ * - Updates existing recipes with backup synchronization
+ * - Comprehensive form validation for all fields
+ * - Error handling with user-friendly messages
+ * - Loading indicators for better user experience
+ * - Automatic UI updates after save/edit operations
+ * 
+ * BACKUP STRATEGY:
+ * - New recipes: Save to Supabase + backup to Airtable
+ * - Recipe edits: Update in Supabase + sync backup in Airtable
+ * - If backup fails, recipe still saves to primary database
+ * 
+ * DEPENDENCIES:
+ * - supabase-database.js (for Supabase operations)
+ * - airtable-backup.js (for backup operations)
+ * - main.js utility functions (validation, UI helpers)
+ */
 
 async function saveNewRecipe() {
     try {
-        // Check if we're editing an existing recipe
-        const isEditing = window.editingRecipeIndex && window.editingRecipeId;
-
-        // Get form data
-        const title = document.getElementById('newRecipeTitle').value.trim();
-        const timeInput = document.getElementById('newRecipeTime').value.trim();
-        const imageData = getCurrentImageData();
-        const difficulty = document.getElementById('newRecipeDifficulty').value;
-        const tagsInput = document.getElementById('newRecipeTags').value.trim();
+        // =================================================================
+        // STEP 1: DETERMINE OPERATION TYPE
+        // =================================================================
         
-        // Validation
+        // Check if we're editing an existing recipe or creating a new one
+        // These global variables are set when the user clicks "Edit Recipe"
+        const isEditing = window.editingRecipeIndex && window.editingRecipeId;
+        
+        console.log(`🔄 ${isEditing ? 'Editing' : 'Creating'} recipe...`);
+
+        // =================================================================
+        // STEP 2: COLLECT AND VALIDATE BASIC FORM DATA
+        // =================================================================
+        
+        // Get basic recipe information from form inputs
+        const title = document.getElementById('newRecipeTitle').value.trim();
+        const timeInput = document.getElementById('newRecipeTime').value.trim(); // Expected in HH:MM format
+        const imageData = getCurrentImageData(); // Gets image from file upload or URL
+        const difficulty = document.getElementById('newRecipeDifficulty').value; // Star rating
+        const tagsInput = document.getElementById('newRecipeTags').value.trim(); // Comma-separated tags
+        
+        // Validate required fields - these are essential for a complete recipe
         if (!title || !timeInput || !difficulty) {
             alert('Please fill in all required fields: Title, Time, and Difficulty.');
-            return;
+            return; // Exit early if validation fails
         }
         
+        // Validate time format - must be HH:MM (e.g., 01:30, 00:45)
+        // This ensures consistent time handling across the application
         if (!isValidTimeFormat(timeInput)) {
             alert('Please enter time in HH:MM format (e.g., 01:30 for 1 hour 30 minutes, 00:45 for 45 minutes).');
-            return;
+            return; // Exit early if time format is invalid
         }
         
-        // Collect form data
-        const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
+        // =================================================================
+        // STEP 3: PROCESS TAGS
+        // =================================================================
         
-        // Collect timeline data
+        // Convert comma-separated tags into clean array
+        // Filters out empty tags after trimming whitespace
+        const tags = tagsInput ? 
+            tagsInput.split(',')                    // Split by comma
+                     .map(tag => tag.trim())        // Remove whitespace from each tag
+                     .filter(tag => tag)            // Remove empty tags
+            : []; // Default to empty array if no tags provided
+        
+        // =================================================================
+        // STEP 4: COLLECT AND VALIDATE TIMELINE DATA
+        // =================================================================
+        
+        // Get all timeline step elements from the dynamic form
         const timelineItems = document.querySelectorAll('#timelineList .dynamic-item');
         const timeline = [];
+        
+        // Process each timeline step
         for (let item of timelineItems) {
-            const step = item.querySelector('.timeline-step-input').value.trim();
-            const stepTime = item.querySelector('.timeline-time-input').value.trim();
+            const step = item.querySelector('.timeline-step-input').value.trim();     // Step name (e.g., "Prep")
+            const stepTime = item.querySelector('.timeline-time-input').value.trim(); // Step time in HH:MM format
             
+            // Only add timeline steps that have both name and time
             if (step && stepTime) {
+                // Validate time format for each timeline step
                 if (!isValidTimeFormat(stepTime)) {
                     alert(`Invalid time format in timeline step "${step}". Please use HH:MM format (e.g., 00:15).`);
-                    return;
+                    return; // Exit if any timeline step has invalid time format
                 }
+                
+                // Add valid timeline step to array
                 timeline.push({ step, time: stepTime });
             }
         }
         
-        // Collect ingredients data
+        // =================================================================
+        // STEP 5: COLLECT AND VALIDATE INGREDIENTS DATA
+        // =================================================================
+        
+        // Get all ingredient elements from the dynamic form
+        // Each ingredient has three separate inputs: quantity, unit, ingredient name
         const ingredientItems = document.querySelectorAll('#newRecipeIngredientsList .ingredient-item');
         const ingredients = [];
+        
+        // Process each ingredient item
         ingredientItems.forEach(item => {
-            const quantity = item.querySelector('.ingredient-quantity-input').value.trim();
-            const unit = item.querySelector('.ingredient-unit-input').value.trim();
-            const ingredient = item.querySelector('.ingredient-name-input').value.trim();
+            const quantity = item.querySelector('.ingredient-quantity-input').value.trim();   // e.g., "2", "1½"
+            const unit = item.querySelector('.ingredient-unit-input').value.trim();           // e.g., "cups", "tsp"
+            const ingredient = item.querySelector('.ingredient-name-input').value.trim();     // e.g., "flour", "salt"
             
+            // Only add ingredients that have at least an ingredient name
+            // Quantity and unit are optional (some ingredients like "salt to taste" don't need quantity)
             if (ingredient) {
                 ingredients.push({
-                    quantity: quantity || '',
-                    unit: unit || '',
-                    ingredient: ingredient
+                    quantity: quantity || '',    // Default to empty string if no quantity
+                    unit: unit || '',           // Default to empty string if no unit
+                    ingredient: ingredient      // Ingredient name is required
                 });
             }
         });
         
-        // Collect instructions data
+        // =================================================================
+        // STEP 6: COLLECT AND VALIDATE INSTRUCTIONS DATA
+        // =================================================================
+        
+        // Get all instruction elements from the dynamic form
         const instructionItems = document.querySelectorAll('#newRecipeInstructionsList .dynamic-item');
         const instructions = [];
+        
+        // Process each instruction step
         instructionItems.forEach(item => {
             const instruction = item.querySelector('.instruction-input').value.trim();
+            
+            // Only add non-empty instructions
             if (instruction) {
                 instructions.push(instruction);
             }
         });
         
-        // Validate collections
+        // =================================================================
+        // STEP 7: VALIDATE COLLECTION COMPLETENESS
+        // =================================================================
+        
+        // Ensure recipe has all required components
+        // A recipe needs at least one of each to be complete and cookable
+        
         if (timeline.length === 0) {
             alert('Please add at least one timeline step.');
-            return;
+            return; // Timeline helps users understand cooking flow
         }
+        
         if (ingredients.length === 0) {
             alert('Please add at least one ingredient.');
-            return;
+            return; // Can't cook without ingredients
         }
+        
         if (instructions.length === 0) {
             alert('Please add at least one instruction.');
-            return;
+            return; // Instructions are essential for cooking
         }
         
-        // Create recipe object
+        // =================================================================
+        // STEP 8: CREATE RECIPE OBJECT
+        // =================================================================
+        
+        // Construct the complete recipe object with all collected data
         const newRecipe = {
-            title,
-            time: timeInput,
-            image: imageData || generateDefaultImage(title),
-            tags,
-            difficulty,
-            timeline,
-            ingredients,
-            instructions
+            title,                                              // Recipe title
+            time: timeInput,                                    // Total cooking time in HH:MM format
+            image: imageData || generateDefaultImage(title),    // Recipe image or generated placeholder
+            tags,                                               // Array of tag strings
+            difficulty,                                         // Star rating string (★★☆☆☆)
+            timeline,                                           // Array of timeline step objects
+            ingredients,                                        // Array of ingredient objects with quantity/unit/name
+            instructions                                        // Array of instruction strings
         };
         
+        // =================================================================
+        // STEP 9: HANDLE EDITING VS. CREATING
+        // =================================================================
+        
         if (isEditing) {
-            // Update existing recipe
+            // =====================================================
+            // EDITING EXISTING RECIPE PATH
+            // =====================================================
+            
+            console.log(`✏️ Updating existing recipe: ${title}`);
+            
+            // Add the existing recipe ID to the recipe object for updates
             newRecipe.id = window.editingRecipeId;
             
-            // Update in Supabase
-            showLoadingIndicator();
-            const result = await supabaseRequest('PATCH', `/recipes?id=eq.${window.editingRecipeId}`, {
-                title: newRecipe.title,
-                time: newRecipe.time,
-                image_url: newRecipe.image,
-                tags: newRecipe.tags,
-                difficulty: newRecipe.difficulty,
-                timeline: newRecipe.timeline,
-                ingredients: newRecipe.ingredients,
-                instructions: newRecipe.instructions
-            });
+            // Show loading indicator to inform user of ongoing operation
+            showLoadingIndicator('Updating recipe...');
             
-            // Update local array
-            const arrayIndex = window.editingRecipeIndex - 1;
-            recipes[arrayIndex] = newRecipe;
+            try {
+                // Update recipe in Supabase database using PATCH request
+                // This updates only the specified fields, preserving the original ID and creation date
+                const result = await supabaseRequest('PATCH', `/recipes?id=eq.${window.editingRecipeId}`, {
+                    title: newRecipe.title,
+                    time: newRecipe.time,
+                    image_url: newRecipe.image,          // Note: Supabase uses 'image_url' field name
+                    tags: newRecipe.tags,
+                    difficulty: newRecipe.difficulty,
+                    timeline: newRecipe.timeline,
+                    ingredients: newRecipe.ingredients,
+                    instructions: newRecipe.instructions
+                });
+                
+                console.log('✅ Recipe updated in Supabase successfully');
+                
+                // Update the recipe in local memory array to keep UI in sync
+                // Convert 1-based index to 0-based for array access
+                const arrayIndex = window.editingRecipeIndex - 1;
+                recipes[arrayIndex] = newRecipe;
+                
+                // =====================================================
+                // BACKUP EDITED RECIPE TO AIRTABLE
+                // =====================================================
+                
+                try {
+                    // For edited recipes, we need to update the backup in Airtable
+                    // First, try to find and update existing Airtable record
+                    console.log('📦 Updating Airtable backup...');
+                    
+                    // Get all Airtable records to find the matching one
+                    const airtableRecords = await airtableRequest('GET', '');
+                    const matchingRecord = airtableRecords.records.find(record => 
+                        record.fields.title === title || 
+                        record.fields.title === newRecipe.title
+                    );
+                    
+                    if (matchingRecord) {
+                        // Update existing Airtable record
+                        const airtableUpdateData = convertRecipeToAirtable(newRecipe);
+                        await airtableRequest('PATCH', `/${matchingRecord.id}`, {
+                            fields: airtableUpdateData.fields
+                        });
+                        console.log('✅ Airtable backup updated successfully');
+                    } else {
+                        // If no matching record found, create new backup entry
+                        await backupSingleRecipeToAirtable(newRecipe);
+                        console.log('✅ New Airtable backup created for edited recipe');
+                    }
+                    
+                } catch (backupError) {
+                    // Don't fail the edit operation if backup fails
+                    console.warn('⚠️ Recipe updated in Supabase but Airtable backup failed:', backupError);
+                    // User is notified but edit operation continues
+                }
+                
+                // Clean up editing state variables
+                delete window.editingRecipeIndex;
+                delete window.editingRecipeId;
+                
+                hideLoadingIndicator();
+                
+                // Load the updated recipe to show changes in UI
+                // Use the stored index to load the correct recipe
+                loadRecipe(window.editingRecipeIndex || 1);
+                
+                alert(`Recipe "${title}" has been updated successfully!`);
+                
+            } catch (supabaseError) {
+                // Handle Supabase update errors
+                hideLoadingIndicator();
+                console.error('❌ Failed to update recipe in Supabase:', supabaseError);
+                throw supabaseError; // Re-throw to be caught by outer try-catch
+            }
             
-            // Clean up editing state
-            delete window.editingRecipeIndex;
-            delete window.editingRecipeId;
-            
-            hideLoadingIndicator();
-            
-            // Load the updated recipe
-            loadRecipe(window.editingRecipeIndex || 1);
-            
-            alert(`Recipe "${title}" has been updated successfully!`);
         } else {
-            // Save new recipe (existing code)
-            showLoadingIndicator();
-            await saveRecipeToSupabase(newRecipe);
+            // =====================================================
+            // CREATING NEW RECIPE PATH
+            // =====================================================
+            
+            console.log(`➕ Creating new recipe: ${title}`);
+            
+            // Show loading indicator for new recipe creation
+            showLoadingIndicator('Saving new recipe...');
+            
+            // Use the backup-enabled save function that handles both Supabase and Airtable
+            // This function:
+            // 1. Saves to Supabase (primary database)
+            // 2. Automatically backs up to Airtable (secondary database)
+            // 3. Handles errors gracefully (if backup fails, recipe still saves to Supabase)
+            await saveRecipeWithBackup(newRecipe);
+            
             hideLoadingIndicator();
             
-            // Load the new recipe
+            // Load the newly created recipe (it will be the last one in the array)
+            // Using 1-based indexing to match database IDs
             loadRecipe(recipes.length);
             
             alert(`Recipe "${title}" has been saved to your database successfully!`);
+            
+            console.log('✅ New recipe created and backed up successfully');
         }
         
-        // Return to recipe view
+        // =================================================================
+        // STEP 10: RETURN TO RECIPE VIEW
+        // =================================================================
+        
+        // Switch back to the recipe viewing interface
+        // This hides the form and shows the recipe display
         showRecipeView();
         
+        console.log('🎉 Recipe operation completed successfully');
+        
     } catch (error) {
+        // =================================================================
+        // ERROR HANDLING
+        // =================================================================
+        
+        // Ensure loading indicator is hidden even if an error occurs
         hideLoadingIndicator();
-        console.error('Error saving recipe:', error);
-        alert('Failed to save recipe to database. Please check your internet connection and try again.');
+        
+        // Log detailed error information for debugging
+        console.error('❌ Error saving recipe:', error);
+        
+        // Show user-friendly error message
+        // Different messages based on error type for better user experience
+        let errorMessage = 'Failed to save recipe to database. ';
+        
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+            errorMessage += 'Please check your internet connection and try again.';
+        } else if (error.message.includes('401') || error.message.includes('403')) {
+            errorMessage += 'Authentication error. Please refresh the page and try again.';
+        } else if (error.message.includes('500')) {
+            errorMessage += 'Server error. Please try again in a few moments.';
+        } else {
+            errorMessage += 'Please try again or contact support if the problem persists.';
+        }
+        
+        alert(errorMessage);
+        
+        // Don't navigate away from form on error - let user fix issues and retry
+        console.log('💡 Form data preserved for user to retry after fixing issues');
     }
+}
+
+// =============================================================================
+// UTILITY FUNCTIONS USED BY saveNewRecipe()
+// =============================================================================
+
+/**
+ * Validates time format is HH:MM
+ * @param {string} timeStr - Time string to validate
+ * @returns {boolean} True if valid HH:MM format
+ */
+function isValidTimeFormat(timeStr) {
+    if (!timeStr || typeof timeStr !== 'string') {
+        return false;
+    }
+    
+    // Regular expression to match HH:MM format
+    // Allows 00:00 to 23:59
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    return timeRegex.test(timeStr);
+}
+
+/**
+ * Gets current image data from preview or returns null
+ * @returns {string|null} Image data URL or null if no image
+ */
+function getCurrentImageData() {
+    const previewImage = document.getElementById('previewImage');
+    const previewContainer = document.getElementById('imagePreview');
+    
+    // Only return image data if preview is visible and has valid src
+    if (previewContainer && 
+        previewImage && 
+        !previewContainer.classList.contains('hidden') && 
+        previewImage.src && 
+        previewImage.src !== window.location.href) { // Prevent returning page URL as image
+        return previewImage.src;
+    }
+    
+    return null;
+}
+
+/**
+ * Generates a default SVG image for recipes without uploaded images
+ * @param {string} title - Recipe title to include in image
+ * @returns {string} Base64-encoded SVG data URL
+ */
+function generateDefaultImage(title) {
+    const svg = `
+        <svg width="300" height="180" viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="180" fill="#F5F5DC"/>
+            <circle cx="150" cy="90" r="40" fill="#D2691E"/>
+            <text x="150" y="100" font-family="Georgia, serif" font-size="16" fill="#8B4513" text-anchor="middle" font-weight="bold">${title.substring(0, 20)}</text>
+            <text x="150" y="160" font-family="Georgia, serif" font-size="12" fill="#8B4513" text-anchor="middle" font-style="italic">Custom Recipe</text>
+        </svg>
+    `;
+    return 'data:image/svg+xml;base64,' + btoa(svg);
 }
 
 // =============================================================================
@@ -395,11 +646,26 @@ function updateAdminUI() {
             // Use flex to maintain header button layout
             control.style.display = 'flex'; 
         });
+
+        if (typeof addBackupControls === 'function') {
+            addBackupControls();
+        }
+        
+        const backupToggle = document.querySelector('.backup-toggle');
+        if (backupToggle) {
+            backupToggle.classList.add('show');
+        }
     } else {
         // Hide admin controls and reset button text
         if (adminButton) {
             adminButton.textContent = '🔐 Admin';
             adminButton.title = 'Admin login';
+        }
+        
+        // HIDE BACKUP CONTROLS:
+        const backupToggle = document.querySelector('.backup-toggle');
+        if (backupToggle) {
+            backupToggle.classList.remove('show');
         }
         
         // Hide all admin-only elements (including New Recipe button)
