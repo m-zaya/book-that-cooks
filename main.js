@@ -1225,9 +1225,96 @@ function handleAdminLogin(event) {
     }
 }
 
+// =============================================================================
+// 15. DELETE RECIPE FUNCTION - Admin only
+// =============================================================================
+
+/**
+ * Deletes the currently displayed recipe (admin only)
+ */
+async function deleteCurrentRecipe() {
+    // Double-check admin authentication
+    if (!isAdminAuthenticated()) {
+        alert('Admin authentication required to delete recipes.');
+        return;
+    }
+    
+    // Safety check - ensure we have a valid recipe
+    if (!recipes || recipes.length === 0 || currentRecipeIndex < 1 || currentRecipeIndex > recipes.length) {
+        alert('No recipe to delete.');
+        return;
+    }
+    
+    // Get current recipe info for confirmation
+    const currentRecipe = recipes[currentRecipeIndex - 1]; // Convert to 0-based index
+    const recipeName = currentRecipe ? currentRecipe.title : 'this recipe';
+    
+    // Confirm deletion with user
+    const confirmDelete = confirm(`Are you sure you want to permanently delete "${recipeName}"?\n\nThis action cannot be undone.`);
+    
+    if (!confirmDelete) {
+        return; // User cancelled
+    }
+    
+    try {
+        // Show loading indicator
+        showLoadingIndicator();
+        
+        // Delete from Supabase database if recipe has an ID
+        if (currentRecipe.id) {
+            console.log('Deleting recipe from Supabase:', currentRecipe.title);
+            
+            // Make DELETE request to Supabase
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?id=eq.${currentRecipe.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to delete recipe from database: ${response.status}`);
+            }
+            
+            console.log('Recipe deleted from Supabase successfully');
+        }
+        
+        // Remove from local recipes array
+        recipes.splice(currentRecipeIndex - 1, 1); // Remove from array
+        
+        // Handle navigation after deletion
+        if (recipes.length === 0) {
+            // No recipes left - show new recipe form
+            hideLoadingIndicator();
+            alert('All recipes have been deleted. You can add a new recipe.');
+            showNewRecipeForm();
+            return;
+        }
+        
+        // Adjust current index if necessary
+        if (currentRecipeIndex > recipes.length) {
+            currentRecipeIndex = recipes.length; // Go to last recipe
+        }
+        
+        // Load the recipe at the current index
+        loadRecipe(currentRecipeIndex);
+        
+        hideLoadingIndicator();
+        
+        // Show success message
+        alert(`Recipe "${recipeName}" has been deleted successfully.`);
+        
+    } catch (error) {
+        hideLoadingIndicator();
+        console.error('Error deleting recipe:', error);
+        alert(`Failed to delete recipe: ${error.message}\n\nPlease try again or check your internet connection.`);
+    }
+}
 
 // =============================================================================
-// 15. EVENT LISTENERS AND INITIALIZATION
+// 16. EVENT LISTENERS AND INITIALIZATION
 // =============================================================================
 
 function setupEventListeners() {

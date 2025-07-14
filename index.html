@@ -455,6 +455,11 @@ RESPONSIVE DESIGN:
             <span id="recipeCounter">1 of 3</span>
             <button class="nav-btn" onclick="nextRecipe()">Next →</button>
         </div>
+
+        <!-- Delete recipe button - admin only, positioned bottom right -->
+        <button class="delete-recipe-btn admin-only" onclick="deleteCurrentRecipe()" title="Delete this recipe">
+            🗑️
+        </button>
     </div>
 
     <!-- Admin Login Modal - Hidden by default -->
