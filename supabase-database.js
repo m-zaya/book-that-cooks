@@ -57,7 +57,9 @@ async function loadRecipesFromSupabase() {
         console.log('Loading recipes from Supabase...');
         showLoadingIndicator();
         
-        const data = await supabaseRequest('GET', '/recipes?order=created_at.desc');
+        // Orders by the database ID in ascending order, so the first record created gets loaded first.
+        const data = await supabaseRequest('GET', '/recipes?order=id.asc');
+        
         const parsedRecipes = parseSupabaseRecords(data);
         
         console.log(`Successfully loaded ${parsedRecipes.length} recipes from Supabase`);
@@ -246,7 +248,8 @@ async function saveNewRecipe() {
         hideLoadingIndicator();
         
         // Load the new recipe
-        loadRecipe(recipes.length - 1);
+        // Using 1-based indexing
+        loadRecipe(recipes.length);
         
         // Show success message
         alert(`Recipe "${title}" has been saved to your database successfully!`);
@@ -417,7 +420,7 @@ window.reloadRecipes = async function() {
         console.log(`✅ Reloaded ${recipes.length} recipes`);
         
         if (typeof loadRecipe === 'function' && recipes.length > 0) {
-            loadRecipe(0);
+            loadRecipe(1);
         }
         
         return recipes;

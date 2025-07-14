@@ -21,7 +21,8 @@ function initializeApp() {
         return;
     }
     
-    loadRecipe(0);
+    currentRecipeIndex = 1; // Set initial index
+    loadRecipe(1);
     setupEventListeners();
     showRecipeView();
     
@@ -190,8 +191,8 @@ function isValidIngredient(ingredient) {
  * @param {number} index - Index of the recipe to load from recipes array
  */
 function loadRecipe(index) {
-    // Validate index to prevent errors
-    if (index < 0 || index >= recipes.length) {
+    // Validate index to prevent errors (1-based indexing to match database IDs)
+    if (index < 1 || index > recipes.length) {
         console.error('Invalid recipe index:', index);
         return;
     }
@@ -199,8 +200,11 @@ function loadRecipe(index) {
     // Switch back to recipe view if we're in a different view
     showRecipeView();
 
+    // Convert 1-based index to 0-based for array access
+    const arrayIndex = index - 1;
+
     // Get the recipe object from the data array
-    const recipe = recipes[index];
+    const recipe = recipes[arrayIndex];
     
     // Update basic recipe information
     document.getElementById('recipeTitle').textContent = recipe.title;
@@ -226,8 +230,10 @@ function loadRecipe(index) {
     // Update navigation counter
     updateRecipeCounter();
     
-    // Store current index
-    currentRecipeIndex = index;
+    // Store current index (only update if not already set by navigation)
+    if (currentRecipeIndex !== index) {
+        currentRecipeIndex = index;
+    }
 }
 
 /**
@@ -365,9 +371,12 @@ function generateTimeline(timeline) {
 
 /**
  * Navigates to the next recipe
+ * Using 1-based indexing to match Supabase IDs
  */
 function nextRecipe() {
-    const nextIndex = (currentRecipeIndex + 1) % recipes.length;
+    // Move to next recipe, wrap around to first if at end
+    const nextIndex = currentRecipeIndex >= recipes.length ? 1 : currentRecipeIndex + 1;
+    currentRecipeIndex = nextIndex; // Update the index first
     loadRecipe(nextIndex);
 }
 
@@ -375,7 +384,9 @@ function nextRecipe() {
  * Navigates to the previous recipe
  */
 function previousRecipe() {
-    const prevIndex = currentRecipeIndex === 0 ? recipes.length - 1 : currentRecipeIndex - 1;
+    // Move to previous recipe, wrap around to last if at beginning
+    const prevIndex = currentRecipeIndex <= 1 ? recipes.length : currentRecipeIndex - 1;
+    currentRecipeIndex = prevIndex; // Update the index first
     loadRecipe(prevIndex);
 }
 
@@ -384,7 +395,12 @@ function previousRecipe() {
  */
 function updateRecipeCounter() {
     const counter = document.getElementById('recipeCounter');
-    counter.textContent = `${currentRecipeIndex + 1} of ${recipes.length}`;
+    // Ensure we have valid recipes array before displaying
+    if (recipes && recipes.length > 0) {
+        counter.textContent = `${currentRecipeIndex} of ${recipes.length}`;
+    } else {
+        counter.textContent = 'No recipes';
+    }
 }
 
 // =============================================================================
@@ -605,7 +621,7 @@ function generateFilteredTableOfContents(recipesToShow) {
     recipesToShow.forEach((recipe) => {
         const tocEntry = document.createElement('div');
         tocEntry.className = 'toc-recipe';
-        tocEntry.onclick = () => loadRecipe(recipe.originalIndex);
+        tocEntry.onclick = () => loadRecipe(recipe.originalIndex + 1);
         
         // Convert HH:MM time format to human-readable display for TOC entries
         const displayTime = formatTimeForDisplay(recipe.time);
@@ -652,9 +668,10 @@ function clearAllTags() {
 
 /**
  * Selects and displays a random recipe
+ * Using 1-based indexing to match Supabase IDs
  */
 function showRandomRecipe() {
-    const randomIndex = Math.floor(Math.random() * recipes.length);
+    const randomIndex = Math.floor(Math.random() * recipes.length) + 1;
     loadRecipe(randomIndex);
 }
 
