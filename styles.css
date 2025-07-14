@@ -1821,3 +1821,8 @@ body {
     background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
     transform: translateY(-2px);
 }
+
+/* Admin-only elements - hidden by default, shown when admin is logged in */
+.admin-only {
+    display: none;
+}

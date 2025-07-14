@@ -356,8 +356,10 @@ function updateAdminUI() {
             adminButton.title = 'Click to logout admin';
         }
         
+        // Show all admin-only elements (including New Recipe button)
         adminControls.forEach(control => {
-            control.style.display = 'block';
+            // Use flex to maintain header button layout
+            control.style.display = 'flex'; 
         });
     } else {
         // Hide admin controls and reset button text
@@ -366,6 +368,7 @@ function updateAdminUI() {
             adminButton.title = 'Admin login';
         }
         
+        // Hide all admin-only elements (including New Recipe button)
         adminControls.forEach(control => {
             control.style.display = 'none';
         });

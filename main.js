@@ -1144,7 +1144,90 @@ function insertFraction(button, fraction) {
 }
 
 // =============================================================================
-// 14. EVENT LISTENERS AND INITIALIZATION
+// 14. ADMIN AUTHENTICATION HANDLERS
+// =============================================================================
+
+/**
+ * Handles admin button clicks - shows login modal or logs out
+ */
+function handleAdminClick() {
+    if (isAdminAuthenticated()) {
+        // Admin is logged in, so log them out
+        logoutAdmin();
+    } else {
+        // Admin is not logged in, show login modal
+        showAdminModal();
+    }
+}
+
+/**
+ * Shows the admin login modal
+ */
+function showAdminModal() {
+    const modal = document.getElementById('adminLoginModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        // Focus on username field for better UX
+        setTimeout(() => {
+            const usernameField = document.getElementById('adminUsername');
+            if (usernameField) usernameField.focus();
+        }, 100);
+    }
+}
+
+/**
+ * Closes the admin login modal
+ */
+function closeAdminModal() {
+    const modal = document.getElementById('adminLoginModal');
+    const errorMessage = document.getElementById('adminLoginError');
+    
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    
+    // Clear form and hide error message
+    const form = document.getElementById('adminLoginForm');
+    if (form) form.reset();
+    
+    if (errorMessage) {
+        errorMessage.classList.add('hidden');
+    }
+}
+
+/**
+ * Handles admin login form submission
+ */
+function handleAdminLogin(event) {
+    event.preventDefault(); // Prevent form from submitting normally
+    
+    const username = document.getElementById('adminUsername').value;
+    const password = document.getElementById('adminPassword').value;
+    const errorMessage = document.getElementById('adminLoginError');
+    
+    // Attempt authentication using function from supabase-database.js
+    if (authenticateAdmin(username, password)) {
+        // Login successful - close modal and clear form
+        closeAdminModal();
+        console.log('Admin login successful');
+    } else {
+        // Login failed - show error message
+        if (errorMessage) {
+            errorMessage.classList.remove('hidden');
+        }
+        
+        // Clear password field for security
+        const passwordField = document.getElementById('adminPassword');
+        if (passwordField) {
+            passwordField.value = '';
+            passwordField.focus();
+        }
+    }
+}
+
+
+// =============================================================================
+// 15. EVENT LISTENERS AND INITIALIZATION
 // =============================================================================
 
 function setupEventListeners() {
