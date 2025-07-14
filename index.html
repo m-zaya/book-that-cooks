@@ -74,6 +74,12 @@ RESPONSIVE DESIGN:
                 <span>➕</span>
                 <span>New Recipe</span>
             </button>
+    
+            <!-- Admin login/logout button -->
+            <button class="header-btn admin" id="adminLoginButton" onclick="handleAdminClick()" title="Admin login">
+                <span>🔐</span>
+                <span>Admin</span>
+            </button>
         </div>
         
         <!-- Left side page stack for 3D effect (hidden on mobile) -->
@@ -447,6 +453,37 @@ RESPONSIVE DESIGN:
             <button class="nav-btn" onclick="previousRecipe()">← Previous</button>
             <span id="recipeCounter">1 of 3</span>
             <button class="nav-btn" onclick="nextRecipe()">Next →</button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal - Hidden by default -->
+    <div id="adminLoginModal" class="admin-modal hidden">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h2>Admin Login</h2>
+                <button class="admin-modal-close" onclick="closeAdminModal()">&times;</button>
+            </div>
+            
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                <div class="admin-form-group">
+                    <label for="adminUsername">Username:</label>
+                    <input type="text" id="adminUsername" required autocomplete="username">
+                </div>
+                
+                <div class="admin-form-group">
+                    <label for="adminPassword">Password:</label>
+                    <input type="password" id="adminPassword" required autocomplete="current-password">
+                </div>
+                
+                <div class="admin-form-actions">
+                    <button type="submit" class="admin-login-btn">Login</button>
+                    <button type="button" class="admin-cancel-btn" onclick="closeAdminModal()">Cancel</button>
+                </div>
+            </form>
+            
+            <div id="adminLoginError" class="admin-error-message hidden">
+                Invalid username or password. Please try again.
+            </div>
         </div>
     </div>
 

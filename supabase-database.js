@@ -13,6 +13,21 @@ All syntax errors have been fixed and tested.
 const SUPABASE_URL = 'https://zrorohvugeeixwxtnqnc.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpyb3JvaHZ1Z2VlaXh3eHRucW5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MzI5MzIsImV4cCI6MjA2NzUwODkzMn0.l047BcGrIgrcwhho2xTQn7IwgIlE7liWqJpjJhGN7Lk';
 
+
+// =============================================================================
+// ADMIN CONFIGURATION - Single admin login for all administrators
+// =============================================================================
+
+// Simple admin credentials - in production, consider environment variables
+const ADMIN_CREDENTIALS = {
+    username: 'admin',
+    password: 'admin' // Change this to a secure password
+};
+
+// Admin state tracking
+let isAdminLoggedIn = false;
+
+
 // =============================================================================
 // GLOBAL VARIABLES
 // =============================================================================
@@ -59,7 +74,7 @@ async function loadRecipesFromSupabase() {
         
         // Orders by the database ID in ascending order, so the first record created gets loaded first.
         const data = await supabaseRequest('GET', '/recipes?order=id.asc');
-        
+
         const parsedRecipes = parseSupabaseRecords(data);
         
         console.log(`Successfully loaded ${parsedRecipes.length} recipes from Supabase`);
@@ -265,6 +280,99 @@ async function saveNewRecipe() {
 }
 
 // =============================================================================
+// ADMIN AUTHENTICATION FUNCTIONS
+// =============================================================================
+
+/**
+ * Authenticates admin credentials
+ * @param {string} username - Admin username
+ * @param {string} password - Admin password
+ * @returns {boolean} True if credentials are valid
+ */
+function authenticateAdmin(username, password) {
+    // Simple credential check - could be enhanced with hashing in production
+    const isValid = username === ADMIN_CREDENTIALS.username && 
+                   password === ADMIN_CREDENTIALS.password;
+    
+    if (isValid) {
+        isAdminLoggedIn = true;
+        console.log('Admin logged in successfully');
+        
+        // Store login state in sessionStorage (cleared when browser tab closes)
+        sessionStorage.setItem('cookbook_admin_logged_in', 'true');
+        
+        // Update UI to show admin features
+        updateAdminUI();
+    }
+    
+    return isValid;
+}
+
+/**
+ * Logs out the admin user
+ */
+function logoutAdmin() {
+    isAdminLoggedIn = false;
+    console.log('Admin logged out');
+    
+    // Clear session storage
+    sessionStorage.removeItem('cookbook_admin_logged_in');
+    
+    // Update UI to hide admin features
+    updateAdminUI();
+}
+
+/**
+ * Checks if admin is currently logged in
+ * @returns {boolean} True if admin is logged in
+ */
+function isAdminAuthenticated() {
+    return isAdminLoggedIn;
+}
+
+/**
+ * Restores admin session from sessionStorage on page load
+ */
+function restoreAdminSession() {
+    const storedState = sessionStorage.getItem('cookbook_admin_logged_in');
+    if (storedState === 'true') {
+        isAdminLoggedIn = true;
+        updateAdminUI();
+        console.log('Admin session restored');
+    }
+}
+
+/**
+ * Updates the UI to show/hide admin features based on login status
+ */
+function updateAdminUI() {
+    const adminButton = document.getElementById('adminLoginButton');
+    const adminControls = document.querySelectorAll('.admin-only');
+    
+    if (isAdminLoggedIn) {
+        // Show admin controls and change button text
+        if (adminButton) {
+            adminButton.textContent = '👤 Logout';
+            adminButton.title = 'Click to logout admin';
+        }
+        
+        adminControls.forEach(control => {
+            control.style.display = 'block';
+        });
+    } else {
+        // Hide admin controls and reset button text
+        if (adminButton) {
+            adminButton.textContent = '🔐 Admin';
+            adminButton.title = 'Admin login';
+        }
+        
+        adminControls.forEach(control => {
+            control.style.display = 'none';
+        });
+    }
+}
+
+// =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
 
@@ -370,6 +478,9 @@ async function initializeDatabase() {
         if (typeof initializeApp === 'function') {
             initializeApp();
         }
+
+        // Restore admin session if exists
+        restoreAdminSession();
         
         console.log('Supabase database initialized successfully');
         console.log(`Loaded ${recipes.length} recipes from database`);
