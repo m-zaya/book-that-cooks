@@ -230,10 +230,12 @@ function loadRecipe(index) {
     // Update navigation counter
     updateRecipeCounter();
     
-    // Store current index (only update if not already set by navigation)
-    if (currentRecipeIndex !== index) {
-        currentRecipeIndex = index;
-    }
+    // ALWAYS update currentRecipeIndex to ensure consistency
+    // This ensures the index always matches what's being displayed
+    currentRecipeIndex = index;
+    
+    // Update navigation counter AFTER setting the index
+    updateRecipeCounter();
 }
 
 /**
@@ -376,7 +378,7 @@ function generateTimeline(timeline) {
 function nextRecipe() {
     // Move to next recipe, wrap around to first if at end
     const nextIndex = currentRecipeIndex >= recipes.length ? 1 : currentRecipeIndex + 1;
-    currentRecipeIndex = nextIndex; // Update the index first
+    // Let loadRecipe() handle updating currentRecipeIndex for consistency
     loadRecipe(nextIndex);
 }
 
@@ -386,7 +388,7 @@ function nextRecipe() {
 function previousRecipe() {
     // Move to previous recipe, wrap around to last if at beginning
     const prevIndex = currentRecipeIndex <= 1 ? recipes.length : currentRecipeIndex - 1;
-    currentRecipeIndex = prevIndex; // Update the index first
+    // Let loadRecipe() handle updating currentRecipeIndex for consistency
     loadRecipe(prevIndex);
 }
 
@@ -672,7 +674,20 @@ function clearAllTags() {
  */
 function showRandomRecipe() {
     const randomIndex = Math.floor(Math.random() * recipes.length) + 1;
-    loadRecipe(randomIndex);
+
+    // Check if the random index is the same as the current recipe index
+    if (randomIndex === currentRecipeIndex) {
+        // Update index to new recipe
+        currentRecipeIndex = randomIndex + 1; 
+
+        loadRecipe(randomIndex + 1); // Increment to ensure we load a different recipe
+    }
+    else {
+        // Force update currentRecipeIndex and reload recipe even if it's the same
+        // This ensures the display always refreshes
+        currentRecipeIndex = randomIndex;
+        loadRecipe(randomIndex);
+    }
 }
 
 // =============================================================================
