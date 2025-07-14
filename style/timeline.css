@@ -1,0 +1,147 @@
+/*
+TIMELINE.CSS - COOKING TIMELINE COMPONENT
+=========================================
+
+This file contains the styling for the interactive cooking timeline that shows
+the sequence of cooking steps with visual connections and timing information.
+It creates a horizontal timeline with dots, connecting lines, and step content.
+
+CONTENTS:
+- Timeline Container - Main timeline background and structure
+- Timeline Steps - Individual step containers and content
+- Connecting Elements - Lines and dots that connect timeline steps
+- Step Content - Name and time display for each step
+
+DESIGN FEATURES:
+- Horizontal timeline layout with connecting line
+- Circular dots marking each step
+- Gradient backgrounds for visual depth
+- Responsive step positioning
+- Time display conversion support (HH:MM to readable format)
+
+DEPENDENCIES:
+- base.css for color scheme and typography
+- Works with main.js for time format conversion
+*/
+
+/* =============================================================================
+   TIMELINE CONTAINER - Main timeline structure and background
+   ============================================================================= */
+
+   .timeline {
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-left: 5px solid #8B4513;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.timeline-title {
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.timeline-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    height: 80px;
+}
+
+/* =============================================================================
+   TIMELINE CONNECTING ELEMENTS - Lines and dots
+   ============================================================================= */
+
+/* Starting dot for timeline */
+.timeline-start-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+/* Connecting line along timeline */
+.timeline-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, #8B4513, #D2691E, #8B4513);
+    border-radius: 2px;
+    z-index: 1;
+    transform: translateY(-50%);
+}
+
+/* Timeline dots positioning */
+.timeline-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: absolute;
+    z-index: 2;
+}
+
+.timeline-step:first-child .timeline-dot {
+    left: 0;
+    transform: translateX(-50%);
+}
+
+.timeline-step:last-child .timeline-dot {
+    right: 0;
+    transform: translateX(50%);
+}
+
+.timeline-step:not(:first-child):not(:last-child) .timeline-dot {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* =============================================================================
+   TIMELINE STEPS - Individual step containers and content
+   ============================================================================= */
+
+/* Individual timeline step container */
+.timeline-step {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Content box for each timeline step */
+.timeline-step-content {
+    text-align: center;
+    position: relative;
+    z-index: 3;
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.timeline-step-name {
+    font-weight: bold;
+    color: #8B4513;
+    font-size: 0.9em;
+    margin-bottom: 2px;
+}
+
+.timeline-step-time {
+    color: #666;
+    font-size: 0.8em;
+}

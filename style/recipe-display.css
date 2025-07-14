@@ -1,0 +1,119 @@
+/*
+RECIPE-DISPLAY.CSS - RECIPE CONTENT DISPLAY
+===========================================
+
+This file contains the styling for displaying recipe content including headers,
+images, tags, difficulty ratings, and basic recipe information. It focuses on
+the visual presentation of recipe data in the left page of the book.
+
+CONTENTS:
+- Recipe Header - Title and time display
+- Recipe Images - Responsive image styling with aspect ratio control
+- Recipe Tags - Tag display with brown theme styling
+- Difficulty Rating - Star rating display system
+
+DESIGN FEATURES:
+- Responsive image scaling that maintains aspect ratio
+- Tag system with gradient backgrounds
+- Star-based difficulty rating with golden styling
+- Centered layout with proper spacing
+
+DEPENDENCIES:
+- base.css for typography and color foundation
+- book-layout.css for page structure
+*/
+
+/* =============================================================================
+   RECIPE HEADER SECTION - Title and timing information
+   ============================================================================= */
+
+/* Recipe header section */
+.recipe-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #8B4513;
+}
+
+.recipe-title {
+    font-size: 2.4em;
+    color: #8B4513;
+    margin-bottom: 8px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.recipe-time {
+    color: #666;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1.1em;
+}
+
+/* =============================================================================
+   RECIPE IMAGE STYLING - Responsive image display
+   ============================================================================= */
+
+/* Recipe image styling - ensures full image is always visible and scales with window */
+.recipe-image {
+    width: 100%;
+    max-width: 100%;           /* Ensures image doesn't exceed container width */
+    height: auto;              /* Auto height maintains aspect ratio */
+    min-height: 120px;         /* Minimum height for very wide images */
+    max-height: 40vh;          /* Maximum height scales with viewport height */
+    object-fit: contain;       /* Shows entire image without cropping */
+    object-position: center;   /* Centers the image within container */
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    border: 3px solid #f0f0f0;
+    display: block;            /* Ensures proper block display */
+    margin-left: auto;         /* Centers image horizontally */
+    margin-right: auto;        /* Centers image horizontally */
+}
+
+/* =============================================================================
+   RECIPE TAGS - Tag container and individual tag styling
+   ============================================================================= */
+
+/* Recipe tags container and individual tags */
+.recipe-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.tag {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* =============================================================================
+   DIFFICULTY RATING - Star-based rating system
+   ============================================================================= */
+
+/* Difficulty rating with stars */
+.difficulty-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+.difficulty-stars {
+    color: #FFD700;
+    font-size: 1.2em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}

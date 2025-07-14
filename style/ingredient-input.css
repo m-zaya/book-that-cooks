@@ -1,0 +1,184 @@
+/*
+INGREDIENT-INPUTS.CSS - SEPARATED INGREDIENT FIELDS
+===================================================
+
+This file contains the styling for the separated ingredient input system
+with quantity, unit, and ingredient name fields, plus the interactive
+fraction helper popup for easy Unicode fraction entry.
+
+CONTENTS:
+- Ingredient Item Layout - Three-field layout system
+- Individual Field Styling - Quantity, unit, and ingredient name inputs
+- Fraction Helper Popup - Interactive fraction selection interface
+- Responsive Behavior - Mobile and desktop adaptations
+
+DESIGN FEATURES:
+- Three-column layout for ingredient components
+- Fixed widths for quantity and unit, flexible for ingredient name
+- Interactive fraction helper with Unicode symbols
+- Popup positioning that adapts to screen edges
+- Smooth animations for popup appearance
+- Grid layout for fraction buttons
+
+DEPENDENCIES:
+- base.css for typography and color scheme
+- forms.css for base form input styling
+- Works with main.js for fraction helper functionality
+*/
+
+/* =============================================================================
+   INGREDIENT ITEM LAYOUT - Three-field layout system
+   ============================================================================= */
+
+/* Specific styling for ingredient input items with three separate fields */
+.ingredient-item {
+    display: flex;
+    gap: 8px; /* Smaller gap for better field grouping */
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+/* Container for quantity input with fraction helper */
+.quantity-input-container {
+    position: relative;
+    flex: 0 0 80px; /* Fixed width for quantity field - fits numbers and fractions */
+    min-width: 80px;
+}
+
+/* =============================================================================
+   INDIVIDUAL FIELD STYLING - Quantity, unit, and ingredient inputs
+   ============================================================================= */
+
+/* Individual ingredient input field sizing and styling */
+.ingredient-quantity-input {
+    width: 100%; /* Fill the container */
+    margin-bottom: 0;
+    text-align: center; /* Center-align numbers for better readability */
+}
+
+.ingredient-unit-input {
+    flex: 0 0 100px; /* Fixed width for unit field - fits common units like "cups", "tbsp" */
+    min-width: 100px;
+    margin-bottom: 0;
+}
+
+.ingredient-name-input {
+    flex: 1; /* Takes remaining space - allows longer ingredient names */
+    margin-bottom: 0;
+}
+
+/* Hover and focus states for ingredient inputs */
+.ingredient-quantity-input:focus,
+.ingredient-unit-input:focus,
+.ingredient-name-input:focus {
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+/* Placeholder styling for ingredient inputs */
+.ingredient-quantity-input::placeholder {
+    color: #999;
+    font-size: 0.9em;
+}
+
+.ingredient-unit-input::placeholder {
+    color: #999;
+    font-size: 0.9em;
+}
+
+.ingredient-name-input::placeholder {
+    color: #999;
+    font-size: 0.9em;
+}
+
+/* Remove button spacing for ingredient items */
+.ingredient-item .remove-btn {
+    flex-shrink: 0; /* Prevent button from shrinking */
+    margin-left: 5px; /* Small gap between inputs and remove button */
+}
+
+/* =============================================================================
+   FRACTION HELPER POPUP - Interactive fraction selection interface
+   ============================================================================= */
+
+/* Fraction helper popup styling */
+.fraction-helper {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    background: #ffffff;
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin-top: 2px;
+    animation: fadeIn 0.2s ease-out;
+    /* Fixed sizing - make it wider than the container */
+    width: 240px; /* Fixed width regardless of container */
+    min-width: 240px;
+    /* Prevent it from going off screen on the right */
+    right: auto;
+}
+
+/* If the helper would go off the right edge, position it to the right instead */
+.fraction-helper.align-right {
+    left: auto;
+    right: 0;
+}
+
+/* Fade-in animation for smooth appearance */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fraction-helper-title {
+    font-size: 0.8em;
+    color: #8B4513;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+/* =============================================================================
+   FRACTION BUTTONS - Grid layout and interactive styling
+   ============================================================================= */
+
+.fraction-buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns for compact layout */
+    gap: 4px;
+}
+
+.fraction-btn {
+    background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px 2px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fraction-btn:hover {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.fraction-btn:active {
+    transform: translateY(0);
+}

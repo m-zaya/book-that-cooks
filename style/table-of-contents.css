@@ -1,0 +1,319 @@
+/*
+TABLE-OF-CONTENTS.CSS - TOC LAYOUT AND SEARCH
+=============================================
+
+This file contains the styling for the split Table of Contents layout with
+search controls on the left page and results display on the right page.
+It includes search functionality, filtering, sorting, and recipe browsing.
+
+CONTENTS:
+- TOC Controls (Left Page) - Search and filter controls
+- TOC Results (Right Page) - Recipe listings and display
+- Search Interface - Input styling and help text
+- Filter System - Tag filters and sorting options
+- Recipe Entries - Individual recipe display in TOC
+
+DESIGN FEATURES:
+- Split-screen layout for controls and results
+- Real-time search with visual feedback
+- Tag filtering with select all/clear all functionality
+- Sorting by alphabetical, difficulty, and time
+- Recipe counter showing filtered results
+- Hover effects for recipe entries
+
+DEPENDENCIES:
+- base.css for typography and color scheme
+- book-layout.css for page structure
+- Works with main.js for search and filter functionality
+*/
+
+/* =============================================================================
+   TABLE OF CONTENTS CONTROLS - Left Page (Search and filters)
+   ============================================================================= */
+
+/* TABLE OF CONTENTS CONTROLS - Left page styling */
+.table-of-contents-controls {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Header for table of contents controls page */
+.toc-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #8B4513;
+}
+
+.toc-title {
+    font-size: 2em;
+    color: #8B4513;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.toc-subtitle {
+    color: #666;
+    font-style: italic;
+    font-size: 1em;
+}
+
+/* =============================================================================
+   SEARCH INTERFACE - Search input and help text
+   ============================================================================= */
+
+/* Search section styling */
+.toc-search-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.control-title {
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Search input styling */
+.search-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    font-family: inherit;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1), inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-input::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+.search-help {
+    display: block;
+    color: #666;
+    font-style: italic;
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+
+/* =============================================================================
+   FILTER AND SORT CONTROLS - Tag filtering and sorting options
+   ============================================================================= */
+
+/* Table of Contents Controls */
+.toc-controls {
+    padding: 1rem;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 1rem;
+}
+
+.control-section {
+    margin-bottom: 1rem;
+}
+
+.toc-select {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: #ffffff;
+    transition: border-color 0.3s ease;
+}
+
+.toc-select:focus {
+    outline: none;
+    border-color: #8B4513;
+}
+
+/* Tag Filter Styling */
+.tag-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background-color: #f8f8f8;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tag-filter:hover {
+    background-color: #eee;
+}
+
+.filter-btn {
+    margin-right: 0.5rem;
+    margin-bottom: 0.7rem;
+    padding: 0.3rem 0.7rem;
+    background-color: #8B4513;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-btn:hover {
+    background-color: #A0522D;
+}
+
+/* Recipe count display */
+.recipe-count {
+    text-align: center;
+    font-weight: bold;
+    color: #8B4513;
+    padding: 10px;
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+}
+
+/* =============================================================================
+   TABLE OF CONTENTS RESULTS - Right Page (Recipe listings)
+   ============================================================================= */
+
+/* TABLE OF CONTENTS RESULTS - Right page styling */
+.table-of-contents-results {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Header for table of contents results page */
+.toc-results-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #8B4513;
+}
+
+.toc-results-title {
+    font-size: 1.8em;
+    color: #8B4513;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.toc-results-subtitle {
+    color: #666;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+/* Grid layout for recipe entries in table of contents results */
+.toc-recipes {
+    display: grid;
+    grid-template-columns: 1fr; /* Single column layout */
+    gap: 12px;
+}
+
+/* =============================================================================
+   RECIPE ENTRIES - Individual recipe display in TOC
+   ============================================================================= */
+
+/* Individual recipe entry in table of contents */
+.toc-recipe {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.toc-recipe:hover {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    transform: translateX(5px); /* Slide effect on hover */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Small thumbnail image for each recipe in TOC */
+.toc-recipe-image {
+    width: 60px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #ddd;
+    flex-shrink: 0;
+}
+
+/* Recipe information in table of contents */
+.toc-recipe-info {
+    flex: 1;
+    min-width: 0; /* Prevents flex item from overflowing */
+}
+
+.toc-recipe-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 5px;
+    word-wrap: break-word;
+}
+
+.toc-recipe-meta {
+    color: #666;
+    font-size: 0.9em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* =============================================================================
+   NO RESULTS MESSAGE - When no recipes match search/filter
+   ============================================================================= */
+
+/* No results message styling */
+.no-results-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.no-results-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.no-results-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #8B4513;
+}
+
+.no-results-suggestion {
+    font-style: italic;
+    font-size: 0.9em;
+}

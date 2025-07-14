@@ -1,0 +1,155 @@
+/*
+IMAGE-UPLOAD.CSS - IMAGE HANDLING COMPONENTS
+============================================
+
+This file contains the styling for image upload and preview functionality
+in the new recipe form. It supports both file upload and URL input methods
+with live preview capabilities and error handling.
+
+CONTENTS:
+- Image Upload Section - Container and structure
+- Upload Options - File upload and URL input styling
+- Image Preview - Live preview display and controls
+- Remove Image Button - Image removal functionality
+- Form Labels - Consistent labeling system
+
+DESIGN FEATURES:
+- Dual input methods (file upload and URL)
+- Live image preview with aspect ratio control
+- Hover effects for interactive elements
+- Error handling for invalid images
+- Consistent brown theme integration
+- Responsive preview sizing
+
+DEPENDENCIES:
+- base.css for typography and color scheme
+- forms.css for form input styling consistency
+- Works with main.js for image handling functionality
+*/
+
+/* =============================================================================
+   IMAGE UPLOAD SECTION - Container and main structure
+   ============================================================================= */
+
+/* Image upload section styling */
+.image-upload-section {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+/* =============================================================================
+   UPLOAD OPTIONS - File upload and URL input methods
+   ============================================================================= */
+
+/* Individual upload option containers (file vs URL) */
+.upload-option {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 2px dashed #ddd;
+    transition: border-color 0.3s ease;
+}
+
+.upload-option:hover {
+    border-color: #8B4513;
+}
+
+.upload-label {
+    display: block;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* File input styling */
+.form-file-input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: #fafafa;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.form-file-input:hover {
+    border-color: #8B4513;
+}
+
+.form-file-input:focus {
+    outline: none;
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+/* Help text styling */
+.upload-help {
+    display: block;
+    color: #666;
+    font-style: italic;
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
+/* =============================================================================
+   IMAGE PREVIEW - Live preview display and controls
+   ============================================================================= */
+
+/* Image preview container */
+.image-preview {
+    margin-top: 20px;
+    padding: 15px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 2px solid #8B4513;
+    text-align: center;
+}
+
+.preview-label {
+    display: block;
+    font-weight: bold;
+    color: #8B4513;
+    margin-bottom: 10px;
+}
+
+/* Preview image styling */
+.preview-img {
+    max-width: 100%;
+    max-height: 200px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+/* =============================================================================
+   REMOVE IMAGE BUTTON - Image removal functionality
+   ============================================================================= */
+
+/* Remove image button */
+.remove-image-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.remove-image-btn:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}

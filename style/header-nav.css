@@ -1,0 +1,91 @@
+/*
+HEADER-NAVIGATION.CSS - HEADER BUTTONS AND NAVIGATION
+=====================================================
+
+This file contains the styling for the three-button header navigation system
+that replaces the dropdown selector. It includes the Table of Contents, Random
+Recipe, and New Recipe buttons, as well as the admin login button.
+
+CONTENTS:
+- Header Button Bar - Container and positioning
+- Individual Button Styling - TOC, Random, New Recipe buttons
+- Admin Button - Login/logout functionality
+- Hover Effects - Interactive feedback
+
+DESIGN FEATURES:
+- Semi-transparent background with backdrop blur
+- Consistent brown theme matching the book design
+- Responsive button sizing with icons and text
+- Glass-like effect with modern aesthetics
+
+DEPENDENCIES:
+- base.css for typography and color scheme
+- Works with admin-auth.css for admin functionality
+*/
+
+/* =============================================================================
+   HEADER BUTTON BAR - Container and positioning above the book
+   ============================================================================= */
+
+/* Container for the three header buttons positioned above the book */
+.header-buttons {
+    position: absolute;
+    top: -50px; /* Positioned above the book */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px; /* Space between buttons */
+    background: rgba(255,255,255,0.95); /* Semi-transparent white background */
+    border: 2px solid #8B4513; /* Brown border matching book theme */
+    border-radius: 12px;
+    padding: 12px 20px;
+    z-index: 20; /* High z-index to appear above other elements */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Drop shadow for depth */
+    backdrop-filter: blur(10px); /* Blur effect for modern glass look */
+}
+
+/* =============================================================================
+   BUTTON STYLING - Base styles and individual button variations
+   ============================================================================= */
+
+/* Base styling for all header buttons */
+.header-btn {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease; /* Smooth transitions for hover effects */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between icon and text */
+}
+
+/* Uniform styling for main navigation buttons - consistent brown theme */
+.header-btn.toc,
+.header-btn.random,
+.header-btn.new {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+}
+
+/* Hover effects for main navigation buttons */
+.header-btn.toc:hover,
+.header-btn.random:hover,
+.header-btn.new:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* Admin button styling - matches other buttons but distinct purpose */
+.header-btn.admin {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+}
+
+.header-btn.admin:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-2px);
+}

@@ -1,0 +1,92 @@
+/*
+BOOK-LAYOUT.CSS - CORE BOOK STRUCTURE
+=====================================
+
+This file contains the main book pages structure and binding effects.
+It creates the core book layout with left and right pages, the central spine,
+and basic page styling that forms the foundation of the 3D book interface.
+
+CONTENTS:
+- Main Book Pages - Core book structure and binding
+- Page Layout - Individual page styling and positioning
+- Book Spine - Central binding shadow effect
+- Page Numbers - Bottom corner page numbering
+
+DEPENDENCIES:
+- base.css must be loaded first for foundation styles
+- Works with 3d-effects.css for complete 3D appearance
+*/
+
+/* =============================================================================
+   MAIN BOOK PAGES - Core book structure and binding
+   ============================================================================= */
+   .book-pages {
+    position: absolute;
+    left: 2%;
+    top: 50px; /* Moved down to accommodate header buttons */
+    width: 96%;
+    height: calc(100% - 60px); /* Adjusted height for header space */
+    display: flex;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow: hidden;
+    z-index: 10;
+}
+
+/* Book spine shadow effect down the center */
+.book-spine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, 
+        rgba(0,0,0,0.1) 0%,
+        rgba(0,0,0,0.3) 20%,
+        rgba(0,0,0,0.3) 80%,
+        rgba(0,0,0,0.1) 100%
+    );
+    transform: translateX(-50%);
+    z-index: 15;
+}
+
+/* =============================================================================
+   PAGE LAYOUT - Individual page styling and positioning
+   ============================================================================= */
+.page {
+    width: 50%;
+    height: 100%;
+    padding: 40px 30px;
+    position: relative;
+    overflow-y: auto;
+    background: linear-gradient(to bottom, #ffffff 0%, #fefefe 100%);
+}
+
+/* Left page with gradient shadow near spine */
+.page-left {
+    background: linear-gradient(to right, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+    border-right: 1px solid #eee;
+}
+
+/* Right page with gradient shadow near spine */
+.page-right {
+    background: linear-gradient(to left, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+}
+
+/* Page numbers at bottom corners */
+.page-number {
+    position: absolute;
+    bottom: 20px;
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+}
+
+.page-left .page-number {
+    left: 30px;
+}
+
+.page-right .page-number {
+    right: 30px;
+}

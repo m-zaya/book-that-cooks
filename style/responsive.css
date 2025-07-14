@@ -1,0 +1,304 @@
+/*
+RESPONSIVE.CSS - MOBILE AND TABLET ADAPTATIONS
+==============================================
+
+This file contains all responsive design adaptations for mobile and tablet
+devices. It must be loaded LAST to ensure it overrides other styles properly.
+It transforms the side-by-side book layout into a stacked mobile layout.
+
+CONTENTS:
+- Mobile Layout Transforms - Book container and page stacking
+- Header Button Adaptations - Mobile-friendly navigation
+- Form Mobile Adaptations - Touch-friendly form controls
+- Navigation Controls - Mobile positioning and sizing
+- Component-Specific Mobile Styles - TOC, ingredients, etc.
+
+DESIGN FEATURES:
+- Transforms side-by-side pages to stacked layout
+- Touch-friendly button sizing and spacing
+- Mobile-optimized form inputs and controls
+- Responsive navigation positioning
+- Maintains functionality while improving usability
+
+DEPENDENCIES:
+- ALL other CSS files must be loaded first
+- Overrides styles from all other components
+- Works with main.js for responsive JavaScript functionality
+
+BREAKPOINTS:
+- Mobile: max-width 768px (primary responsive breakpoint)
+*/
+
+/* =============================================================================
+   MOBILE LAYOUT TRANSFORMS - Book container and page stacking
+   ============================================================================= */
+
+   @media (max-width: 768px) {
+    /* Main container adaptations */
+    .book-container {
+        height: 90vh; /* Reduced height to give more breathing room */
+        width: 95%;
+        padding-top: 60px; /* Add top padding to accommodate header buttons */
+        padding-bottom: 80px; /* Add bottom padding for navigation controls */
+    }
+    
+    /* Transform book pages from side-by-side to stacked layout */
+    .book-pages {
+        flex-direction: column;
+        left: 2.5%; /* Center the book better */
+        width: 95%; /* Slightly smaller width */
+        top: 20px; /* Smaller top offset since container has padding */
+        height: calc(100% - 40px); /* Adjust for container padding */
+    }
+    
+    /* Stack pages vertically instead of side-by-side */
+    .page {
+        width: 100%;
+        height: 50%;
+        padding: 20px 15px;
+    }
+    
+    /* Mobile page styling - adapt gradients for stacked layout */
+    .page-left {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        background: linear-gradient(to bottom, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+    }
+    
+    .page-right {
+        background: linear-gradient(to top, #fafafa 0%, #ffffff 95%, #f8f8f8 100%);
+    }
+    
+    /* Transform book spine from vertical to horizontal */
+    .book-spine {
+        width: 100%;
+        height: 2px;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(to right, 
+            rgba(0,0,0,0.1) 0%, 
+            rgba(0,0,0,0.3) 20%, 
+            rgba(0,0,0,0.3) 80%, 
+            rgba(0,0,0,0.1) 100%
+        );
+    }
+    
+    /* Hide 3D page stacks on mobile - not needed for stacked layout */
+    .page-stack-left,
+    .page-stack-right {
+        display: none;
+    }
+
+    /* =============================================================================
+       HEADER BUTTON ADAPTATIONS - Mobile-friendly navigation
+       ============================================================================= */
+    
+    /* Keep header buttons horizontal on mobile but make them properly sized */
+    .header-buttons {
+        flex-direction: row; /* Keep horizontal layout */
+        gap: 6px; /* Smaller gap between buttons */
+        padding: 8px 16px; /* Better padding for mobile */
+        top: -45px; /* Position above the book with proper clearance */
+        /* Make the container fit mobile screens properly */
+        max-width: 85vw; /* Slightly smaller to ensure it fits */
+        left: 50%; /* Center the container */
+        transform: translateX(-50%); /* Perfect centering */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    
+    .header-btn {
+        padding: 8px 12px; /* Better padding for mobile touch targets */
+        font-size: 0.75em; /* Slightly larger font for readability */
+        justify-content: center;
+        /* Make buttons more compact but still usable */
+        min-width: 0; /* Allow buttons to shrink */
+        flex: 1; /* Distribute space evenly between buttons */
+        gap: 4px; /* Small gap between icon and text */
+        border-radius: 16px; /* Smaller border radius for mobile */
+    }
+    
+    /* Keep text visible but make it shorter on mobile */
+    .header-btn.toc span:last-child {
+        content: "TOC"; /* Shorter text */
+    }
+    
+    .header-btn.random span:last-child {
+        content: "Random"; /* Keep as is */
+    }
+    
+    .header-btn.new span:last-child {
+        content: "New"; /* Shorter text */
+    }
+
+    /* =============================================================================
+       RECIPE DISPLAY MOBILE ADAPTATIONS
+       ============================================================================= */
+    
+    /* Smaller recipe title on mobile */
+    .recipe-title {
+        font-size: 1.8em;
+    }
+
+    /* =============================================================================
+       NAVIGATION CONTROLS - Mobile positioning and sizing
+       ============================================================================= */
+    
+    .nav-controls {
+        bottom: -60px; /* Position below the book with proper clearance */
+        padding: 10px 16px; /* Better padding for mobile */
+        gap: 12px; /* Better spacing between elements */
+        border-radius: 20px; /* Smaller border radius for mobile */
+        box-shadow: 0 3px 10px rgba(0,0,0,0.25); /* Stronger shadow for better visibility */
+        background: rgba(255,255,255,0.95); /* Slightly more opaque background */
+        backdrop-filter: blur(8px); /* Blur effect */
+    }
+    
+    .nav-btn {
+        padding: 10px 16px; /* Better touch targets for mobile */
+        font-size: 0.85em; /* Slightly larger font */
+        border-radius: 16px; /* Consistent with header buttons */
+        min-width: 80px; /* Ensure buttons have minimum width */
+    }
+    
+    #recipeCounter {
+        font-size: 0.9em; /* Slightly larger counter text */
+        font-weight: bold;
+        color: #8B4513; /* Match the theme color */
+        padding: 0 8px; /* Add some padding around the counter */
+    }
+
+    /* Mobile positioning for admin recipe controls */
+    .admin-recipe-controls {
+        bottom: -60px; /* Same as nav controls */
+        right: 5%; /* Slightly more inset on mobile */
+        gap: 8px; /* Smaller gap on mobile */
+    }
+
+    .edit-recipe-btn {
+        font-size: 0.7em; /* Smaller text on mobile */
+        padding: 0 12px; /* Less horizontal padding */
+        height: 36px; /* Slightly smaller on mobile */
+    }
+
+    .delete-recipe-btn {
+        width: 36px; /* Slightly smaller on mobile */
+        height: 36px;
+        font-size: 1em;
+    }
+
+    /* =============================================================================
+       FORM MOBILE ADAPTATIONS - Touch-friendly form controls
+       ============================================================================= */
+    
+    /* Mobile form adaptations */
+    .form-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .form-submit,
+    .form-cancel {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    /* Mobile search input adjustments */
+    .search-input {
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
+    
+    /* Mobile TOC controls */
+    .toc-controls {
+        padding: 0.8rem;
+    }
+    
+    .tag-filters {
+        gap: 0.3rem;
+    }
+    
+    .tag-filter {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.8em;
+    }
+    
+    /* Mobile TOC results */
+    .toc-results-title {
+        font-size: 1.5em;
+    }
+    
+    .toc-recipe-meta {
+        flex-direction: column;
+        gap: 5px;
+        font-size: 0.8em;
+    }
+
+    /* =============================================================================
+       TABLE OF CONTENTS MOBILE ADAPTATIONS
+       ============================================================================= */
+    
+    /* Table of contents mobile layout */
+    .toc-recipe {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .toc-recipe-image {
+        width: 80px;
+        height: 50px;
+    }
+
+    /* =============================================================================
+       INGREDIENT INPUT MOBILE ADAPTATIONS
+       ============================================================================= */
+    
+    /* Mobile ingredient input adaptations */
+    .ingredient-item {
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+        background: #f9f9f9;
+        border-radius: 8px;
+    }
+    
+    .quantity-input-container,
+    .ingredient-unit-input,
+    .ingredient-name-input {
+        flex: none;
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .ingredient-quantity-input {
+        width: 100%;
+    }
+    
+    .ingredient-item .remove-btn {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 5px;
+    }
+    
+    /* Mobile fraction helper adjustments */
+    .fraction-helper {
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2000;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+    
+    .fraction-buttons {
+        grid-template-columns: repeat(4, 1fr); /* Fewer columns on mobile */
+        gap: 6px;
+    }
+    
+    .fraction-btn {
+        min-height: 32px;
+        font-size: 1em;
+    }
+}

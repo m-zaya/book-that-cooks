@@ -1,0 +1,50 @@
+/*
+BASE.CSS - FOUNDATION STYLES
+============================
+
+This file contains the CSS reset and fundamental styling for the Digital Cookbook.
+It establishes the foundation for consistent cross-browser appearance and sets up
+the main container layout and perspective for the 3D book effect.
+
+CONTENTS:
+- CSS Reset - Removes browser default styling
+- Body & Container Layout - Main page background and book positioning
+- Typography base settings
+- Color scheme foundation
+
+COLOR SCHEME:
+- Primary: Brown tones (#8B4513, #A0522D, #654321)
+- Background: Warm gradient (#2c1810 to #6b3e2e)
+- Paper: White/cream tones (#ffffff, #fafafa, #f8f8f8)
+*/
+
+/* =============================================================================
+   CSS RESET - Removes default browser styling for consistent appearance
+   ============================================================================= */
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* =============================================================================
+   BODY & CONTAINER LAYOUT - Main page setup and book positioning
+   ============================================================================= */
+body {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #6b3e2e 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    perspective: 1200px;
+}
+
+.book-container {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    height: 80vh;
+    min-height: 650px;
+}

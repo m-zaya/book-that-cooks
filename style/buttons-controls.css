@@ -1,0 +1,176 @@
+/*
+BUTTONS-CONTROLS.CSS - BUTTONS AND INTERACTIVE ELEMENTS
+=======================================================
+
+This file contains the styling for general buttons, navigation controls,
+admin controls, and utility classes used throughout the Digital Cookbook.
+It provides consistent button styling and interactive feedback.
+
+CONTENTS:
+- General Button Styling - Base button appearance and hover effects
+- Navigation Controls - Previous/Next buttons and recipe counter
+- Admin Controls - Edit and delete recipe buttons (admin only)
+- Utility Classes - Hidden class and common modifiers
+
+DESIGN FEATURES:
+- Consistent brown theme across all buttons
+- Smooth hover animations with lift effects
+- Disabled button states with reduced interactivity
+- Admin-only controls with secure styling
+- Responsive button sizing and positioning
+
+DEPENDENCIES:
+- base.css for color scheme and typography
+- Works with main.js for interactive functionality
+- Integrates with admin-auth.css for admin-only features
+*/
+
+/* =============================================================================
+   GENERAL BUTTON STYLING - Base button appearance and hover effects
+   ============================================================================= */
+
+/* General button styling */
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+}
+
+/* =============================================================================
+   NAVIGATION CONTROLS - Previous/Next buttons and recipe counter
+   ============================================================================= */
+
+/* Navigation controls at bottom */
+.nav-controls {
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    background: rgba(255,255,255,0.9);
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+}
+
+.nav-btn {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.nav-btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-1px);
+}
+
+.nav-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* =============================================================================
+   ADMIN CONTROLS - Edit and delete recipe buttons (admin only)
+   ============================================================================= */
+
+/* Admin recipe controls container - positioned bottom right */
+.admin-recipe-controls {
+    position: absolute;
+    bottom: -50px; /* Same vertical position as nav controls */
+    display: flex;
+    gap: 10px; /* Space between edit and delete buttons */
+    align-items: center;
+    z-index: 15; /* Above other elements */
+    right: 2%; /* Aligned with right edge of book */
+}
+
+/* Edit recipe button - rectangular with text */
+.edit-recipe-btn {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    border: none;
+    padding: 0 16px;
+    border-radius: 20px; /* Rounded corners to match circle button */
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(139, 69, 19, 0.3);
+    height: 40px; /* Fixed height as requested */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap; /* Prevents text wrapping */
+    right: 50%;
+}
+
+.edit-recipe-btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.4);
+}
+
+.edit-recipe-btn:active {
+    transform: translateY(0);
+}
+
+/* Delete recipe button - small, non-intrusive, admin only */
+.delete-recipe-btn {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 50%; /* Makes it circular */
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+    width: 40px; /* Fixed width for perfect circle */
+    height: 40px; /* Fixed height for perfect circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-recipe-btn:hover {
+    background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+    transform: translateY(-2px) scale(1.1);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.delete-recipe-btn:active {
+    transform: translateY(0) scale(1.05);
+}
+
+/* =============================================================================
+   UTILITY CLASSES - Common modifiers and helper classes
+   ============================================================================= */
+
+/* Hidden class for toggling element visibility */
+.hidden {
+    display: none !important;
+}

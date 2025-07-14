@@ -1,0 +1,216 @@
+/*
+ADMIN-AUTH.CSS - ADMIN AUTHENTICATION MODAL
+===========================================
+
+This file contains the styling for the admin authentication modal system
+including login form, error handling, and admin-only element visibility
+controls. It provides secure access to administrative functions.
+
+CONTENTS:
+- Modal Overlay - Full-screen modal backdrop
+- Modal Content - Login form container and styling
+- Form Elements - Input fields and action buttons
+- Error Messaging - Login error display
+- Admin-Only Controls - Visibility management for admin features
+
+DESIGN FEATURES:
+- Modal overlay with backdrop blur effect
+- Slide-in animation for smooth modal appearance
+- Consistent brown theme integration
+- Form validation and error feedback
+- Security-focused design patterns
+
+DEPENDENCIES:
+- base.css for typography and color scheme
+- Works with supabase-database.js for authentication
+- Integrates with main.js for modal management
+*/
+
+/* =============================================================================
+   MODAL OVERLAY - Full-screen modal backdrop
+   ============================================================================= */
+
+/* Modal overlay that covers the entire screen */
+.admin-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000; /* Higher than loading overlay */
+    font-family: 'Georgia', serif;
+}
+
+/* =============================================================================
+   MODAL CONTENT - Login form container and header
+   ============================================================================= */
+
+/* Main modal content container */
+.admin-modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: adminModalSlideIn 0.3s ease-out;
+}
+
+/* Slide-in animation for modal appearance */
+@keyframes adminModalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Modal header with title and close button */
+.admin-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #8B4513;
+    padding-bottom: 15px;
+}
+
+.admin-modal-header h2 {
+    color: #8B4513;
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Close button (X) in top right */
+.admin-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #8B4513;
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.admin-modal-close:hover {
+    color: #A0522D;
+}
+
+/* =============================================================================
+   FORM ELEMENTS - Input fields and styling
+   ============================================================================= */
+
+/* Form input groups */
+.admin-form-group {
+    margin-bottom: 20px;
+}
+
+.admin-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #8B4513;
+    font-weight: bold;
+}
+
+.admin-form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1em;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.admin-form-group input:focus {
+    outline: none;
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+/* =============================================================================
+   ACTION BUTTONS - Login and cancel buttons
+   ============================================================================= */
+
+/* Action buttons container */
+.admin-form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+/* Login button styling */
+.admin-login-btn {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    max-width: 120px;
+}
+
+.admin-login-btn:hover {
+    background: linear-gradient(135deg, #654321 0%, #8B4513 100%);
+    transform: translateY(-1px);
+}
+
+/* Cancel button styling */
+.admin-cancel-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    max-width: 120px;
+}
+
+.admin-cancel-btn:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+/* =============================================================================
+   ERROR MESSAGING - Login error display
+   ============================================================================= */
+
+/* Error message styling */
+.admin-error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-top: 15px;
+    text-align: center;
+    border: 1px solid #f5c6cb;
+}
+
+/* =============================================================================
+   ADMIN-ONLY CONTROLS - Visibility management for admin features
+   ============================================================================= */
+
+/* Admin-only elements - hidden by default, shown when admin is logged in */
+.admin-only {
+    display: none;
+}

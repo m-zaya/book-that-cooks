@@ -1,0 +1,133 @@
+/*
+3D-EFFECTS.CSS - VISUAL DEPTH EFFECTS
+=====================================
+
+This file creates the 3D page stack effects and decorative elements that give
+the Digital Cookbook its realistic book appearance. It includes perspective
+transforms, shadow layers, and corner decorations.
+
+CONTENTS:
+- 3D Page Stack Effects - Left and right page stacks with shadows
+- Decorative Elements - Corner details and visual enhancements
+- Shadow Layers - Multiple shadow effects for depth
+
+DESIGN FEATURES:
+- 3D perspective transforms for realistic book appearance
+- Gradient backgrounds for depth and texture
+- Box shadows for realistic lighting effects
+- Multiple pseudo-elements for layered shadow effects
+
+DEPENDENCIES:
+- base.css for perspective container
+- book-layout.css for main book structure
+*/
+
+/* =============================================================================
+   3D PAGE STACK EFFECTS - Creates illusion of multiple stacked pages
+   ============================================================================= */
+
+/* Left page stack with 3D rotation */
+.page-stack-left {
+    position: absolute;
+    left: 0;
+    top: 60px; /* Moved down to make room for header buttons */
+    width: 48%;
+    height: calc(100% - 80px); /* Adjusted height for header space */
+    transform-origin: right center;
+    transform: perspective(1000px) rotateY(-15deg);
+}
+
+/* Shadow layers for left stack depth effect */
+.page-stack-left::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: 10px;
+    bottom: -5px;
+    background: linear-gradient(to right, #f8f8f8, #e8e8e8, #d8d8d8);
+    border-radius: 5px 0 0 5px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    z-index: -3;
+}
+
+.page-stack-left::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: 8px;
+    bottom: -3px;
+    background: linear-gradient(to right, #f0f0f0, #e0e0e0, #d0d0d0);
+    border-radius: 5px 0 0 5px;
+    box-shadow: -3px 0 10px rgba(0,0,0,0.15);
+    z-index: -2;
+}
+
+/* Right page stack with opposite 3D rotation */
+.page-stack-right {
+    position: absolute;
+    right: 0;
+    top: 60px; /* Moved down to make room for header buttons */
+    width: 48%;
+    height: calc(100% - 80px); /* Adjusted height for header space */
+    transform-origin: left center;
+    transform: perspective(1000px) rotateY(15deg);
+}
+
+/* Shadow layers for right stack depth effect */
+.page-stack-right::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 10px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(to left, #f8f8f8, #e8e8e8, #d8d8d8);
+    border-radius: 0 5px 5px 0;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+    z-index: -3;
+}
+
+.page-stack-right::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 8px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(to left, #f0f0f0, #e0e0e0, #d0d0d0);
+    border-radius: 0 5px 5px 0;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.15);
+    z-index: -2;
+}
+
+/* =============================================================================
+   DECORATIVE ELEMENTS - Corner details and visual enhancements
+   ============================================================================= */
+
+/* Top-left corner decoration */
+.book-pages::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    z-index: 5;
+}
+
+/* Top-right corner decoration */
+.book-pages::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    clip-path: polygon(100% 0, 100% 100%, 0 0);
+    z-index: 5;
+}

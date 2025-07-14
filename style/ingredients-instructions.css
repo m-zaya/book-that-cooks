@@ -1,0 +1,158 @@
+/*
+INGREDIENTS-INSTRUCTIONS.CSS - RECIPE CONTENT LISTS
+===================================================
+
+This file contains the styling for ingredients lists and instructions with
+interactive checkboxes. It handles the display of recipe content in the right
+page of the book with completion tracking and visual feedback.
+
+CONTENTS:
+- Recipe Section Structure - General section styling
+- Ingredients List - Spoon icons and ingredient display
+- Instructions List - Interactive checkboxes and numbered steps
+- Completion States - Visual feedback for completed steps
+
+DESIGN FEATURES:
+- Interactive checkboxes with completion styling
+- Numbered instruction steps with circular backgrounds
+- Spoon emoji icons for ingredients
+- Smooth transitions for completion states
+- Reset functionality for instruction checklist
+
+DEPENDENCIES:
+- base.css for color scheme and typography
+- book-layout.css for page structure
+- Works with main.js for interactive functionality
+*/
+
+/* =============================================================================
+   RECIPE SECTION STRUCTURE - General section styling and headers
+   ============================================================================= */
+
+/* General recipe section spacing */
+.recipe-section {
+    margin-bottom: 30px;
+}
+
+/* Section header with title and button on same line */
+.section-header {
+    display: flex;                    /* Makes title and button sit horizontally */
+    justify-content: space-between;   /* Pushes title left, button right */
+    align-items: center;              /* Vertically centers both elements */
+    margin-bottom: 15px;              /* Space below the header */
+    padding-bottom: 8px;              /* Space before the border line */
+    border-bottom: 2px solid #ddd;    /* Moved border from title to header container */
+}
+
+.section-title {
+    font-size: 1.4em;
+    color: #8B4513;
+    margin: 0;                        /* Remove default margin since flexbox handles spacing */
+    font-weight: bold;
+}
+
+/* Reset button styling when positioned in section header */
+.reset-btn {
+    padding: 8px 16px;                /* Smaller padding than regular buttons */
+    font-size: 0.8em;                 /* Smaller text to not compete with title */
+    border-radius: 20px;              /* Smaller radius for subtle appearance */
+    margin-left: 15px;                /* Space between title and button */
+}
+
+/* =============================================================================
+   INGREDIENTS LIST - Spoon icons and ingredient display
+   ============================================================================= */
+
+/* Ingredients list styling */
+.ingredients-list {
+    list-style: none;
+    padding: 0;
+}
+
+.ingredients-list li {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 8px 0 8px 20px;
+    position: relative;
+    border-bottom: 1px dotted #eee;
+}
+
+/* Spoon emoji before each ingredient */
+.ingredients-list li:before {
+    content: "🥄";
+    position: absolute;
+    left: 0;
+    top: 8px;
+}
+
+/* =============================================================================
+   INSTRUCTIONS LIST - Interactive checkboxes and numbered steps
+   ============================================================================= */
+
+/* Instructions list container */
+.instructions-list {
+    list-style: none;
+    padding: 0;
+}
+
+/* Individual instruction item with interactive checkbox */
+.instruction-item {
+    margin-bottom: 18px;
+    padding: 15px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-radius: 10px;
+    border-left: 5px solid #8B4513;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.instruction-checkbox {
+    margin-top: 4px;
+    transform: scale(1.3);
+    accent-color: #8B4513;
+}
+
+.instruction-text {
+    flex: 1;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+}
+
+/* Numbered circles for instructions */
+.instruction-number {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* =============================================================================
+   COMPLETION STATES - Visual feedback for completed instructions
+   ============================================================================= */
+
+/* Completed instruction states */
+.instruction-item.completed .instruction-text {
+    text-decoration: line-through;
+    color: #999;
+    opacity: 0.6;
+}
+
+.instruction-item.completed .instruction-number {
+    background: linear-gradient(135deg, #999 0%, #777 100%);
+    opacity: 0.6;
+}
+
+.instruction-item.completed {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    border-left-color: #999;
+}

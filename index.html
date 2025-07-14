@@ -7,11 +7,13 @@ This is the main HTML file that creates the Digital Cookbook interface.
 It contains only the structural markup and links to external CSS and JavaScript files.
 Updated to support universal HH:MM time format throughout the application.
 Updated to support separated ingredient components (quantity, unit, ingredient).
+Updated to use modular CSS file structure for better maintainability.
 
 CONTENTS:
 - Document structure with proper HTML5 semantics
 - Meta tags for character encoding and responsive design
-- Links to external stylesheets and scripts
+- Links to modular CSS stylesheets in logical loading order
+- Links to external scripts
 - Main book container with left and right page stacks for 3D effect
 - Header buttons for Table of Contents, Random Recipe, and New Recipe
 - Book pages container with spine shadow effect
@@ -31,8 +33,26 @@ INGREDIENT STRUCTURE UPDATES:
 - Form validation ensures proper ingredient data entry
 - Display logic formats ingredients properly from separated components
 
+CSS ARCHITECTURE:
+The CSS has been split into 15 modular files for better maintainability:
+1. base.css - Foundation styles and reset
+2. book-layout.css - Core book structure
+3. 3d-effects.css - Visual depth and 3D effects
+4. header-navigation.css - Header button navigation
+5. recipe-display.css - Recipe content styling
+6. timeline.css - Cooking timeline component
+7. ingredients-instructions.css - Recipe content lists
+8. table-of-contents.css - TOC layout and search
+9. forms.css - New recipe form system
+10. image-upload.css - Image handling components
+11. ingredient-inputs.css - Separated ingredient fields
+12. buttons-controls.css - Buttons and interactive elements
+13. admin-auth.css - Admin authentication modal
+14. backup-controls.css - Backup system styling
+15. responsive.css - Mobile and tablet adaptations (MUST BE LAST)
+
 DEPENDENCIES:
-- External CSS: styles.css for all visual styling and layout
+- External CSS: 15 modular CSS files for complete styling and layout
 - External JavaScript: recipes.js for recipe data and main.js for interactive functionality
 
 RESPONSIVE DESIGN:
@@ -50,8 +70,38 @@ RESPONSIVE DESIGN:
         <!-- favicon -->
         <link rel="icon" type="image/png" href="cooking.png">
         
-        <!-- External CSS stylesheet -->
-        <link rel="stylesheet" href="styles.css">
+        <!-- ===================================================================
+             CSS FILES IN LOGICAL LOADING ORDER
+             =================================================================== -->
+        
+        <!-- 1. FOUNDATION STYLES - Must be loaded first -->
+        <link rel="stylesheet" href="css/base.css">
+        
+        <!-- 2. LAYOUT AND STRUCTURE - Core book appearance -->
+        <link rel="stylesheet" href="css/book-layout.css">
+        <link rel="stylesheet" href="css/3d-effects.css">
+        
+        <!-- 3. NAVIGATION AND CONTROLS - User interface elements -->
+        <link rel="stylesheet" href="css/header-navigation.css">
+        <link rel="stylesheet" href="css/buttons-controls.css">
+        
+        <!-- 4. RECIPE DISPLAY COMPONENTS - Content presentation -->
+        <link rel="stylesheet" href="css/recipe-display.css">
+        <link rel="stylesheet" href="css/timeline.css">
+        <link rel="stylesheet" href="css/ingredients-instructions.css">
+        
+        <!-- 5. INTERACTIVE FEATURES - User interaction components -->
+        <link rel="stylesheet" href="css/table-of-contents.css">
+        <link rel="stylesheet" href="css/forms.css">
+        <link rel="stylesheet" href="css/image-upload.css">
+        <link rel="stylesheet" href="css/ingredient-inputs.css">
+        
+        <!-- 6. ADMIN FEATURES - Administrative functionality -->
+        <link rel="stylesheet" href="css/admin-auth.css">
+        <link rel="stylesheet" href="css/backup-controls.css">
+        
+        <!-- 7. RESPONSIVE DESIGN - MUST BE LOADED LAST to override other styles -->
+        <link rel="stylesheet" href="css/responsive.css">
     </head>
 
 <body>
