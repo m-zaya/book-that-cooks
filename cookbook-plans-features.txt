@@ -1,0 +1,15 @@
+Work in progress (features) list:
+
+all the tags to be clickable -- click on a tag and see all recipes that have that tag
+
+tags pop up as auto complete if they already exist
+
+x button for fraction helper
+
+edit button to recipes (all fields)
+
+cooking timeline -- if more than 2 steps, for it to curve to fit on the screen
+
+if steps are filled in, total time is calculated automatically - but can be overwritten. If no steps are provided (make them optional) then total time is a required manual field
+
+a login for admin to be able to edit and create recipes

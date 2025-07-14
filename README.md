@@ -1,5 +1,8 @@
 # Digital Cookbook
 
+[Digital Cookbook - Git Pages](https://m-zaya.github.io/book-that-cooks/)
+
+
 A beautiful, interactive cookbook interface that presents recipes in a realistic 3D book format with advanced functionality for browsing, searching, and creating recipes. Features a modern three-button navigation system and comprehensive recipe management capabilities.
 
 ## 📖 Overview
@@ -50,7 +53,7 @@ digital-cookbook/
 ├── styles.css          # Complete styling with responsive design and 3D effects
 ├── recipes.js          # Recipe data with structured ingredient format
 ├── main.js             # Interactive functionality and state management
-├── future progress     # Development roadmap and planned features
+├── future-plans.txt    # Development roadmap and planned features
 └── README.md           # Project documentation
 ```
 
