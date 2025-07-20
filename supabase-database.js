@@ -724,7 +724,7 @@ function showLoadingIndicator() {
         loader.innerHTML = `
             <div class="loading-content">
                 <div class="loading-spinner"></div>
-                <div class="loading-text">Working with database...</div>
+                <div class="loading-text">Loading...</div>
             </div>
         `;
         loader.style.cssText = `
