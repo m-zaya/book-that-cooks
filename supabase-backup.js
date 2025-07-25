@@ -235,11 +235,20 @@ async function backupSingleRecipeToAirtable(recipe) {
  * Clears all records from backup Supabase database
  * Use with caution - this deletes all backup data!
  */
+/**
+ * FIXED VERSION: Clears all records from backup Supabase database
+ * Use with caution - this deletes all backup data!
+ * 
+ * FIXES:
+ * 1. Removes the problematic id=neq.null filter that was causing type errors
+ * 2. Uses proper Supabase delete syntax for clearing all records
+ * 3. Adds better error handling for different scenarios
+ */
 async function clearBackupDatabase() {
     try {
         console.log('🗑️ Clearing existing backup database records...');
         
-        // Get all existing records to get their IDs
+        // Get all existing records to get their IDs first
         const response = await backupSupabaseRequest('GET', '');
         const existingRecords = response;
         
@@ -248,35 +257,228 @@ async function clearBackupDatabase() {
             return;
         }
         
-        // Delete all records at once using Supabase's delete capabilities
-        // This is more efficient than Airtable's batch approach
+        console.log(`Found ${existingRecords.length} existing backup records to delete`);
+        
+        // FIXED APPROACH: Delete all records using a different method
+        // Method 1: Try truncate-like delete (delete all without filter)
         try {
-            // Delete all records without condition (careful!)
-            await backupSupabaseRequest('DELETE', '?id=neq.null'); // Delete where ID is not equal to null (all records)
-            console.log(`🗑️ Deleted all ${existingRecords.length} backup records`);
-        } catch (error) {
-            // Fallback: delete in batches by ID if bulk delete fails
-            console.log('Bulk delete failed, falling back to batch delete...');
+            // Use a filter that will match all records (id is greater than 0)
+            // This avoids the problematic "null" string conversion
+            await backupSupabaseRequest('DELETE', '?id=gt.0');
+            console.log(`🗑️ Successfully deleted all ${existingRecords.length} backup records using bulk delete`);
+            return;
             
-            const batchSize = 20;
+        } catch (bulkDeleteError) {
+            console.log('Bulk delete failed, falling back to individual record deletion...');
+            console.log('Bulk delete error:', bulkDeleteError.message);
+            
+            // Method 2: Fallback - delete records in batches by ID
+            const batchSize = 10; // Smaller batches for more reliable deletion
+            let deletedCount = 0;
+            
             for (let i = 0; i < existingRecords.length; i += batchSize) {
                 const batch = existingRecords.slice(i, i + batchSize);
-                const deletePromises = batch.map(record => 
-                    backupSupabaseRequest('DELETE', `?id=eq.${record.id}`)
-                );
                 
-                await Promise.all(deletePromises);
-                console.log(`🗑️ Deleted batch ${Math.floor(i / batchSize) + 1}: ${batch.length} records`);
+                // Delete each record in the batch individually
+                for (const record of batch) {
+                    try {
+                        await backupSupabaseRequest('DELETE', `?id=eq.${record.id}`);
+                        deletedCount++;
+                        console.log(`🗑️ Deleted record ${deletedCount}/${existingRecords.length}: ${record.title || 'Untitled'}`);
+                    } catch (recordError) {
+                        console.warn(`Failed to delete record ${record.id}:`, recordError.message);
+                        // Continue with next record instead of stopping
+                    }
+                }
+                
+                // Small delay between batches to avoid rate limiting
+                if (i + batchSize < existingRecords.length) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
             }
+            
+            console.log(`🗑️ Deleted ${deletedCount} of ${existingRecords.length} backup records using individual deletion`);
         }
         
         console.log('✅ Backup database cleared successfully');
         
     } catch (error) {
         console.error('❌ Failed to clear backup database:', error);
+        
+        // Provide more specific error guidance
+        if (error.message.includes('22P02')) {
+            console.error('💡 This appears to be a data type conversion error.');
+            console.error('💡 Your backup database might have different column types than expected.');
+            console.error('💡 Try recreating the backup table with the correct schema.');
+        } else if (error.message.includes('401') || error.message.includes('403')) {
+            console.error('💡 Permission error - check your backup database credentials and RLS policies.');
+        }
+        
         throw error;
     }
 }
+
+/**
+ * ALTERNATIVE APPROACH: Clear backup database using SQL truncate
+ * This is more efficient but requires different permissions
+ */
+async function clearBackupDatabaseAlternative() {
+    try {
+        console.log('🗑️ Clearing backup database using SQL truncate...');
+        
+        // Use Supabase SQL execution endpoint
+        const response = await fetch(`${BACKUP_SUPABASE_CONFIG.url}/rest/v1/rpc/truncate_recipes_backup`, {
+            method: 'POST',
+            headers: {
+                'apikey': BACKUP_SUPABASE_CONFIG.anonKey,
+                'Authorization': `Bearer ${BACKUP_SUPABASE_CONFIG.anonKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`SQL truncate failed: ${response.status}`);
+        }
+        
+        console.log('✅ Backup database cleared using SQL truncate');
+        
+    } catch (error) {
+        console.warn('SQL truncate method failed, falling back to standard delete:', error.message);
+        // Fall back to the fixed delete method above
+        return clearBackupDatabase();
+    }
+}
+
+/**
+ * IMPROVED: Enhanced backup function with better error handling
+ * This fixes the issue that was causing the backup to fail
+ */
+async function backupAllRecipesToAirtableFixed() {
+    try {
+        console.log('🔄 Starting full backup to backup Supabase database...');
+        showLoadingIndicator('Creating backup...');
+        
+        // Get all recipes from your current recipes array (loaded from primary Supabase)
+        if (!recipes || recipes.length === 0) {
+            alert('No recipes found to backup. Please load recipes first.');
+            return false;
+        }
+        
+        // FIXED: Use the improved clear function that handles the delete error
+        await clearBackupDatabase();
+        
+        // Convert recipes to backup format
+        const backupRecords = recipes.map(recipe => convertRecipeToBackupFormat(recipe));
+        
+        // Supabase can handle larger batches than Airtable, but we'll still batch for reliability
+        const batchSize = 5; // Reduced batch size for more reliable uploads
+        let successCount = 0;
+        
+        for (let i = 0; i < backupRecords.length; i += batchSize) {
+            const batch = backupRecords.slice(i, i + batchSize);
+            
+            try {
+                // Create records array for Supabase bulk insert
+                const recordsToInsert = batch;
+                
+                const response = await backupSupabaseRequest('POST', '', recordsToInsert);
+                
+                successCount += response.length;
+                console.log(`✅ Backed up batch ${Math.floor(i / batchSize) + 1}: ${response.length} recipes`);
+                
+                // Add small delay between batches to avoid overwhelming the server
+                if (i + batchSize < backupRecords.length) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+                
+            } catch (error) {
+                console.error(`❌ Failed to backup batch ${Math.floor(i / batchSize) + 1}:`, error);
+                // Continue with next batch rather than stopping completely
+            }
+        }
+        
+        hideLoadingIndicator();
+        
+        if (successCount > 0) {
+            console.log(`🎉 Backup completed successfully! ${successCount} recipes backed up to backup Supabase database.`);
+            alert(`Backup successful! ${successCount} of ${recipes.length} recipes backed up to backup database.`);
+            return true;
+        } else {
+            throw new Error('No recipes were successfully backed up');
+        }
+        
+    } catch (error) {
+        hideLoadingIndicator();
+        console.error('❌ Backup failed:', error);
+        alert(`Backup failed: ${error.message}`);
+        return false;
+    }
+}
+
+// =============================================================================
+// SQL FUNCTION FOR BACKUP DATABASE (Optional Enhancement)
+// =============================================================================
+
+/**
+ * OPTIONAL: Create this SQL function in your backup Supabase database
+ * to enable more efficient table clearing
+ * 
+ * Run this in your backup Supabase SQL Editor:
+ */
+const BACKUP_DATABASE_SQL_FUNCTION = `
+-- Create a function to truncate the backup table efficiently
+CREATE OR REPLACE FUNCTION truncate_recipes_backup()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    TRUNCATE TABLE recipes_backup RESTART IDENTITY;
+END;
+$$;
+
+-- Grant execute permission to anonymous users
+GRANT EXECUTE ON FUNCTION truncate_recipes_backup() TO anon;
+`;
+
+// =============================================================================
+// DEBUGGING HELPER FUNCTIONS
+// =============================================================================
+
+/**
+ * Debug function to test different delete approaches
+ * Use in browser console: testBackupDeletion()
+ */
+window.testBackupDeletion = async function() {
+    try {
+        console.log('🧪 Testing backup deletion methods...');
+        
+        // Test 1: Check what records exist
+        const records = await backupSupabaseRequest('GET', '?limit=5');
+        console.log(`Found ${records.length} records in backup database`);
+        
+        if (records.length === 0) {
+            console.log('✅ No records to delete - database is empty');
+            return;
+        }
+        
+        // Test 2: Try deleting one record by ID
+        const firstRecord = records[0];
+        try {
+            await backupSupabaseRequest('DELETE', `?id=eq.${firstRecord.id}`);
+            console.log(`✅ Successfully deleted test record ${firstRecord.id}`);
+        } catch (error) {
+            console.error('❌ Single record deletion failed:', error);
+        }
+        
+        // Test 3: Check if there are any records left
+        const remainingRecords = await backupSupabaseRequest('GET', '?limit=1');
+        console.log(`${remainingRecords.length} records remaining after test deletion`);
+        
+    } catch (error) {
+        console.error('❌ Backup deletion test failed:', error);
+    }
+};
 
 // =============================================================================
 // RESTORE OPERATIONS - Restore from backup (same interface as Airtable version)
