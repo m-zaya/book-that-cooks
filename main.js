@@ -873,7 +873,7 @@ function resetIngredientsList() {
             <!-- ENHANCED UNIT SELECTOR - Replaces simple text input -->
             <div class="unit-selector-container">
                 <input type="text" 
-                    placeholder="Select unit..." 
+                    placeholder="Select Unit" 
                     class="form-input unit-selector-input" 
                     readonly
                     onclick="toggleUnitSelector(this)"
@@ -1014,7 +1014,7 @@ function addIngredientItem() {
         <!-- ENHANCED UNIT SELECTOR - Replaces simple text input -->
         <div class="unit-selector-container">
             <input type="text" 
-                   placeholder="Select unit..." 
+                   placeholder="Select Unit" 
                    class="form-input unit-selector-input" 
                    readonly
                    onclick="toggleUnitSelector(this)"
@@ -1819,7 +1819,7 @@ function populateIngredientsList(ingredients) {
             <!-- ENHANCED UNIT SELECTOR - Replaces simple text input -->
             <div class="unit-selector-container">
                 <input type="text" 
-                    placeholder="Select unit..." 
+                    placeholder="Select Unit" 
                     class="form-input unit-selector-input" 
                     readonly
                     onclick="toggleUnitSelector(this)"
