@@ -36,8 +36,8 @@ BREAKPOINTS:
    @media (max-width: 768px) {
     /* Main container adaptations */
     .book-container {
-        height: 90vh; /* Reduced height to give more breathing room */
-        width: 95%;
+        height: 75vh;     /* ← SHORTER (was 90vh) */
+        width: 98%;       /* ← WIDER (was 95%) */
         padding-top: 60px; /* Add top padding to accommodate header buttons */
         padding-bottom: 80px; /* Add bottom padding for navigation controls */
     }
