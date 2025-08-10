@@ -101,22 +101,22 @@ DEPENDENCIES:
    FRACTION HELPER POPUP - Interactive fraction selection interface
    ============================================================================= */
 
-/* Fraction helper popup styling */
+/* ENHANCED: Fraction helper popup styling with better visibility */
 .fraction-helper {
     position: absolute;
     top: 100%;
     left: 0;
     z-index: 1000;
     background: #ffffff;
-    border: 2px solid #8B4513;
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    margin-top: 2px;
-    animation: fadeIn 0.2s ease-out;
-    /* Fixed sizing - make it wider than the container */
-    width: 240px; /* Fixed width regardless of container */
-    min-width: 240px;
+    border: 3px solid #8B4513; /* ENHANCED: Thicker border for better visibility */
+    border-radius: 12px; /* ENHANCED: Larger border radius for modern look */
+    padding: 16px; /* ENHANCED: More padding for better spacing */
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25); /* ENHANCED: Stronger shadow for depth */
+    margin-top: 4px; /* ENHANCED: Slightly more spacing from input */
+    animation: fadeIn 0.3s ease-out; /* ENHANCED: Slightly longer animation */
+    /* ENHANCED: Increased width for larger buttons */
+    width: 300px; /* ENHANCED: Wider to accommodate larger buttons */
+    min-width: 300px;
     /* Prevent it from going off screen on the right */
     right: auto;
 }
@@ -127,58 +127,194 @@ DEPENDENCIES:
     right: 0;
 }
 
-/* Fade-in animation for smooth appearance */
+/* ENHANCED: Smoother fade-in animation with scale effect */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-5px);
+        transform: translateY(-8px) scale(0.95); /* ENHANCED: Added scale for smooth appearance */
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
+/* ENHANCED: More prominent title styling */
 .fraction-helper-title {
-    font-size: 0.8em;
+    font-size: 0.9em; /* ENHANCED: Slightly larger text */
     color: #8B4513;
     font-weight: bold;
-    margin-bottom: 6px;
+    margin-bottom: 12px; /* ENHANCED: More space below title */
     text-align: center;
+    padding-bottom: 8px; /* ENHANCED: Padding below title */
+    border-bottom: 2px solid #f0f0f0; /* ENHANCED: Subtle separator line */
 }
 
 /* =============================================================================
-   FRACTION BUTTONS - Grid layout and interactive styling
+   FRACTION BUTTONS - ENHANCED Grid layout and interactive styling
    ============================================================================= */
 
+/* ENHANCED: Better grid layout with fewer columns for larger buttons */
 .fraction-buttons {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 columns for compact layout */
-    gap: 4px;
+    grid-template-columns: repeat(5, 1fr); /* ENHANCED: Reduced from 5 to 4 columns for larger buttons */
+    gap: 8px; /* ENHANCED: Increased gap between buttons */
 }
 
+/* ENHANCED: Much larger and more visible fraction buttons */
 .fraction-btn {
     background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 4px 2px;
-    font-size: 1em;
+    border: 2px solid #ddd; /* ENHANCED: Thicker border */
+    border-radius: 8px; /* ENHANCED: Larger border radius */
+    padding: 12px 8px; /* ENHANCED: Much more padding for larger buttons */
+    font-size: 1.4em; /* ENHANCED: Significantly larger font size */
+    font-weight: bold; /* ENHANCED: Bold text for better visibility */
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
-    min-height: 24px;
+    min-height: 48px; /* ENHANCED: Much taller buttons for easier clicking */
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* ENHANCED: Subtle shadow for depth */
+    
+    /* ENHANCED: Better typography for fraction symbols */
+    font-family: Georgia, Times, serif; /* Better font for fraction display */
+    line-height: 1; /* Tight line height for centered fractions */
+
+    /* font color */
+    color: #654321;
 }
 
+/* ENHANCED: More dramatic hover effects */
 .fraction-btn:hover {
     background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
     color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transform: translateY(-2px) scale(1.05); /* ENHANCED: Added scale effect */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25); /* ENHANCED: Stronger shadow on hover */
+    border-color: #654321; /* ENHANCED: Darker border on hover */
 }
 
+/* ENHANCED: Active state with subtle press effect */
 .fraction-btn:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(1.02); /* ENHANCED: Subtle press animation */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* ENHANCED: Focus state for keyboard accessibility */
+.fraction-btn:focus {
+    outline: none;
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.3); /* Focus ring for accessibility */
+}
+
+
+/* ENHANCED: Add close button to fraction helper */
+.fraction-helper::after {
+    content: "×";
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.fraction-helper::after:hover {
+    background: rgba(139, 69, 19, 0.1);
+    color: #8B4513;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN - Mobile adaptations for fraction helper
+   ============================================================================= */
+
+/* ENHANCED: Better mobile experience */
+@media (max-width: 768px) {
+    .fraction-helper {
+        position: fixed; /* ENHANCED: Full overlay on mobile */
+        left: 20px;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2000;
+        max-height: 70vh; /* ENHANCED: Limit height on mobile */
+        overflow-y: auto;
+        width: auto; /* Let it fill the space */
+        min-width: auto;
+        padding: 20px; /* ENHANCED: More padding on mobile */
+        
+        /* ENHANCED: Mobile backdrop */
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+    }
+    
+    /* ENHANCED: Larger buttons on mobile for touch */
+    .fraction-buttons {
+        grid-template-columns: repeat(3, 1fr); /* ENHANCED: Even fewer columns on mobile */
+        gap: 12px; /* ENHANCED: More space between buttons on mobile */
+    }
+    
+    .fraction-btn {
+        min-height: 56px; /* ENHANCED: Even taller on mobile for easier touch */
+        font-size: 1.6em; /* ENHANCED: Larger text on mobile */
+        padding: 16px 12px; /* ENHANCED: More padding for touch targets */
+    }
+    
+    /* ENHANCED: Larger close button on mobile */
+    .fraction-helper::after {
+        top: 12px;
+        right: 16px;
+        font-size: 24px;
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* =============================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================================= */
+
+/* ENHANCED: Better contrast and focus states */
+@media (prefers-reduced-motion: reduce) {
+    .fraction-helper {
+        animation: none; /* Respect user motion preferences */
+    }
+    
+    .fraction-btn {
+        transition: none;
+    }
+    
+    .fraction-btn:hover {
+        transform: none; /* No transform animations for reduced motion */
+    }
+}
+
+/* ENHANCED: High contrast mode support */
+@media (prefers-contrast: high) {
+    .fraction-helper {
+        border-color: #000;
+        background: #fff;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+    
+    .fraction-btn {
+        border-color: #000;
+        background: #fff;
+        color: #000;
+    }
+    
+    .fraction-btn:hover {
+        background: #000;
+        color: #fff;
+    }
 }

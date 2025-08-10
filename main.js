@@ -913,11 +913,15 @@ function removeTimelineItem(button) {
     }
 }
 
-// Updated ingredient functions to support separated input fields and fraction helper
+/**
+ * ENHANCED: Modified addIngredientItem function to include fraction helper initialization
+ * This replaces the existing addIngredientItem function in main.js
+ */
 function addIngredientItem() {
     const ingredientsList = document.querySelector('#newRecipeIngredientsList');
     const newItem = document.createElement('div');
     newItem.className = 'dynamic-item ingredient-item';
+    
     // Updated to include three separate input fields with fraction helper for quantity
     newItem.innerHTML = `
         <div class="quantity-input-container">
@@ -928,11 +932,16 @@ function addIngredientItem() {
             <div class="fraction-helper hidden">
                 <div class="fraction-helper-title">Common Fractions:</div>
                 <div class="fraction-buttons">
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '½')">½</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')">¼</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¾')">¾</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅓')">⅓</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅔')">⅔</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '½')" title="Ctrl+1">½</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')" title="Ctrl+2">¼</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¾')" title="Ctrl+3">¾</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅓')" title="Ctrl+4">⅓</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅔')" title="Ctrl+5">⅔</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅛')" title="One eighth">⅛</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅜')" title="Three eighths">⅜</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅝')" title="Five eighths">⅝</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅞')" title="Seven eighths">⅞</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')" title="One quarter">¼</button>
                 </div>
             </div>
         </div>
@@ -940,7 +949,15 @@ function addIngredientItem() {
         <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" title="Enter ingredient name (e.g., flour, eggs, salt)">
         <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
     `;
+    
     ingredientsList.appendChild(newItem);
+    
+    // ENHANCED: Initialize the fraction helper for the new input
+    const newQuantityInput = newItem.querySelector('.ingredient-quantity-input');
+    if (newQuantityInput) {
+        setupFractionInputListener(newQuantityInput);
+        console.log('✅ Fraction helper initialized for new ingredient item');
+    }
 }
 
 function removeIngredientItem(button) {
@@ -1214,6 +1231,9 @@ function hideFractionHelper(input) {
                 // Only hide if the input is still not focused and no button is being clicked
                 if (document.activeElement !== input && !helper.contains(document.activeElement)) {
                     helper.classList.add('hidden');
+                    // Clear the last inserted fraction data when helper closes
+                    delete helper.dataset.lastInsertedFraction;
+                    delete helper.dataset.lastInsertPosition;
                 }
             }, 150);
         }
@@ -1221,7 +1241,8 @@ function hideFractionHelper(input) {
 }
 
 /**
- * Inserts a fraction symbol into the quantity input field
+ * ENHANCED: Inserts a fraction symbol into the quantity input field with smart replacement
+ * If the same or different fraction was just inserted, it replaces the previous one
  * @param {HTMLElement} button - The fraction button that was clicked
  * @param {string} fraction - The fraction symbol to insert
  */
@@ -1232,25 +1253,218 @@ function insertFraction(button, fraction) {
         const input = document.getElementById(helper.dataset.targetInput);
         if (input) {
             // Get current cursor position or use end of text
-            const start = input.selectionStart || input.value.length;
-            const end = input.selectionEnd || input.value.length;
+            let start = input.selectionStart || input.value.length;
+            let end = input.selectionEnd || input.value.length;
             
-            // Insert the fraction at cursor position
             const currentValue = input.value;
-            const newValue = currentValue.substring(0, start) + fraction + currentValue.substring(end);
             
+            // ENHANCED: Check if we previously inserted a fraction from this helper
+            const lastInsertedFraction = helper.dataset.lastInsertedFraction;
+            const lastInsertPosition = parseInt(helper.dataset.lastInsertPosition);
+            
+            let newValue, newPosition;
+            
+            if (lastInsertedFraction && !isNaN(lastInsertPosition)) {
+                // ENHANCED: We previously inserted a fraction, so we should replace it
+                
+                // Check if the cursor is at or near the last insertion point
+                const isNearLastInsertion = Math.abs(start - (lastInsertPosition + lastInsertedFraction.length)) <= 1;
+                
+                // Check if the last inserted fraction still exists at the expected position
+                const expectedFractionStart = lastInsertPosition;
+                const expectedFractionEnd = lastInsertPosition + lastInsertedFraction.length;
+                const textAtExpectedPosition = currentValue.substring(expectedFractionStart, expectedFractionEnd);
+                
+                if (textAtExpectedPosition === lastInsertedFraction && 
+                    (isNearLastInsertion || start === end)) {
+                    
+                    // ENHANCED: Replace the previous fraction with the new one
+                    console.log(`🔄 Replacing previous fraction "${lastInsertedFraction}" with "${fraction}"`);
+                    
+                    newValue = currentValue.substring(0, expectedFractionStart) + 
+                              fraction + 
+                              currentValue.substring(expectedFractionEnd);
+                    
+                    // Set cursor position after the new fraction
+                    newPosition = expectedFractionStart + fraction.length;
+                    
+                } else {
+                    // ENHANCED: Previous fraction was modified or cursor moved significantly
+                    // Insert at current position instead
+                    console.log(`➕ Previous fraction modified or cursor moved, inserting "${fraction}" at current position`);
+                    
+                    newValue = currentValue.substring(0, start) + fraction + currentValue.substring(end);
+                    newPosition = start + fraction.length;
+                }
+                
+            } else {
+                // ENHANCED: No previous insertion, insert normally at cursor position
+                console.log(`➕ First fraction insertion: "${fraction}"`);
+                
+                newValue = currentValue.substring(0, start) + fraction + currentValue.substring(end);
+                newPosition = start + fraction.length;
+            }
+            
+            // Apply the changes to the input
             input.value = newValue;
             
-            // Set cursor position after the inserted fraction
-            const newPosition = start + fraction.length;
+            // Set cursor position after the inserted/replaced fraction
             input.focus();
             input.setSelectionRange(newPosition, newPosition);
+            
+            // ENHANCED: Store information about this insertion for potential replacement
+            helper.dataset.lastInsertedFraction = fraction;
+            helper.dataset.lastInsertPosition = newPosition - fraction.length;
+            
+            console.log(`✅ Fraction "${fraction}" inserted/replaced successfully at position ${newPosition - fraction.length}`);
             
             // Keep the helper visible for multiple selections
             // Users can click multiple fractions or click outside to hide
         }
     }
 }
+
+/**
+ * ENHANCED: Alternative insertion method for keyboards/accessibility
+ * Allows keyboard users to access fraction functionality
+ * @param {HTMLElement} input - The quantity input field
+ * @param {string} fraction - The fraction symbol to insert
+ */
+function insertFractionViaKeyboard(input, fraction) {
+    // Create a mock button element to reuse the existing logic
+    const mockButton = {
+        closest: () => {
+            const container = input.closest('.quantity-input-container');
+            return container ? container.querySelector('.fraction-helper') : null;
+        }
+    };
+    
+    // Use the enhanced insertFraction function
+    insertFraction(mockButton, fraction);
+}
+
+/**
+ * ENHANCED: Utility function to clear the last insertion tracking
+ * Useful when the input value is programmatically changed
+ * @param {HTMLElement} input - The quantity input field
+ */
+function clearFractionInsertionTracking(input) {
+    const container = input.closest('.quantity-input-container');
+    if (container) {
+        const helper = container.querySelector('.fraction-helper');
+        if (helper) {
+            delete helper.dataset.lastInsertedFraction;
+            delete helper.dataset.lastInsertPosition;
+            console.log('🧹 Fraction insertion tracking cleared');
+        }
+    }
+}
+
+/**
+ * ENHANCED: Event listener for input changes to clear tracking when user types
+ * This prevents replacement behavior when user manually edits the field
+ */
+function setupFractionInputListener(input) {
+    let lastValue = input.value;
+    
+    input.addEventListener('input', function() {
+        const currentValue = this.value;
+        
+        // If the value changed in a way that wasn't a simple addition at the end,
+        // clear the insertion tracking
+        if (currentValue !== lastValue) {
+            const helper = this.closest('.quantity-input-container')?.querySelector('.fraction-helper');
+            if (helper && helper.dataset.lastInsertedFraction) {
+                const lastFraction = helper.dataset.lastInsertedFraction;
+                const lastPosition = parseInt(helper.dataset.lastInsertPosition);
+                
+                // Check if the last inserted fraction is still intact
+                const expectedText = lastValue.substring(0, lastPosition) + lastFraction + lastValue.substring(lastPosition + lastFraction.length);
+                
+                if (currentValue !== expectedText) {
+                    // User manually edited the field, clear tracking
+                    clearFractionInsertionTracking(this);
+                    console.log('🔄 User edited field manually, clearing fraction tracking');
+                }
+            }
+        }
+        
+        lastValue = currentValue;
+    });
+    
+    // Also clear tracking when field is cleared
+    input.addEventListener('focus', function() {
+        if (this.value === '') {
+            clearFractionInsertionTracking(this);
+        }
+    });
+}
+
+/**
+ * ENHANCED: Initialize fraction helpers for all quantity inputs
+ * Call this function after adding new ingredient items to set up the enhanced behavior
+ */
+function initializeFractionHelpers() {
+    const quantityInputs = document.querySelectorAll('.ingredient-quantity-input');
+    quantityInputs.forEach(input => {
+        // Remove existing listeners to avoid duplicates
+        input.removeEventListener('input', setupFractionInputListener);
+        input.removeEventListener('focus', setupFractionInputListener);
+        
+        // Add enhanced input tracking
+        setupFractionInputListener(input);
+    });
+    
+    console.log(`✅ Enhanced fraction helpers initialized for ${quantityInputs.length} quantity inputs`);
+}
+
+/**
+ * ENHANCED: Keyboard shortcut support for common fractions
+ * Add this to your existing keyboard event listeners
+ */
+function handleFractionKeyboardShortcuts(event) {
+    // Only handle shortcuts when focused on quantity inputs
+    if (!event.target.classList.contains('ingredient-quantity-input')) {
+        return;
+    }
+    
+    // Ctrl/Cmd + number combinations for quick fraction insertion
+    if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey) {
+        switch(event.key) {
+            case '1':
+                event.preventDefault();
+                insertFractionViaKeyboard(event.target, '½');
+                break;
+            case '2':
+                event.preventDefault();
+                insertFractionViaKeyboard(event.target, '¼');
+                break;
+            case '3':
+                event.preventDefault();
+                insertFractionViaKeyboard(event.target, '¾');
+                break;
+            case '4':
+                event.preventDefault();
+                insertFractionViaKeyboard(event.target, '⅓');
+                break;
+            case '5':
+                event.preventDefault();
+                insertFractionViaKeyboard(event.target, '⅔');
+                break;
+        }
+    }
+}
+
+// ENHANCED: Add keyboard shortcut support to existing event listeners
+document.addEventListener('keydown', handleFractionKeyboardShortcuts);
+
+// ENHANCED: Initialize fraction helpers when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure all elements are rendered
+    setTimeout(initializeFractionHelpers, 100);
+});
+
+
 
 // =============================================================================
 // 14. ADMIN AUTHENTICATION HANDLERS

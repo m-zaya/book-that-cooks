@@ -44,7 +44,6 @@ body {
 .book-container {
     position: relative;
     width: 90%;
-    max-width: 1000px;
     height: 80vh;
     min-height: 650px;
 }
