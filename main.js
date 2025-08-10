@@ -188,6 +188,7 @@ function isValidIngredient(ingredient) {
 
 /**
  * Main function to load and display a recipe
+ * UPDATED: Enhanced loadRecipe function to ensure admin controls are properly displayed
  * @param {number} index - Index of the recipe to load from recipes array
  */
 function loadRecipe(index) {
@@ -197,7 +198,8 @@ function loadRecipe(index) {
         return;
     }
 
-    // Switch back to recipe view if we're in a different view
+    // UPDATED: Switch to recipe view first to ensure proper admin control visibility
+    // This ensures that when a recipe is loaded, we're definitely in recipe view mode
     showRecipeView();
 
     // Convert 1-based index to 0-based for array access
@@ -227,16 +229,26 @@ function loadRecipe(index) {
     // Update instructions list
     updateInstructionsList(recipe.instructions);
     
-    // Update navigation counter
-    updateRecipeCounter();
-    
     // ALWAYS update currentRecipeIndex to ensure consistency
     // This ensures the index always matches what's being displayed
     currentRecipeIndex = index;
     
     // Update navigation counter AFTER setting the index
     updateRecipeCounter();
+    
+    console.log(`✅ Recipe loaded: "${recipe.title}" (Index: ${index})`);
+    
+    // UPDATED: Ensure admin controls are visible if admin is logged in
+    // This handles cases where admin controls might have been hidden
+    if (isAdminAuthenticated()) {
+        const adminControls = document.querySelector('.admin-recipe-controls');
+        if (adminControls) {
+            adminControls.style.display = 'flex';
+            console.log('✅ Admin controls enabled for loaded recipe');
+        }
+    }
 }
+
 
 /**
  * Updates the recipe tags display
@@ -409,8 +421,14 @@ function updateRecipeCounter() {
 // 7. VIEW MANAGEMENT - Toggle between recipe, TOC, and form views
 // =============================================================================
 
+
+// =============================================================================
+// ENHANCED VIEW MANAGEMENT - Updated functions to control admin button visibility
+// =============================================================================
+
 /**
  * Shows the main recipe view and hides other views
+ * UPDATED: Now also shows admin controls when in recipe view
  */
 function showRecipeView() {
     // Hide table of contents CONTROLS (left page)
@@ -427,14 +445,25 @@ function showRecipeView() {
     // Hide new recipe form RIGHT side  
     document.getElementById('newRecipeFormRight').classList.add('hidden');
     
-    // Show navigation controls
+    // Show navigation controls (Previous/Next buttons and recipe counter)
     document.querySelector('.nav-controls').style.display = 'flex';
     
+    // UPDATED: Show admin recipe controls ONLY when viewing a recipe
+    // This ensures edit/delete buttons only appear when a recipe is visible
+    const adminControls = document.querySelector('.admin-recipe-controls');
+    if (adminControls && isAdminAuthenticated()) {
+        adminControls.style.display = 'flex'; // Show admin controls when viewing recipe
+    }
+    
+    // Update current view state for other functions to reference
     currentView = 'recipe';
+    
+    console.log('✅ Recipe view displayed - admin controls shown for authenticated admins');
 }
 
 /**
  * Shows the table of contents view with controls on left and results on right
+ * UPDATED: Now hides admin controls since no recipe is being displayed
  */
 function showTOCView() {
     // Hide recipe view from left page
@@ -456,11 +485,22 @@ function showTOCView() {
     // Hide navigation controls (not relevant for TOC)
     document.querySelector('.nav-controls').style.display = 'none';
     
+    // UPDATED: Hide admin recipe controls since no specific recipe is being displayed
+    // Users can't edit/delete recipes from the table of contents view
+    const adminControls = document.querySelector('.admin-recipe-controls');
+    if (adminControls) {
+        adminControls.style.display = 'none'; // Hide admin controls in TOC view
+    }
+    
+    // Update current view state
     currentView = 'toc';
+    
+    console.log('✅ Table of Contents view displayed - admin controls hidden');
 }
 
 /**
  * Shows the new recipe form split across both pages and hides other content
+ * UPDATED: Now hides admin controls since we're in form mode, not viewing a recipe
  */
 function showNewRecipeView() {
     // Hide recipe view from left page
@@ -480,7 +520,17 @@ function showNewRecipeView() {
     // Hide navigation controls (not relevant for form)
     document.querySelector('.nav-controls').style.display = 'none';
     
+    // UPDATED: Hide admin recipe controls since we're creating/editing a recipe via form
+    // Edit/delete controls don't make sense when filling out a new recipe form
+    const adminControls = document.querySelector('.admin-recipe-controls');
+    if (adminControls) {
+        adminControls.style.display = 'none'; // Hide admin controls in form view
+    }
+    
+    // Update current view state
     currentView = 'newRecipe';
+    
+    console.log('✅ New Recipe form displayed - admin controls hidden');
 }
 
 // =============================================================================
@@ -489,9 +539,13 @@ function showNewRecipeView() {
 
 /**
  * Shows the table of contents with search controls on left and results on right
+ * UPDATED: Enhanced table of contents function to ensure admin controls are hidden
  */
 function showTableOfContents() {
+    // Switch to TOC view (this will hide admin controls automatically)
     showTOCView();
+    
+    // Generate tag filters and update TOC display
     generateTagFilters();
     updateTableOfContents();
     
@@ -502,6 +556,8 @@ function showTableOfContents() {
         // Small delay to ensure the page is visible before focusing
         setTimeout(() => searchBar.focus(), 100);
     }
+    
+    console.log('✅ Table of Contents displayed - admin recipe controls properly hidden');
 }
 
 /**
@@ -670,6 +726,7 @@ function clearAllTags() {
 
 /**
  * Selects and displays a random recipe
+ * UPDATED: Enhanced random recipe function to ensure proper view management
  * Using 1-based indexing to match Supabase IDs
  */
 function showRandomRecipe() {
@@ -684,11 +741,13 @@ function showRandomRecipe() {
         return;
     }
 
-    // Force update currentRecipeIndex and reload recipe even if it's the same
-    // This ensures the display always refreshes
-    currentRecipeIndex = randomIndex;
+    // UPDATED: loadRecipe will handle switching to recipe view and showing admin controls
+    // No need to manually manage view state here since loadRecipe handles it
     loadRecipe(randomIndex);
+    
+    console.log('✅ Random recipe displayed with proper admin control visibility');
 }
+
 
 // =============================================================================
 // 10. NEW RECIPE FORM FUNCTIONS - Updated to use Supabase backend
@@ -696,11 +755,61 @@ function showRandomRecipe() {
 
 /**
  * Shows the new recipe form
+ * UPDATED: Enhanced new recipe form function to ensure admin controls are hidden
  */
 function showNewRecipeForm() {
+    // Switch to new recipe view (this will hide admin controls automatically)
     showNewRecipeView();
+    
+    // Clear the form fields
     clearNewRecipeForm();
+    
+    console.log('✅ New Recipe form displayed - admin recipe controls properly hidden');
 }
+
+// =============================================================================
+// UTILITY FUNCTION - Check if user is viewing a recipe
+// =============================================================================
+
+/**
+ * NEW: Utility function to check if the user is currently viewing a recipe
+ * This can be used by other functions to determine if admin controls should be visible
+ * @returns {boolean} True if currently viewing a recipe, false otherwise
+ */
+function isViewingRecipe() {
+    return currentView === 'recipe';
+}
+
+/**
+ * NEW: Utility function to safely show/hide admin recipe controls based on current state
+ * This provides a centralized way to manage admin control visibility
+ */
+function updateAdminRecipeControlsVisibility() {
+    const adminControls = document.querySelector('.admin-recipe-controls');
+    
+    if (!adminControls) {
+        console.warn('⚠️ Admin recipe controls element not found');
+        return;
+    }
+    
+    // Only show admin controls if:
+    // 1. User is an authenticated admin, AND
+    // 2. User is currently viewing a recipe (not TOC or form)
+    const shouldShow = isAdminAuthenticated() && isViewingRecipe();
+    
+    if (shouldShow) {
+        adminControls.style.display = 'flex';
+        console.log('✅ Admin recipe controls shown - viewing recipe as admin');
+    } else {
+        adminControls.style.display = 'none';
+        if (!isAdminAuthenticated()) {
+            console.log('⚠️ Admin recipe controls hidden - not authenticated');
+        } else {
+            console.log('⚠️ Admin recipe controls hidden - not viewing recipe');
+        }
+    }
+}
+
 
 /**
  * Clears all fields in the new recipe form
@@ -1483,17 +1592,28 @@ async function deleteCurrentRecipe() {
 // 16. EVENT LISTENERS AND INITIALIZATION
 // =============================================================================
 
+// =============================================================================
+// EVENT LISTENERS UPDATE
+// =============================================================================
+
+/**
+ * UPDATED: Enhanced event listener setup to include view change monitoring
+ * This ensures admin controls are always properly managed
+ */
 function setupEventListeners() {
     document.addEventListener('keydown', function(event) {
+        // Only handle recipe navigation keys when actually viewing a recipe
         if (currentView !== 'recipe') return;
         
         switch(event.key) {
             case 'ArrowLeft':
                 event.preventDefault();
-                previousRecipe();
+                // This will call loadRecipe which manages admin controls
+                previousRecipe(); 
                 break;
             case 'ArrowRight':
                 event.preventDefault();
+                // This will call loadRecipe which manages admin controls
                 nextRecipe();
                 break;
             case 'r':
@@ -1507,11 +1627,13 @@ function setupEventListeners() {
             case 'T':
                 if (event.ctrlKey || event.metaKey) {
                     event.preventDefault();
-                    showTableOfContents();
+                    showTableOfContents(); // This will hide admin controls
                 }
                 break;
         }
     });
+    
+    console.log('✅ Enhanced event listeners setup with admin control management');
 }
 
 // =============================================================================

@@ -628,7 +628,8 @@ function restoreAdminSession() {
 }
 
 /**
- * Updates the UI to show/hide admin features based on login status
+ * UPDATED: Enhanced updateAdminUI function to respect current view state
+ * This ensures admin controls are only shown in appropriate contexts
  */
 function updateAdminUI() {
     const adminButton = document.getElementById('adminLoginButton');
@@ -641,20 +642,36 @@ function updateAdminUI() {
             adminButton.title = 'Click to logout admin';
         }
         
-        // Show all admin-only elements (including New Recipe button)
+        // Show all admin-only elements (including New Recipe button in header)
         adminControls.forEach(control => {
             // Use flex to maintain header button layout
             control.style.display = 'flex'; 
         });
 
+        // Add backup controls if the function exists
         if (typeof addBackupControls === 'function') {
             addBackupControls();
         }
         
+        // Show backup toggle if it exists
         const backupToggle = document.querySelector('.backup-toggle');
         if (backupToggle) {
             backupToggle.classList.add('show');
         }
+        
+        // UPDATED: Only show admin recipe controls if we're currently viewing a recipe
+        // This prevents the edit/delete buttons from appearing in TOC or form views
+        const adminRecipeControls = document.querySelector('.admin-recipe-controls');
+        if (adminRecipeControls) {
+            if (currentView === 'recipe') {
+                adminRecipeControls.style.display = 'flex'; // Show only in recipe view
+                console.log('✅ Admin recipe controls enabled for recipe view');
+            } else {
+                adminRecipeControls.style.display = 'none'; // Hide in all other views
+                console.log('⚠️ Admin recipe controls hidden - not in recipe view');
+            }
+        }
+        
     } else {
         // Hide admin controls and reset button text
         if (adminButton) {
@@ -662,16 +679,18 @@ function updateAdminUI() {
             adminButton.title = 'Admin login';
         }
         
-        // HIDE BACKUP CONTROLS:
+        // Hide backup controls
         const backupToggle = document.querySelector('.backup-toggle');
         if (backupToggle) {
             backupToggle.classList.remove('show');
         }
         
-        // Hide all admin-only elements (including New Recipe button)
+        // Hide all admin-only elements (including New Recipe button and admin recipe controls)
         adminControls.forEach(control => {
             control.style.display = 'none';
         });
+        
+        console.log('✅ All admin controls hidden - admin logged out');
     }
 }
 
