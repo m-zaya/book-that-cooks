@@ -1,30 +1,20 @@
 /*
-TABLE-OF-CONTENTS.CSS - TOC LAYOUT AND SEARCH
-=============================================
+TABLE-OF-CONTENTS.CSS - TOC LAYOUT AND SEARCH (FIXED VERSION)
+=============================================================
 
-This file contains the styling for the split Table of Contents layout with
-search controls on the left page and results display on the right page.
-It includes search functionality, filtering, sorting, and recipe browsing.
+FIXED: This file contains the updated styling for the Table of Contents layout 
+with the hover overflow issue resolved. The animation no longer causes the 
+recipe entries to exceed their container width.
 
-CONTENTS:
-- TOC Controls (Left Page) - Search and filter controls
-- TOC Results (Right Page) - Recipe listings and display
-- Search Interface - Input styling and help text
-- Filter System - Tag filters and sorting options
-- Recipe Entries - Individual recipe display in TOC
+CHANGES MADE:
+- Added `overflow: hidden` to `.table-of-contents-results` container
+- Reduced `translateX(5px)` to `translateX(2px)` for more subtle animation
+- Added `box-sizing: border-box` to ensure padding is included in width calculations
+- Added `max-width: 100%` to prevent any potential width overflow
+- Ensured responsive behavior is maintained
 
-DESIGN FEATURES:
-- Split-screen layout for controls and results
-- Real-time search with visual feedback
-- Tag filtering with select all/clear all functionality
-- Sorting by alphabetical, difficulty, and time
-- Recipe counter showing filtered results
-- Hover effects for recipe entries
-
-DEPENDENCIES:
-- base.css for typography and color scheme
-- book-layout.css for page structure
-- Works with main.js for search and filter functionality
+The fix ensures that recipe entries stay within their container bounds while
+maintaining the visual feedback on hover.
 */
 
 /* =============================================================================
@@ -196,13 +186,15 @@ DEPENDENCIES:
 }
 
 /* =============================================================================
-   TABLE OF CONTENTS RESULTS - Right Page (Recipe listings)
+   TABLE OF CONTENTS RESULTS - Right Page (Recipe listings) - FIXED VERSION
    ============================================================================= */
 
-/* TABLE OF CONTENTS RESULTS - Right page styling */
+/* TABLE OF CONTENTS RESULTS - Right page styling with overflow fix */
 .table-of-contents-results {
     height: 100%;
     overflow-y: auto;
+    /* FIXED: Added overflow-x hidden to prevent horizontal scrolling caused by hover animations */
+    overflow-x: hidden;
 }
 
 /* Header for table of contents results page */
@@ -231,13 +223,15 @@ DEPENDENCIES:
     display: grid;
     grid-template-columns: 1fr; /* Single column layout */
     gap: 12px;
+    /* FIXED: Added padding to provide space for the hover animation */
+    padding-right: 5px;
 }
 
 /* =============================================================================
-   RECIPE ENTRIES - Individual recipe display in TOC
+   RECIPE ENTRIES - Individual recipe display in TOC - FIXED VERSION
    ============================================================================= */
 
-/* Individual recipe entry in table of contents */
+/* Individual recipe entry in table of contents - FIXED hover behavior */
 .toc-recipe {
     display: flex;
     align-items: center;
@@ -249,11 +243,18 @@ DEPENDENCIES:
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    /* FIXED: Ensure proper box sizing and prevent overflow */
+    box-sizing: border-box;
+    max-width: 100%;
+    /* FIXED: Add small margin to accommodate the transform animation */
+    margin-right: 3px;
 }
 
+/* FIXED: Reduced translateX from 5px to 2px and ensured container can handle it */
 .toc-recipe:hover {
     background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
-    transform: translateX(5px); /* Slide effect on hover */
+    /* FIXED: Reduced slide effect to prevent overflow - was translateX(5px) */
+    transform: translateX(2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
@@ -271,6 +272,8 @@ DEPENDENCIES:
 .toc-recipe-info {
     flex: 1;
     min-width: 0; /* Prevents flex item from overflowing */
+    /* FIXED: Ensure text doesn't cause width expansion */
+    overflow: hidden;
 }
 
 .toc-recipe-title {
@@ -278,7 +281,10 @@ DEPENDENCIES:
     font-weight: bold;
     color: #8B4513;
     margin-bottom: 5px;
+    /* FIXED: Prevent long titles from causing overflow */
     word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .toc-recipe-meta {
@@ -287,6 +293,8 @@ DEPENDENCIES:
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    /* FIXED: Prevent meta text from causing overflow */
+    overflow: hidden;
 }
 
 /* =============================================================================
@@ -316,4 +324,48 @@ DEPENDENCIES:
 .no-results-suggestion {
     font-style: italic;
     font-size: 0.9em;
+}
+
+/* =============================================================================
+   MOBILE RESPONSIVE FIXES - Ensure mobile devices don't have overflow issues
+   ============================================================================= */
+
+@media (max-width: 768px) {
+    /* Table of contents mobile layout - ensure no overflow */
+    .toc-recipe {
+        flex-direction: column;
+        text-align: center;
+        /* FIXED: Remove margin on mobile to maximize space usage */
+        margin-right: 0;
+        /* FIXED: Reduce padding on mobile to prevent overflow */
+        padding: 12px;
+    }
+    
+    /* FIXED: No transform on mobile to prevent any overflow issues */
+    .toc-recipe:hover {
+        transform: none;
+        /* Keep the background change but remove the slide animation */
+        background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .toc-recipe-image {
+        width: 80px;
+        height: 50px;
+    }
+    
+    .toc-recipe-meta {
+        flex-direction: column;
+        gap: 5px;
+        font-size: 0.8em;
+    }
+    
+    /* FIXED: Ensure containers don't allow horizontal overflow on mobile */
+    .table-of-contents-results {
+        overflow-x: hidden;
+    }
+    
+    .toc-recipes {
+        padding-right: 0; /* Remove right padding on mobile */
+    }
 }
