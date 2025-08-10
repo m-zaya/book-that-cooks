@@ -8,6 +8,7 @@ It contains only the structural markup and links to external CSS and JavaScript 
 Updated to support universal HH:MM time format throughout the application.
 Updated to support separated ingredient components (quantity, unit, ingredient).
 Updated to use modular CSS file structure for better maintainability.
+ENHANCED with tabbed unit selector interface for Volume and Weight measurements.
 
 CONTENTS:
 - Document structure with proper HTML5 semantics
@@ -29,12 +30,13 @@ TIME FORMAT UPDATES:
 - All time inputs now expect and validate HH:MM format (e.g., 01:30, 00:45)
 
 INGREDIENT STRUCTURE UPDATES:
-- Each ingredient now has three separate input fields: quantity, unit, and ingredient name
+- Each ingredient now has three separate input fields: quantity, unit selector, and ingredient name
+- Enhanced unit selector with Volume/Weight tabs and smart pluralization
 - Form validation ensures proper ingredient data entry
 - Display logic formats ingredients properly from separated components
 
 CSS ARCHITECTURE:
-The CSS has been split into 15 modular files for better maintainability:
+The CSS has been split into 16 modular files for better maintainability:
 1. base.css - Foundation styles and reset
 2. book-layout.css - Core book structure
 3. 3d-effects.css - Visual depth and 3D effects
@@ -46,14 +48,15 @@ The CSS has been split into 15 modular files for better maintainability:
 9. forms.css - New recipe form system
 10. img-upload.css - Image handling components
 11. ingredient-input.css - Separated ingredient fields
-12. buttons-controls.css - Buttons and interactive elements
-13. admin-auth.css - Admin authentication modal
-14. backup-controls.css - Backup system styling
-15. responsive.css - Mobile and tablet adaptations (MUST BE LAST)
+12. enhanced-unit-selector.css - Tabbed unit selection interface
+13. buttons-controls.css - Buttons and interactive elements
+14. admin-auth.css - Admin authentication modal
+15. backup-controls.css - Backup system styling
+16. responsive.css - Mobile and tablet adaptations (MUST BE LAST)
 
 DEPENDENCIES:
-- External CSS: 15 modular CSS files for complete styling and layout
-- External JavaScript: recipes.js for recipe data and main.js for interactive functionality
+- External CSS: 16 modular CSS files for complete styling and layout
+- External JavaScript: supabase-database.js and main.js for interactive functionality
 
 RESPONSIVE DESIGN:
 - Mobile-first approach with media queries in CSS
@@ -95,6 +98,8 @@ RESPONSIVE DESIGN:
         <link rel="stylesheet" href="style/forms.css">
         <link rel="stylesheet" href="style/img-upload.css">
         <link rel="stylesheet" href="style/ingredient-input.css">
+        <!-- ENHANCED UNIT SELECTOR - New tabbed interface for unit selection -->
+        <link rel="stylesheet" href="style/enhanced-unit-selector.css">
         
         <!-- 6. ADMIN FEATURES - Administrative functionality -->
         <link rel="stylesheet" href="style/admin-auth.css">
@@ -439,13 +444,13 @@ RESPONSIVE DESIGN:
                         <button type="button" class="add-btn" onclick="addTimelineItem()">Add Timeline Step</button>
                     </div>
                     
-                    <!-- Ingredients section - Updated to support separated quantity, unit, and ingredient inputs -->
+                    <!-- Ingredients section - ENHANCED with tabbed unit selector -->
                     <div class="form-section">
                         <h3 class="form-section-title">Ingredients</h3>
-                        <!-- Updated help text explaining the separated ingredient input fields -->
-                        <p class="form-help-text">Enter each ingredient with separate quantity, unit, and ingredient name (e.g., "2", "cups", "flour")</p>
+                        <!-- Updated help text explaining the enhanced ingredient input system -->
+                        <p class="form-help-text">Enter each ingredient with quantity, unit selector (Volume/Weight tabs), and ingredient name</p>
                         
-                        <!-- Updated dynamic list container for ingredients with three separate input fields -->
+                        <!-- ENHANCED dynamic list container for ingredients with tabbed unit selector -->
                         <div class="dynamic-list" id="newRecipeIngredientsList">
                             <div class="dynamic-item ingredient-item">
                                 <!-- Quantity input field with fraction helper -->
@@ -466,10 +471,85 @@ RESPONSIVE DESIGN:
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Unit input field (measurement units) -->
-                                <input type="text" placeholder="Unit" class="form-input ingredient-unit-input" title="Enter unit (e.g., cups, tsp, tbsp, large)">
+                                
+                                <!-- ENHANCED UNIT SELECTOR - Replaces simple text input with tabbed interface -->
+                                <div class="unit-selector-container">
+                                    <input type="text" 
+                                           placeholder="Select unit..." 
+                                           class="form-input unit-selector-input" 
+                                           readonly
+                                           onclick="toggleUnitSelector(this)"
+                                           title="Click to select measurement unit">
+                                    
+                                    <div class="unit-selector-popup hidden">
+                                        <!-- Tab headers for Volume and Weight -->
+                                        <div class="unit-tabs">
+                                            <button class="unit-tab active" onclick="switchUnitTab(this, 'volume')">
+                                                📏 Volume
+                                            </button>
+                                            <button class="unit-tab" onclick="switchUnitTab(this, 'weight')">
+                                                ⚖️ Weight
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Tab content container -->
+                                        <div class="unit-tab-content">
+                                            <!-- Volume measurements panel -->
+                                            <div class="unit-tab-panel active" data-tab="volume">
+                                                <div class="unit-options">
+                                                    <!-- Common volume measurements (singular forms with smart pluralization) -->
+                                                    <button class="unit-option" onclick="selectUnit(this, 'cup')">cup</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'tbsp')">tbsp</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'tsp')">tsp</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'ml')">ml</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'liter')">l</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'fl oz')">fl oz</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'pint')">pint</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'quart')">quart</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'gallon')">gallon</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'pinch')">pinch</button>
+                                                </div>
+                                                
+                                                <!-- Custom input for volume -->
+                                                <div class="unit-custom-separator">
+                                                    <div class="unit-custom-label">Other volume unit:</div>
+                                                    <input type="text" 
+                                                           class="unit-custom-input" 
+                                                           placeholder="Type custom volume unit..."
+                                                           onkeyup="handleCustomUnit(this)"
+                                                           onblur="validateCustomUnit(this)">
+                                                    <div class="unit-custom-message"></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Weight measurements panel -->
+                                            <div class="unit-tab-panel" data-tab="weight">
+                                                <div class="unit-options">
+                                                    <!-- Common weight measurements (singular forms with smart pluralization) -->
+                                                    <button class="unit-option" onclick="selectUnit(this, 'oz')">oz</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'lb')">lb</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'g')">g</button>
+                                                    <button class="unit-option" onclick="selectUnit(this, 'kg')">kg</button>
+                                                </div>
+                                                
+                                                <!-- Custom input for weight -->
+                                                <div class="unit-custom-separator">
+                                                    <div class="unit-custom-label">Other weight unit:</div>
+                                                    <input type="text" 
+                                                           class="unit-custom-input" 
+                                                           placeholder="Type custom weight unit..."
+                                                           onkeyup="handleCustomUnit(this)"
+                                                           onblur="validateCustomUnit(this)">
+                                                    <div class="unit-custom-message"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <!-- Ingredient name input field -->
-                                <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" title="Enter ingredient name (e.g., flour, eggs, salt)">
+                                <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" 
+                                       title="Enter ingredient name (e.g., flour, eggs, salt)">
                                 <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
                             </div>
                         </div>

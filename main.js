@@ -869,7 +869,74 @@ function resetIngredientsList() {
                     </div>
                 </div>
             </div>
-            <input type="text" placeholder="Unit" class="form-input ingredient-unit-input" title="Enter unit (e.g., cups, tsp, tbsp, large)">
+        
+            <!-- ENHANCED UNIT SELECTOR - Replaces simple text input -->
+            <div class="unit-selector-container">
+                <input type="text" 
+                    placeholder="Select unit..." 
+                    class="form-input unit-selector-input" 
+                    readonly
+                    onclick="toggleUnitSelector(this)"
+                    title="Click to select measurement unit">
+                
+                <div class="unit-selector-popup hidden">
+                    <div class="unit-tabs">
+                        <button class="unit-tab active" onclick="switchUnitTab(this, 'volume')">
+                            📏 Volume
+                        </button>
+                        <button class="unit-tab" onclick="switchUnitTab(this, 'weight')">
+                            ⚖️ Weight
+                        </button>
+                    </div>
+                    
+                    <div class="unit-tab-content">
+                        <div class="unit-tab-panel active" data-tab="volume">
+                            <div class="unit-options">
+                                <button class="unit-option" onclick="selectUnit(this, 'cup')">cup</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'tbsp')">tbsp</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'tsp')">tsp</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'ml')">ml</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'liter')">liter</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'fl oz')">fl oz</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'pint')">pint</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'quart')">quart</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'gallon')">gallon</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'pinch')">pinch</button>
+                            </div>
+                            
+                            <div class="unit-custom-separator">
+                                <div class="unit-custom-label">Other volume unit:</div>
+                                <input type="text" 
+                                    class="unit-custom-input" 
+                                    placeholder="Type custom volume unit..."
+                                    onkeyup="handleCustomUnit(this)"
+                                    onblur="validateCustomUnit(this)">
+                                <div class="unit-custom-message"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="unit-tab-panel" data-tab="weight">
+                            <div class="unit-options">
+                                <button class="unit-option" onclick="selectUnit(this, 'oz')">oz</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'lb')">lb</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'g')">g</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'kg')">kg</button>
+                            </div>
+                            
+                            <div class="unit-custom-separator">
+                                <div class="unit-custom-label">Other weight unit:</div>
+                                <input type="text" 
+                                    class="unit-custom-input" 
+                                    placeholder="Type custom weight unit..."
+                                    onkeyup="handleCustomUnit(this)"
+                                    onblur="validateCustomUnit(this)">
+                                <div class="unit-custom-message"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" title="Enter ingredient name (e.g., flour, eggs, salt)">
             <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
         </div>
@@ -917,12 +984,15 @@ function removeTimelineItem(button) {
  * ENHANCED: Modified addIngredientItem function to include fraction helper initialization
  * This replaces the existing addIngredientItem function in main.js
  */
+/**
+ * ENHANCED: Modified addIngredientItem function to include unit selector
+ */
 function addIngredientItem() {
     const ingredientsList = document.querySelector('#newRecipeIngredientsList');
     const newItem = document.createElement('div');
     newItem.className = 'dynamic-item ingredient-item';
     
-    // Updated to include three separate input fields with fraction helper for quantity
+    // Updated to include enhanced unit selector instead of simple text input
     newItem.innerHTML = `
         <div class="quantity-input-container">
             <input type="text" placeholder="Qty" class="form-input ingredient-quantity-input" 
@@ -932,33 +1002,98 @@ function addIngredientItem() {
             <div class="fraction-helper hidden">
                 <div class="fraction-helper-title">Common Fractions:</div>
                 <div class="fraction-buttons">
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '½')" title="Ctrl+1">½</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')" title="Ctrl+2">¼</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¾')" title="Ctrl+3">¾</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅓')" title="Ctrl+4">⅓</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅔')" title="Ctrl+5">⅔</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅛')" title="One eighth">⅛</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅜')" title="Three eighths">⅜</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅝')" title="Five eighths">⅝</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅞')" title="Seven eighths">⅞</button>
-                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')" title="One quarter">¼</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '½')">½</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¼')">¼</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '¾')">¾</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅓')">⅓</button>
+                    <button type="button" class="fraction-btn" onclick="insertFraction(this, '⅔')">⅔</button>
                 </div>
             </div>
         </div>
-        <input type="text" placeholder="Unit" class="form-input ingredient-unit-input" title="Enter unit (e.g., cups, tsp, tbsp, large)">
-        <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" title="Enter ingredient name (e.g., flour, eggs, salt)">
-        <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
-    `;
-    
-    ingredientsList.appendChild(newItem);
-    
-    // ENHANCED: Initialize the fraction helper for the new input
-    const newQuantityInput = newItem.querySelector('.ingredient-quantity-input');
-    if (newQuantityInput) {
-        setupFractionInputListener(newQuantityInput);
-        console.log('✅ Fraction helper initialized for new ingredient item');
-    }
+        
+        <!-- ENHANCED UNIT SELECTOR - Replaces simple text input -->
+        <div class="unit-selector-container">
+            <input type="text" 
+                   placeholder="Select unit..." 
+                   class="form-input unit-selector-input" 
+                   readonly
+                   onclick="toggleUnitSelector(this)"
+                   title="Click to select measurement unit">
+            
+            <div class="unit-selector-popup hidden">
+                <div class="unit-tabs">
+                    <button class="unit-tab active" onclick="switchUnitTab(this, 'volume')">
+                        📏 Volume
+                    </button>
+                    <button class="unit-tab" onclick="switchUnitTab(this, 'weight')">
+                        ⚖️ Weight
+                    </button>
+                </div>
+                
+                <div class="unit-tab-content">
+                    <div class="unit-tab-panel active" data-tab="volume">
+                        <div class="unit-options">
+                            <button class="unit-option" onclick="selectUnit(this, 'cup')">cup</button>
+                            <button class="unit-option" onclick="selectUnit(this, 'tbsp')">tbsp</button>
+                            <button class="unit-option" onclick="selectUnit(this, 'tsp')">tsp</button>
+                            <button class="unit-option" onclick="selectUnit(this, 'ml')">ml</button>
+                            <button class="unit-option" onclick="selectUnit(this, 'liter')">liter</button>
+                            <button class="unit-option" onclick="selectUnit(this, 'fl oz')">fl oz</button>
+                            <button class="unit-option" onclick="selectUnit(this, 'pint')">pint</button>
+                            <button class="unit-option" onclick="selectUnit(this, 'quart')">quart</button>
+                            <button class="unit-option" onclick="selectUnit(this, 'gallon')">gallon</button>
+                           <button class="unit-option" onclick="selectUnit(this, 'pinch')">pinch</button>
+                       </div>
+                       
+                       <div class="unit-custom-separator">
+                           <div class="unit-custom-label">Other volume unit:</div>
+                           <input type="text" 
+                                  class="unit-custom-input" 
+                                  placeholder="Type custom volume unit..."
+                                  onkeyup="handleCustomUnit(this)"
+                                  onblur="validateCustomUnit(this)">
+                           <div class="unit-custom-message"></div>
+                       </div>
+                   </div>
+                   
+                   <div class="unit-tab-panel" data-tab="weight">
+                       <div class="unit-options">
+                           <button class="unit-option" onclick="selectUnit(this, 'oz')">oz</button>
+                           <button class="unit-option" onclick="selectUnit(this, 'lb')">lb</button>
+                           <button class="unit-option" onclick="selectUnit(this, 'g')">g</button>
+                           <button class="unit-option" onclick="selectUnit(this, 'kg')">kg</button>
+                       </div>
+                       
+                       <div class="unit-custom-separator">
+                           <div class="unit-custom-label">Other weight unit:</div>
+                           <input type="text" 
+                                  class="unit-custom-input" 
+                                  placeholder="Type custom weight unit..."
+                                  onkeyup="handleCustomUnit(this)"
+                                  onblur="validateCustomUnit(this)">
+                           <div class="unit-custom-message"></div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+       
+       <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" 
+              title="Enter ingredient name (e.g., flour, eggs, salt)">
+       <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
+   `;
+   
+   ingredientsList.appendChild(newItem);
+   
+   // Initialize fraction helper for the new quantity input
+   const newQuantityInput = newItem.querySelector('.ingredient-quantity-input');
+   if (newQuantityInput && typeof setupFractionInputListener === 'function') {
+       setupFractionInputListener(newQuantityInput);
+   }
+   
+   console.log('✅ Enhanced ingredient item with unit selector added');
 }
+
 
 function removeIngredientItem(button) {
     const ingredientsList = document.querySelector('#newRecipeIngredientsList');
@@ -1665,10 +1800,10 @@ function populateIngredientsList(ingredients) {
         newItem.innerHTML = `
             <div class="quantity-input-container">
                 <input type="text" placeholder="Qty" class="form-input ingredient-quantity-input" 
-                       title="Enter quantity (e.g., 2, 1½, ¾) - click for fraction help"
-                       onfocus="showFractionHelper(this)" 
-                       onblur="hideFractionHelper(this)"
-                       value="${quantity}">
+                    title="Enter quantity (e.g., 2, 1½, ¾) - click for fraction help"
+                    onfocus="showFractionHelper(this)" 
+                    onblur="hideFractionHelper(this)"
+                    value="${quantity}">
                 <div class="fraction-helper hidden">
                     <div class="fraction-helper-title">Common Fractions:</div>
                     <div class="fraction-buttons">
@@ -1680,12 +1815,80 @@ function populateIngredientsList(ingredients) {
                     </div>
                 </div>
             </div>
-            <input type="text" placeholder="Unit" class="form-input ingredient-unit-input" 
-                   title="Enter unit (e.g., cups, tsp, tbsp, large)" value="${unit}">
+            
+            <!-- ENHANCED UNIT SELECTOR - Replaces simple text input -->
+            <div class="unit-selector-container">
+                <input type="text" 
+                    placeholder="Select unit..." 
+                    class="form-input unit-selector-input" 
+                    readonly
+                    onclick="toggleUnitSelector(this)"
+                    title="Click to select measurement unit"
+                    value="${unit}">
+                
+                <div class="unit-selector-popup hidden">
+                    <div class="unit-tabs">
+                        <button class="unit-tab active" onclick="switchUnitTab(this, 'volume')">
+                            📏 Volume
+                        </button>
+                        <button class="unit-tab" onclick="switchUnitTab(this, 'weight')">
+                            ⚖️ Weight
+                        </button>
+                    </div>
+                    
+                    <div class="unit-tab-content">
+                        <div class="unit-tab-panel active" data-tab="volume">
+                            <div class="unit-options">
+                                <button class="unit-option" onclick="selectUnit(this, 'cup')">cup</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'tbsp')">tbsp</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'tsp')">tsp</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'ml')">ml</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'liter')">liter</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'fl oz')">fl oz</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'pint')">pint</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'quart')">quart</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'gallon')">gallon</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'pinch')">pinch</button>
+                            </div>
+                            
+                            <div class="unit-custom-separator">
+                                <div class="unit-custom-label">Other volume unit:</div>
+                                <input type="text" 
+                                    class="unit-custom-input" 
+                                    placeholder="Type custom volume unit..."
+                                    onkeyup="handleCustomUnit(this)"
+                                    onblur="validateCustomUnit(this)">
+                                <div class="unit-custom-message"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="unit-tab-panel" data-tab="weight">
+                            <div class="unit-options">
+                                <button class="unit-option" onclick="selectUnit(this, 'oz')">oz</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'lb')">lb</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'g')">g</button>
+                                <button class="unit-option" onclick="selectUnit(this, 'kg')">kg</button>
+                            </div>
+                            
+                            <div class="unit-custom-separator">
+                                <div class="unit-custom-label">Other weight unit:</div>
+                                <input type="text" 
+                                    class="unit-custom-input" 
+                                    placeholder="Type custom weight unit..."
+                                    onkeyup="handleCustomUnit(this)"
+                                    onblur="validateCustomUnit(this)">
+                                <div class="unit-custom-message"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <input type="text" placeholder="Ingredient" class="form-input ingredient-name-input" 
-                   title="Enter ingredient name (e.g., flour, eggs, salt)" value="${name}">
+                title="Enter ingredient name (e.g., flour, eggs, salt)" value="${name}">
             <button type="button" class="remove-btn" onclick="removeIngredientItem(this)">Remove</button>
         `;
+
         ingredientsList.appendChild(newItem);
     });
     
@@ -1801,6 +2004,321 @@ async function deleteCurrentRecipe() {
         alert(`Failed to delete recipe: ${error.message}\n\nPlease try again or check your internet connection.`);
     }
 }
+
+
+
+
+// =============================================================================
+// ENHANCED UNIT SELECTOR FUNCTIONALITY
+// =============================================================================
+
+// Predefined unit lists organized by category
+const VOLUME_UNITS = [
+    'cup', 'tbsp', 'tsp', 'ml', 'liter', 'fl oz', 'pint', 'quart', 'gallon', 'pinch',
+    'tablespoon', 'teaspoon', 'liter', 'milliliter', 'fluid ounce', 'dl', 'deciliter'
+];
+
+const WEIGHT_UNITS = [
+    'oz', 'lb', 'g', 'kg', 'mg', 'stone', 'ton',
+    'ounce', 'pound', 'gram', 'kilogram', 'milligram', 'tonne'
+];
+
+// Plural mappings for automatic pluralization
+const PLURAL_MAPPINGS = {
+    'cup': 'cups', 'tbsp': 'tbsp', 'tsp': 'tsp', 'ml': 'ml', 'liter': 'liters',
+    'fl oz': 'fl oz', 'pint': 'pints', 'quart': 'quarts', 'gallon': 'gallons',
+    'pinch': 'pinches', 'tablespoon': 'tablespoons', 'teaspoon': 'teaspoons',
+    'liter': 'liters', 'milliliter': 'milliliters', 'fluid ounce': 'fluid ounces',
+    'dl': 'dl', 'deciliter': 'deciliters', 'oz': 'oz', 'lb': 'lbs', 'g': 'g',
+    'kg': 'kg', 'mg': 'mg', 'stone': 'stone', 'ton': 'tons', 'ounce': 'ounces',
+    'pound': 'pounds', 'gram': 'grams', 'kilogram': 'kilograms',
+    'milligram': 'milligrams', 'tonne': 'tonnes'
+};
+
+/**
+ * Toggles the unit selector popup visibility
+ */
+function toggleUnitSelector(input) {
+    const container = input.closest('.unit-selector-container');
+    const popup = container.querySelector('.unit-selector-popup');
+    
+    closeAllUnitSelectors();
+    
+    if (popup.classList.contains('hidden')) {
+        popup.classList.remove('hidden');
+        input.classList.add('active');
+        adjustPopupPosition(popup);
+        setTimeout(() => {
+            document.addEventListener('click', handleClickOutside);
+        }, 100);
+    } else {
+        closeUnitSelector(container);
+    }
+}
+
+/**
+ * Closes a specific unit selector
+ */
+function closeUnitSelector(container) {
+    const popup = container.querySelector('.unit-selector-popup');
+    const input = container.querySelector('.unit-selector-input');
+    
+    popup.classList.add('hidden');
+    input.classList.remove('active');
+    
+    const customInputs = popup.querySelectorAll('.unit-custom-input');
+    customInputs.forEach(customInput => {
+        customInput.value = '';
+        const message = customInput.parentElement.querySelector('.unit-custom-message');
+        if (message) message.textContent = '';
+    });
+    
+    document.removeEventListener('click', handleClickOutside);
+}
+
+/**
+ * Closes all open unit selectors
+ */
+function closeAllUnitSelectors() {
+    const openSelectors = document.querySelectorAll('.unit-selector-container');
+    openSelectors.forEach(container => {
+        const popup = container.querySelector('.unit-selector-popup');
+        if (popup && !popup.classList.contains('hidden')) {
+            closeUnitSelector(container);
+        }
+    });
+}
+
+/**
+ * Handles clicking outside the unit selector to close it
+ */
+function handleClickOutside(event) {
+    const unitSelector = event.target.closest('.unit-selector-container');
+    if (!unitSelector) {
+        closeAllUnitSelectors();
+    }
+}
+
+/**
+ * Adjusts popup position to prevent it from going off screen
+ */
+function adjustPopupPosition(popup) {
+    const rect = popup.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    if (rect.right > viewportWidth - 10) {
+        popup.style.left = 'auto';
+        popup.style.right = '0';
+    } else {
+        popup.style.left = '0';
+        popup.style.right = 'auto';
+    }
+    
+    if (rect.bottom > viewportHeight - 10) {
+        popup.style.top = 'auto';
+        popup.style.bottom = '100%';
+        popup.style.marginTop = '0';
+        popup.style.marginBottom = '4px';
+    } else {
+        popup.style.top = '100%';
+        popup.style.bottom = 'auto';
+        popup.style.marginTop = '4px';
+        popup.style.marginBottom = '0';
+    }
+}
+
+/**
+ * Switches between Volume and Weight tabs
+ */
+function switchUnitTab(tabButton, tabType) {
+    const popup = tabButton.closest('.unit-selector-popup');
+    
+    const allTabs = popup.querySelectorAll('.unit-tab');
+    allTabs.forEach(tab => tab.classList.remove('active'));
+    tabButton.classList.add('active');
+    
+    const allPanels = popup.querySelectorAll('.unit-tab-panel');
+    allPanels.forEach(panel => panel.classList.remove('active'));
+    
+    const targetPanel = popup.querySelector(`[data-tab="${tabType}"]`);
+    if (targetPanel) {
+        targetPanel.classList.add('active');
+    }
+}
+
+/**
+ * Enhanced unit selection with automatic pluralization
+ */
+function selectUnit(button, unit) {
+    const popup = button.closest('.unit-selector-popup');
+    const container = popup.closest('.unit-selector-container');
+    const input = container.querySelector('.unit-selector-input');
+    
+    const ingredientItem = container.closest('.ingredient-item');
+    let finalUnit = unit;
+    
+    if (ingredientItem) {
+        const quantityInput = ingredientItem.querySelector('.ingredient-quantity-input');
+        if (quantityInput) {
+            const quantity = parseQuantityValue(quantityInput.value);
+            finalUnit = getPluralizedUnit(unit, quantity);
+        }
+    }
+    
+    input.value = finalUnit;
+    input.classList.add('selected');
+    
+    button.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
+    button.style.color = 'white';
+    
+    setTimeout(() => {
+        button.style.background = '';
+        button.style.color = '';
+    }, 300);
+    
+    setTimeout(() => {
+        closeUnitSelector(container);
+    }, 200);
+}
+
+/**
+ * Parses quantity value to determine if it's greater than 1
+ */
+function parseQuantityValue(quantityStr) {
+    if (!quantityStr || typeof quantityStr !== 'string') return 1;
+    
+    const cleanStr = quantityStr.trim().toLowerCase();
+    
+    const fractionMap = {
+        '½': 0.5, '¼': 0.25, '¾': 0.75, '⅓': 0.33, '⅔': 0.67,
+        '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
+    };
+    
+    if (fractionMap[cleanStr]) {
+        return fractionMap[cleanStr];
+    }
+    
+    for (const [fraction, value] of Object.entries(fractionMap)) {
+        if (cleanStr.includes(fraction)) {
+            const beforeFraction = cleanStr.split(fraction)[0];
+            const wholeNumber = parseFloat(beforeFraction) || 0;
+            return wholeNumber + value;
+        }
+    }
+    
+    if (cleanStr.includes('-')) {
+        const firstNumber = parseFloat(cleanStr.split('-')[0]);
+        return isNaN(firstNumber) ? 1 : firstNumber;
+    }
+    
+    const numericValue = parseFloat(cleanStr);
+    return isNaN(numericValue) ? 1 : numericValue;
+}
+
+/**
+ * Returns the appropriate singular or plural form of a unit based on quantity
+ */
+function getPluralizedUnit(unit, quantity) {
+    if (quantity === 1) {
+        return unit;
+    }
+    return PLURAL_MAPPINGS[unit] || unit + 's';
+}
+
+/**
+ * Handles typing in the custom unit input field
+ */
+function handleCustomUnit(input) {
+    const value = input.value.trim().toLowerCase();
+    const messageElement = input.parentElement.querySelector('.unit-custom-message');
+    
+    if (!value) {
+        messageElement.textContent = '';
+        return;
+    }
+    
+    const matchingUnit = findMatchingUnit(value);
+    
+    if (matchingUnit) {
+        messageElement.textContent = `💡 Suggestion: Use "${matchingUnit}" from the preset options above`;
+        messageElement.style.color = '#A0522D';
+    } else {
+        messageElement.textContent = '✅ Custom unit will be saved';
+        messageElement.style.color = '#4CAF50';
+    }
+}
+
+/**
+ * Validates and processes custom unit input when field loses focus
+ */
+function validateCustomUnit(input) {
+    const value = input.value.trim();
+    const messageElement = input.parentElement.querySelector('.unit-custom-message');
+    
+    if (!value) {
+        messageElement.textContent = '';
+        return;
+    }
+    
+    const matchingUnit = findMatchingUnit(value.toLowerCase());
+    
+    if (matchingUnit) {
+        selectCustomUnit(input, matchingUnit);
+        messageElement.textContent = `🔄 Replaced with preset unit: "${matchingUnit}"`;
+        messageElement.style.color = '#2196F3';
+    } else {
+        selectCustomUnit(input, value);
+        messageElement.textContent = '';
+    }
+}
+
+/**
+ * Finds a matching predefined unit for a given input
+ */
+function findMatchingUnit(inputValue) {
+    const allUnits = [...VOLUME_UNITS, ...WEIGHT_UNITS];
+    
+    let match = allUnits.find(unit => unit.toLowerCase() === inputValue);
+    if (match) return match;
+    
+    const variations = {
+        'tablespoon': 'tbsp', 'tablespoons': 'tbsp', 'teaspoon': 'tsp', 'teaspoons': 'tsp',
+        'ounce': 'oz', 'ounces': 'oz', 'pound': 'lb', 'pounds': 'lb', 'gram': 'g',
+        'grams': 'g', 'kilogram': 'kg', 'kilograms': 'kg', 'milliliter': 'ml', 
+        'milliliters': 'ml', 'fluid ounce': 'fl oz',
+        'fluid ounces': 'fl oz', 'pints': 'pint', 'quarts': 'quart', 'gallons': 'gallon',
+        'cups': 'cup', 'pinches': 'pinch', 'lbs': 'lb', 'tons': 'ton', 'tonnes': 'tonne'
+    };
+    
+    if (variations[inputValue]) {
+        return variations[inputValue];
+    }
+    
+    match = allUnits.find(unit => 
+        unit.toLowerCase().includes(inputValue) || 
+        inputValue.includes(unit.toLowerCase())
+    );
+    
+    return match || null;
+}
+
+/**
+ * Selects a custom unit and closes the popup
+ */
+function selectCustomUnit(customInput, unit) {
+    const popup = customInput.closest('.unit-selector-popup');
+    const container = popup.closest('.unit-selector-container');
+    const input = container.querySelector('.unit-selector-input');
+    
+    input.value = unit;
+    input.classList.add('selected');
+    
+    setTimeout(() => {
+        closeUnitSelector(container);
+    }, 300);
+}
+
 
 // =============================================================================
 // 16. EVENT LISTENERS AND INITIALIZATION

@@ -1,0 +1,281 @@
+/*
+ENHANCED-UNIT-SELECTOR.CSS - TABBED UNIT SELECTION INTERFACE
+===========================================================
+
+This file contains the styling for the enhanced unit selector that replaces
+the simple text input with a tabbed interface for Volume and Weight measurements.
+It integrates with the existing Digital Cookbook brown theme.
+
+FEATURES:
+- Tabbed interface for Volume and Weight categories
+- Grid layout for unit selection buttons
+- Custom input with smart replacement suggestions
+- Automatic pluralization based on quantity
+- Mobile responsive design
+
+DEPENDENCIES:
+- base.css for foundation styles
+- forms.css for form input consistency
+- Works with main.js for interactive functionality
+*/
+
+/* =============================================================================
+   UNIT SELECTOR CONTAINER - Main container for the enhanced unit selector
+   ============================================================================= */
+
+/* Container for the enhanced unit selector system */
+.unit-selector-container {
+    position: relative;
+    flex: 0 0 120px; /* Fixed width for unit selector */
+    min-width: 120px;
+}
+
+/* Display input that shows selected unit */
+.unit-selector-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1em;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+    margin-bottom: 0;
+}
+
+/* Add dropdown arrow indicator */
+.unit-selector-input::after {
+    content: "▼";
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 0.8em;
+    pointer-events: none;
+}
+
+.unit-selector-input:focus,
+.unit-selector-input.active {
+    outline: none;
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+/* =============================================================================
+   UNIT SELECTOR POPUP - Tabbed interface for selecting units
+   ============================================================================= */
+
+/* Main popup container for unit selection */
+.unit-selector-popup {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #ffffff;
+    border: 3px solid #8B4513;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    margin-top: 4px;
+    animation: unitSelectorFadeIn 0.3s ease-out;
+    min-width: 320px; /* Ensure popup is wide enough for content */
+}
+
+/* Fade-in animation for smooth popup appearance */
+@keyframes unitSelectorFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =============================================================================
+   TAB INTERFACE - Volume and Weight category tabs
+   ============================================================================= */
+
+/* Tab header container */
+.unit-tabs {
+    display: flex;
+    border-bottom: 2px solid #f0f0f0;
+    background: #f8f8f8;
+    border-radius: 12px 12px 0 0;
+}
+
+/* Individual tab styling */
+.unit-tab {
+    flex: 1;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: bold;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 8px 8px 0 0;
+    position: relative;
+}
+
+/* Active tab styling */
+.unit-tab.active {
+    background: #ffffff;
+    color: #8B4513;
+    border-bottom: 2px solid #8B4513;
+}
+
+/* Tab hover effect */
+.unit-tab:hover:not(.active) {
+    background: rgba(139, 69, 19, 0.1);
+    color: #8B4513;
+}
+
+/* =============================================================================
+   TAB CONTENT - Unit selection grids
+   ============================================================================= */
+
+/* Container for tab content */
+.unit-tab-content {
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden; /* Prevent content from overflowing */
+}
+
+/* Individual tab panels */
+.unit-tab-panel {
+    display: none;
+}
+
+.unit-tab-panel.active {
+    display: block;
+}
+
+/* Grid layout for unit buttons */
+.unit-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(55px, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+/* Individual unit selection buttons */
+.unit-option {
+    background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #654321;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Unit button hover effect */
+.unit-option:hover {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Unit button active/selected state */
+.unit-option:active {
+    transform: translateY(0);
+}
+
+/* =============================================================================
+   CUSTOM UNIT INPUT - "Other" option for typing custom units
+   ============================================================================= */
+
+/* Separator between predefined options and custom input */
+.unit-custom-separator {
+    border-top: 1px solid #eee;
+    margin: 12px 0 8px 0;
+    padding-top: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Label for custom unit input */
+.unit-custom-label {
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+/* Custom unit input field */
+.unit-custom-input {
+    width: 100%;
+    max-width: 100%; /* Ensure it doesn't exceed container */
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9em;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box; /* Include padding and border in width calculation */
+}
+
+.unit-custom-input:focus {
+    outline: none;
+    border-color: #8B4513;
+    box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.1);
+}
+
+/* Validation message for custom input */
+.unit-custom-message {
+    font-size: 0.8em;
+    color: #A0522D;
+    margin-top: 4px;
+    font-style: italic;
+    min-height: 16px; /* Reserve space to prevent layout jumping */
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN - Mobile adaptations
+   ============================================================================= */
+
+@media (max-width: 768px) {
+    .unit-selector-popup {
+        left: -10px;
+        right: -10px;
+        min-width: auto;
+    }
+    
+    .unit-options {
+        grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+        gap: 6px;
+    }
+    
+    .unit-option {
+        font-size: 0.85em;
+        padding: 6px 8px;
+        min-height: 32px;
+    }
+}
+
+/* =============================================================================
+   UTILITY CLASSES - Hidden state and visual feedback
+   ============================================================================= */
+
+/* Visual feedback for successful selection */
+.unit-selector-input.selected {
+    background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+    border-color: #4CAF50;
+}

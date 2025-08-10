@@ -266,25 +266,25 @@ async function saveNewRecipe() {
         // =================================================================
         // STEP 5: COLLECT AND VALIDATE INGREDIENTS DATA
         // =================================================================
-        
+
         // Get all ingredient elements from the dynamic form
-        // Each ingredient has three separate inputs: quantity, unit, ingredient name
+        // Each ingredient has three separate inputs: quantity, unit selector, ingredient name
         const ingredientItems = document.querySelectorAll('#newRecipeIngredientsList .ingredient-item');
         const ingredients = [];
-        
+
         // Process each ingredient item
         ingredientItems.forEach(item => {
-            const quantity = item.querySelector('.ingredient-quantity-input').value.trim();   // e.g., "2", "1½"
-            const unit = item.querySelector('.ingredient-unit-input').value.trim();           // e.g., "cups", "tsp"
-            const ingredient = item.querySelector('.ingredient-name-input').value.trim();     // e.g., "flour", "salt"
+            const quantity = item.querySelector('.ingredient-quantity-input').value.trim();
+            const unitInput = item.querySelector('.unit-selector-input');
+            const unit = unitInput ? unitInput.value.trim() : ''; // Get selected unit from selector
+            const ingredient = item.querySelector('.ingredient-name-input').value.trim();
             
             // Only add ingredients that have at least an ingredient name
-            // Quantity and unit are optional (some ingredients like "salt to taste" don't need quantity)
             if (ingredient) {
                 ingredients.push({
-                    quantity: quantity || '',    // Default to empty string if no quantity
-                    unit: unit || '',           // Default to empty string if no unit
-                    ingredient: ingredient      // Ingredient name is required
+                    quantity: quantity || '',
+                    unit: unit || '',
+                    ingredient: ingredient
                 });
             }
         });
