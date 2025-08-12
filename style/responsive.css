@@ -99,7 +99,7 @@ BREAKPOINTS:
         flex-direction: row; /* Keep horizontal layout */
         gap: 6px; /* Smaller gap between buttons */
         padding: 8px 16px; /* Better padding for mobile */
-        top: -45px; /* Position above the book with proper clearance */
+        top: -40px; /* Position above the book with proper clearance */
         /* Make the container fit mobile screens properly */
         max-width: 99%; /* Slightly smaller to ensure it fits */
         left: 50%; /* Center the container */
