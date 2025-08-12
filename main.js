@@ -249,6 +249,7 @@ function loadRecipe(index) {
     }
     // NEW: Ensure navigation button text is correct for current screen size
     updateNavigationButtonText();
+    updateMobileContextMenuForAdmin();
 }
 
 
@@ -284,6 +285,9 @@ function updateNavigationButtonText() {
 
     //edit button
     const editBtn = document.getElementById('editBtn');
+
+    //backup button
+    const backupBtn = document.getElementById('backupBtn');
     
     if (prevBtn && nextBtn) {
         const screenWidth = window.innerWidth;
@@ -315,6 +319,9 @@ function updateNavigationButtonText() {
             }
             if (editBtn) {
                 editBtn.textContent = '✏️';
+            }
+            if (backupBtn) {
+                backupBtn.textContent = '💾';
             }
             
             console.log(`📱 Small screen detected (${screenWidth}px) - Using compact text for all buttons`);
@@ -1747,6 +1754,7 @@ function handleAdminLogin(event) {
         // Login successful - close modal and clear form
         closeAdminModal();
         console.log('Admin login successful');
+        updateMobileContextMenuForAdmin();
     } else {
         // Login failed - show error message
         if (errorMessage) {

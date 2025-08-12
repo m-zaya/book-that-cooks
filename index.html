@@ -330,7 +330,24 @@ RESPONSIVE DESIGN:
                         <input type="text" id="newRecipeTags" class="form-input" placeholder="Tags (comma-separated, e.g., Dessert, Baking, Sweet)">
                     </div>
                 </div>
-            </div>
+                <!-- Mobile context menu - positioned absolutely within the page -->
+                <div class="mobile-context-menu" id="mobileContextMenu">
+                    <button class="context-menu-trigger" id="contextMenuTrigger" aria-label="Recipe options menu">
+                        ⋯
+                    </button>
+                    <div class="context-menu-dropdown" id="contextMenuDropdown">
+                        <button class="context-menu-item edit" id="mobileEditBtn">
+                            <span class="icon">✏️</span>
+                            <span>Edit Recipe</span>
+                        </button>
+                        <div class="context-menu-divider"></div>
+                        <button class="context-menu-item delete" id="mobileDeleteBtn">
+                            <span class="icon">🗑️</span>
+                            <span>Delete Recipe</span>
+                        </button>
+                    </div>
+                </div>
+            </div> <!-- This closes page-left -->
             
             <!-- RIGHT PAGE - Contains ingredients and instructions OR TOC results OR new recipe form -->
             <div class="page page-right">
@@ -598,7 +615,10 @@ RESPONSIVE DESIGN:
                 🗑️
             </button>
         </div>
-    </div>
+    </div> <!-- This closes the book-container div -->
+
+    <!-- Overlay for click-outside-to-close functionality -->
+    <div class="context-menu-overlay" id="contextMenuOverlay"></div>
 
     <!-- Admin Login Modal - Hidden by default -->
     <div id="adminLoginModal" class="admin-modal hidden">
@@ -638,5 +658,6 @@ RESPONSIVE DESIGN:
     <!-- Backup -->
     <script src="supabase-backup.js"></script>
     <script src="main.js"></script>
+    <script src="mobile-context-menu.js"></script>
 </body>
 </html>

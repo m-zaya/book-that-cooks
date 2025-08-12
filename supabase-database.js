@@ -605,6 +605,7 @@ function logoutAdmin() {
     
     // Update UI to hide admin features
     updateAdminUI();
+    updateMobileContextMenuForAdmin();
 }
 
 /**

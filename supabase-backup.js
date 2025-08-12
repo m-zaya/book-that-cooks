@@ -712,7 +712,7 @@ function addBackupControls() {
     backupControls.innerHTML = `
         <button class="backup-close-btn" onclick="hideBackupPanel()" title="Close backup panel">&times;</button>
         
-        <h3>🗄️ Database Backup</h3>
+        <h3>💾 Database Backup</h3>
         
         <div class="backup-buttons">
             <button class="backup-btn full-backup" onclick="backupAllRecipesToAirtable()" 
@@ -747,10 +747,11 @@ function addBackupControls() {
     if (headerButtons) {
         const toggleButton = document.createElement('button');
         toggleButton.className = 'backup-toggle-btn admin-only backup-toggle';
+        toggleButton.id = 'backupBtn';
         toggleButton.onclick = showBackupPanel;
         toggleButton.title = 'Open backup panel';
         toggleButton.innerHTML = `
-            <span>🗄️</span>
+            <span>💾</span>
             <span>Backup</span>
         `;
         
