@@ -116,26 +116,26 @@ RESPONSIVE DESIGN:
         <!-- Header buttons for navigation - replaces dropdown selector -->
         <div class="header-buttons">
             <!-- Table of Contents button - shows recipe index with thumbnails -->
-            <button class="header-btn toc" onclick="showTableOfContents()">
+            <button id="tocBtn" class="header-btn toc" onclick="showTableOfContents()">
                 <span>📚</span>
                 <span>Table of Contents</span>
             </button>
             
             <!-- Random Recipe button - selects and displays a random recipe -->
-            <button class="header-btn random" onclick="showRandomRecipe()">
+            <button id="randomBtn" class="header-btn random" onclick="showRandomRecipe()">
                 <span>🎲</span>
                 <span>Random Recipe</span>
             </button>
             
             <!-- New Recipe button - opens form to create a new recipe -->
             <!-- (admin only) -->
-            <button class="header-btn new admin-only" onclick="showNewRecipeForm()">
+            <button id="newBtn" class="header-btn new admin-only" onclick="showNewRecipeForm()">
                 <span>➕</span>
                 <span>New Recipe</span>
             </button>
     
             <!-- Admin login/logout button -->
-            <button class="header-btn admin" id="adminLoginButton" onclick="handleAdminClick()" title="Admin login">
+            <button id ="adminLogin" class="header-btn admin" id="adminLoginButton" onclick="handleAdminClick()" title="Admin login">
                 <span>🔐</span>
                 <span>Admin</span>
             </button>
@@ -583,16 +583,15 @@ RESPONSIVE DESIGN:
         </div>
         
         <!-- Navigation controls below the book -->
-         <!-- With data-mobile-text attribute -->
         <div class="nav-controls">
-            <button class="nav-btn" onclick="previousRecipe()" data-mobile-text="← Prev">← Previous</button>
+            <button id="prevBtn" class="nav-btn" onclick="previousRecipe()">← Previous</button>
             <span id="recipeCounter">1 of 3</span>
-            <button class="nav-btn" onclick="nextRecipe()" data-mobile-text="Next →">Next →</button>
+            <button id="nextBtn" class="nav-btn" onclick="nextRecipe()">Next →</button>
         </div>
 
         <!-- Admin recipe controls - positioned bottom right -->
         <div class="admin-recipe-controls admin-only">
-            <button class="edit-recipe-btn" onclick="editCurrentRecipe()" title="Edit this recipe">
+            <button id="editBtn" class="edit-recipe-btn" onclick="editCurrentRecipe()" title="Edit this recipe">
                 EDIT RECIPE
             </button>
             <button class="delete-recipe-btn" onclick="deleteCurrentRecipe()" title="Delete this recipe">

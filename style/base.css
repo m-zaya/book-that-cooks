@@ -37,7 +37,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 10px;
     perspective: 1200px;
 }
 
@@ -46,4 +46,6 @@ body {
     width: 90%;
     height: 80vh;
     min-height: 650px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

@@ -247,6 +247,8 @@ function loadRecipe(index) {
             console.log('✅ Admin controls enabled for loaded recipe');
         }
     }
+    // NEW: Ensure navigation button text is correct for current screen size
+    updateNavigationButtonText();
 }
 
 
@@ -264,6 +266,83 @@ function updateRecipeTags(tags) {
         tagElement.textContent = tag;
         tagsContainer.appendChild(tagElement);
     });
+}
+
+/**
+ * Updates navigation button text based on screen size
+ */
+function updateNavigationButtonText() {
+    // Navigation buttons 
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    // Header buttons (NEW)
+    const tocBtn = document.getElementById('tocBtn');
+    const randomBtn = document.getElementById('randomBtn'); 
+    const newBtn = document.getElementById('newBtn');
+    const adminLogin = document.getElementById('adminLogin');
+
+    //edit button
+    const editBtn = document.getElementById('editBtn');
+    
+    if (prevBtn && nextBtn) {
+        const screenWidth = window.innerWidth;
+        const SMALL_SCREEN_BREAKPOINT = 480; // Phone-sized screens
+        
+        if (screenWidth <= SMALL_SCREEN_BREAKPOINT) {
+            // PHONES: Compact text for navigation
+            prevBtn.textContent = '← Prev';
+            nextBtn.textContent = 'Next →';
+            
+            // PHONES: Remove text from header buttons (icon only)
+            if (tocBtn) {
+                const textSpan = tocBtn.querySelector('span:last-child');
+                if (textSpan) textSpan.textContent = '';
+            }
+            
+            if (randomBtn) {
+                const textSpan = randomBtn.querySelector('span:last-child');
+                if (textSpan) textSpan.textContent = '';
+            }
+            
+            if (newBtn) {
+                const textSpan = newBtn.querySelector('span:last-child');
+                if (textSpan) textSpan.textContent = '';
+            }
+            if (adminLogin) {
+                const textSpan = adminLogin.querySelector('span:last-child');
+                if (textSpan) textSpan.textContent = '';
+            }
+            if (editBtn) {
+                editBtn.textContent = '✏️';
+            }
+            
+            console.log(`📱 Small screen detected (${screenWidth}px) - Using compact text for all buttons`);
+            
+        } else {
+            // TABLETS & DESKTOP: Full text for everything
+            prevBtn.textContent = '← Previous';
+            nextBtn.textContent = 'Next →';
+            
+            // Restore full text for header buttons
+            if (tocBtn) {
+                const textSpan = tocBtn.querySelector('span:last-child');
+                if (textSpan) textSpan.textContent = 'Table of Contents';
+            }
+            
+            if (randomBtn) {
+                const textSpan = randomBtn.querySelector('span:last-child');
+                if (textSpan) textSpan.textContent = 'Random Recipe';
+            }
+            
+            if (newBtn) {
+                const textSpan = newBtn.querySelector('span:last-child');
+                if (textSpan) textSpan.textContent = 'New Recipe';
+            }
+            
+            console.log(`🖥️ Medium/Large screen detected (${screenWidth}px) - Using full text for all buttons`);
+        }
+    }
 }
 
 /**
@@ -2366,7 +2445,20 @@ function setupEventListeners() {
     });
     
     console.log('✅ Enhanced event listeners setup with admin control management');
+
+    // NEW: Add resize listener for navigation button text
+        window.addEventListener('resize', function() {
+        clearTimeout(window.navTextUpdateTimer);
+        window.navTextUpdateTimer = setTimeout(updateNavigationButtonText, 100);
+    });
+    
+    // NEW: Update text on initial load
+    updateNavigationButtonText();
+    
+    console.log('✅ Enhanced event listeners setup with navigation text management');
 }
+
+
 
 // =============================================================================
 // NOTE: This initializeApp function is now called by supabase-database.js

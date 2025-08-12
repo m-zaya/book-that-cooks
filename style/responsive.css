@@ -36,9 +36,9 @@ BREAKPOINTS:
    @media (max-width: 768px) {
     /* Main container adaptations */
     .book-container {
-        height: 75vh;     /* ← SHORTER (was 90vh) */
-        width: 98%;       /* ← WIDER (was 95%) */
-        padding-top: 60px; /* Add top padding to accommodate header buttons */
+        height: 100%;     /* ← SHORTER (was 90vh) */
+        width: 99%;       /* ← WIDER (was 95%) */
+        padding-top: 10vh; /* Add top padding to accommodate header buttons */
         padding-bottom: 80px; /* Add bottom padding for navigation controls */
     }
     
@@ -99,16 +99,17 @@ BREAKPOINTS:
         flex-direction: row; /* Keep horizontal layout */
         gap: 6px; /* Smaller gap between buttons */
         padding: 8px 16px; /* Better padding for mobile */
-        top: -45px; /* Position above the book with proper clearance */
+        top: -50px; /* Position above the book with proper clearance */
         /* Make the container fit mobile screens properly */
-        max-width: 85vw; /* Slightly smaller to ensure it fits */
+        max-width: 99%; /* Slightly smaller to ensure it fits */
         left: 50%; /* Center the container */
         transform: translateX(-50%); /* Perfect centering */
         box-sizing: border-box; /* Include padding in width calculation */
+
     }
     
     .header-btn {
-        padding: 8px 12px; /* Better padding for mobile touch targets */
+        padding: 8px 15px; /* Better padding for mobile touch targets */
         font-size: 0.75em; /* Slightly larger font for readability */
         justify-content: center;
         /* Make buttons more compact but still usable */
@@ -118,18 +119,7 @@ BREAKPOINTS:
         border-radius: 16px; /* Smaller border radius for mobile */
     }
     
-    /* Keep text visible but make it shorter on mobile */
-    .header-btn.toc span:last-child {
-        content: "TOC"; /* Shorter text */
-    }
-    
-    .header-btn.random span:last-child {
-        content: "Random"; /* Keep as is */
-    }
-    
-    .header-btn.new span:last-child {
-        content: "New"; /* Shorter text */
-    }
+
 
     /* =============================================================================
        RECIPE DISPLAY MOBILE ADAPTATIONS
@@ -146,47 +136,48 @@ BREAKPOINTS:
     
   
     .nav-controls {
-        bottom: -60px;
-        padding: 15px 25px;     /* Your updated padding */
-        gap: 20px;              /* Your updated gap */
+        bottom: -50px;
+        padding: 10px 20px;         /* Slightly less horizontal padding */
+        gap: 15px;                  /* Moderate gap between elements */
         border-radius: 25px;
         box-shadow: 0 3px 10px rgba(0,0,0,0.25);
         background: rgba(255,255,255,0.95);
         backdrop-filter: blur(8px);
-        min-width: 280px;       /* Your updated min-width */
+        min-width: 300px;           /* Ensure container is wide enough */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
     
     .nav-btn {
-        padding: 12px 20px;     /* Your updated padding */
-        font-size: 0.9em;       /* Your updated font size */
+        padding: 10px 10px;         /* TALLER but NARROWER */
+        font-size: 0.85em;
         border-radius: 18px;
-        min-width: 100px;       /* Your updated min-width */
+        min-width: 75px;            /* NARROWER to save space */
+        height: 44px;               /* EXPLICIT HEIGHT for touch targets */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;             /* Prevent shrinking */
     }
     
-    /* NEW: Mobile text replacement */
-    .nav-btn[data-mobile-text] {
-        font-size: 0; /* Hide original text */
-    }
     
-    .nav-btn[data-mobile-text]::before {
-        content: attr(data-mobile-text); /* Show mobile text */
-        font-size: 0.85em; /* Restore font size for mobile text */
-        font-weight: bold;
-    }
-    
+    /* EXPANDED: Counter for triple digits */
     #recipeCounter {
-        font-size: 0.95em;
+        font-size: 0.9em;           
         font-weight: bold;
         color: #8B4513;
-        padding: 0 12px;
-        min-width: 60px;
+        padding: 0 16px;            /* MORE horizontal padding */
+        min-width: 90px;            /* WIDER to fit "999 of 999" */
         text-align: center;
+        flex-grow: 1;               /* Take remaining space */
+        white-space: nowrap;        /* Keep on one line */
     }
 
 
     /* Mobile positioning for admin recipe controls */
     .admin-recipe-controls {
-        bottom: -60px; /* Same as nav controls */
+        bottom: 25px; /* Same as nav controls */
         right: 5%; /* Slightly more inset on mobile */
         gap: 8px; /* Smaller gap on mobile */
     }
