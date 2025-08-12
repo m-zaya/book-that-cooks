@@ -45,7 +45,5 @@ body {
     position: relative;
     width: 90%;
     height: 80vh;
-    min-height: 650px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    min-height: 600px;
 }
