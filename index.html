@@ -583,10 +583,11 @@ RESPONSIVE DESIGN:
         </div>
         
         <!-- Navigation controls below the book -->
+         <!-- With data-mobile-text attribute -->
         <div class="nav-controls">
-            <button class="nav-btn" onclick="previousRecipe()">← Previous</button>
+            <button class="nav-btn" onclick="previousRecipe()" data-mobile-text="← Prev">← Previous</button>
             <span id="recipeCounter">1 of 3</span>
-            <button class="nav-btn" onclick="nextRecipe()">Next →</button>
+            <button class="nav-btn" onclick="nextRecipe()" data-mobile-text="Next →">Next →</button>
         </div>
 
         <!-- Admin recipe controls - positioned bottom right -->
